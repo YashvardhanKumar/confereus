@@ -30,9 +30,11 @@ class _CustomFilledButtonState extends State<CustomFilledButton> {
         borderRadius: BorderRadius.circular(5),
       ),
       clipBehavior: Clip.hardEdge,
-      color: kColorDark,
+      color: (widget.onPressed != null) ? kColorDark : kColorDark.withOpacity(0.3),
       child: InkWell(
-        onTap: widget.onPressed!,
+        splashColor: kColorLight.withOpacity(0.7),
+        highlightColor: kColorLight.withOpacity(0.7),
+        onTap: widget.onPressed,
         child: Container(
           // margin: const EdgeInsets.all(10),
           height: widget.height ?? 55,

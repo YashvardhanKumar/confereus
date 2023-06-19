@@ -1,9 +1,0 @@
-{
-    "appId": "confereus-xrcwf",
-    "appUrl": "https://realm.mongodb.com/groups/6479a00c7e0340783ad2e1c4/apps/6484f01487fee9d3e95a3eef",
-    "baseUrl": "https://realm.mongodb.com",
-    "clientApiBaseUrl": "https://asia-south1.gcp.realm.mongodb.com",
-    "dataApiBaseUrl": "https://asia-south1.gcp.data.mongodb-api.com",
-    "dataExplorerLink": "https://cloud.mongodb.com/links/6479a00c7e0340783ad2e1c4/explorer/confereusauth/database/collection/find",
-    "dataSourceName": "mongodb-atlas"
-}

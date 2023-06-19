@@ -12,7 +12,7 @@ class CustomTextFormField extends StatefulWidget {
     this.keyboardType,
     this.suffix,
     this.onTap,
-    this.enabled = true,
+    this.enabled = true, this.minLines, this.maxLines,
   }) : super(key: key);
   final Widget? suffix;
   final String label;
@@ -23,7 +23,7 @@ class CustomTextFormField extends StatefulWidget {
   final TextInputType? keyboardType;
   final VoidCallback? onTap;
   final bool enabled;
-
+  final int? minLines, maxLines;
   @override
   State<CustomTextFormField> createState() => _CustomTextFormFieldState();
 }
@@ -52,6 +52,8 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           obscureText: widget.isPassword && !isVisible,
           keyboardType: widget.keyboardType,
           validator: widget.validator,
+          minLines: widget.minLines,
+          maxLines: widget.maxLines ?? widget.minLines ?? 1,
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,

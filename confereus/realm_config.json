@@ -1,8 +1,0 @@
-{
-    "app_id": "confereus-rhydk",
-    "config_version": 20210101,
-    "name": "confereus",
-    "location": "IN-MB",
-    "provider_region": "gcp-asia-south1",
-    "deployment_model": "LOCAL"
-}

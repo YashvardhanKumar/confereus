@@ -37,40 +37,48 @@
 // }
 
 import 'dart:convert';
+import 'dart:io';
 
-import 'package:bcrypt/bcrypt.dart';
-import 'package:confereus/models/user%20model/user_model.dart';
-import 'package:confereus/routes/otp_page.dart';
+import 'package:confereus/routes/add_about_you_page.dart';
+import 'package:confereus/routes/auth/otp_page.dart';
+import 'package:confereus/sign_up_APIs/email_and_password/login.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:realm/realm.dart';
-import 'package:web_socket_channel/io.dart';
 import 'package:http/http.dart' as http;
+import 'package:web_socket_channel/io.dart';
 
 import '../../constants.dart';
+
 // final config = Configuration.flexibleSync(,[Users.schema]);
 // final realm = Realm(config);
 
-Future<IOWebSocketChannel?> signUp(BuildContext context, String _mail, String _name,
-    DateTime _dob, String _cpwd) async {
-  Map<String,dynamic> reqBody = {
+Future<String?> signUp(BuildContext context, String _mail,
+    String _name, DateTime _dob, String _cpwd) async {
+  Map<String, dynamic> reqBody = {
     "name": _name,
     "email": _mail,
     "password": _cpwd,
-  "dob": _dob,
+    "dob": _dob,
   };
-  var res = await http.post(Uri.parse(signup),
-  headers: {
-    "Content-Type": "application/json"
-  },
-    body: jsonEncode(reqBody),
-  );
-  var jsonResp = jsonDecode(res.body);
-  if(jsonResp['status']){
-
-  }else {
-    print("Something Went Wrong");
-
+  HttpClient client = HttpClient();
+  HttpClientRequest request = await client.postUrl(Uri.parse(signupRoute));
+  request.headers.contentType = ContentType.json;
+  request.add(utf8.encode(jsonEncode(reqBody)));
+  HttpClientResponse res = await request.close();
+  var data = jsonDecode(await res.transform(utf8.decoder).join());
+  // var res = await http.post(
+  //   Uri.parse(signupRoute),
+  //   headers: {"Content-Type": "application/json"},
+  //   body: jsonEncode(reqBody),
+  // );
+  // var jsonResp = jsonDecode(res.body);
+  if (data['status']) {
+    await storage.write('token', data['token']);
+    await storage.write('isLoggedIn', true);
+    await storage.write('auth_provider', 'email_login');
+    updateCookie(res);
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => OTPPage(email: _mail)));
+  } else {
+    return data['success'];
   }
   // User
   // Check if email is valid.

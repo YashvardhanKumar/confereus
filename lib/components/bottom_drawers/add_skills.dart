@@ -2,9 +2,7 @@ import 'package:confereus/components/button/filled_button.dart';
 import 'package:confereus/components/input_fields/text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 
-import '../../constants.dart';
 import '../input_fields/dropdown_text_field.dart';
 
 void addSkills(BuildContext context) {

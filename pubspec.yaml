@@ -40,10 +40,13 @@ dependencies:
   google_nav_bar: ^5.0.6
   web_socket_channel: ^2.4.0
   get_storage: ^2.1.1
-  realm: ^1.2.0
   bcrypt: ^1.1.3
   mailer: ^6.0.1
   http: ^0.13.6
+  jwt_decoder: ^2.0.1
+  flutter_secure_storage: ^8.0.0
+  provider: ^6.0.5
+  linkedin_login: ^2.2.1
 
 dev_dependencies:
   flutter_test:
@@ -70,7 +73,18 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - images/
-    - assets/config/
+
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: fonts/Poppins/Poppins-Regular.ttf
+        - asset: fonts/Poppins/Poppins-Medium.ttf
+        - asset: fonts/Poppins/Poppins-SemiBold.ttf
+        - asset: fonts/Poppins/Poppins-Bold.ttf
+
+    - family: CustomIcon
+      fonts:
+        - asset: fonts/CustomIcon.ttf
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

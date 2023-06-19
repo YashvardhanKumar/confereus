@@ -4,13 +4,20 @@ import 'package:confereus/components/bottom_drawers/add_work_experience.dart';
 import 'package:confereus/components/button/add_button.dart';
 import 'package:confereus/components/button/filled_button.dart';
 import 'package:confereus/constants.dart';
+import 'package:confereus/main.dart';
 import 'package:confereus/routes/main_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+// import 'package:realm/realm.dart';
 
 import '../components/tiles/education_tile.dart';
 import '../components/tiles/skill_tile.dart';
 import '../components/tiles/work_experience_tile.dart';
+// Credentials credentials = Credentials.anonymous();
+//
+// final configRealm = Configuration.flexibleSync(credentials, schemaObjects)
+// final realm = Realm(config);
 
 class AddAboutYou extends StatefulWidget {
   const AddAboutYou({Key? key}) : super(key: key);
@@ -57,7 +64,7 @@ class _AddAboutYouState extends State<AddAboutYou> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Divider(),
+                    const Divider(),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -102,14 +109,14 @@ class _AddAboutYouState extends State<AddAboutYou> {
                     ),
                   ],
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 AddButton(
                   text: 'Add Work Experience',
                   onPressed: () => addWorkExperience(context),
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -120,7 +127,7 @@ class _AddAboutYouState extends State<AddAboutYou> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Divider(),
+                    const Divider(),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -169,7 +176,7 @@ class _AddAboutYouState extends State<AddAboutYou> {
                     ),
                   ],
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 AddButton(
@@ -178,7 +185,7 @@ class _AddAboutYouState extends State<AddAboutYou> {
                     addEducation(context);
                   },
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 Column(
@@ -191,8 +198,8 @@ class _AddAboutYouState extends State<AddAboutYou> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Divider(),
-                    Column(
+                    const Divider(),
+                    const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Text(
@@ -203,17 +210,17 @@ class _AddAboutYouState extends State<AddAboutYou> {
                         //   ),
                         // ),
                         Padding(
-                          padding: const EdgeInsets.all(10.0),
+                          padding: EdgeInsets.all(10.0),
                           child: SkillTile(
                               skill: 'Flutter', expertise: 'Advanced'),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(10.0),
+                          padding: EdgeInsets.all(10.0),
                           child: SkillTile(
                               skill: 'Firebase', expertise: 'Advanced'),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(10.0),
+                          padding: EdgeInsets.all(10.0),
                           child: SkillTile(
                               skill: 'Web Development',
                               expertise: 'Intermediate'),
@@ -222,7 +229,7 @@ class _AddAboutYouState extends State<AddAboutYou> {
                     ),
                   ],
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 AddButton(
@@ -243,8 +250,14 @@ class _AddAboutYouState extends State<AddAboutYou> {
             while (Navigator.canPop(context)) {
               Navigator.pop(context);
             }
+            final data = JwtDecoder.tryDecode(storage.read('token'));
+            if(data == null) {
+              storage.write('token', null);
+              Navigator.pushReplacement(
+                  context, MaterialPageRoute(builder: (_) => const LogoPage(needsLogin: true,)));
+            }
             Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (_) => MainPage()));
+                context, MaterialPageRoute(builder: (_) => MainPage(email: data!['email'],)));
           },
           child: Text(
             'Continue',
