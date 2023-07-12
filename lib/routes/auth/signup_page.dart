@@ -1,8 +1,10 @@
 
-import 'package:confereus/sign_up_APIs/email_and_password/sign_up.dart';
+import 'package:confereus/API/user_api.dart';
+import 'package:confereus/models/user%20model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../components/button/filled_button.dart';
 import '../../components/input_fields/text_form_field.dart';
@@ -45,7 +47,7 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
               //       fontSize: 28, fontWeight: FontWeight.w500),
               //   textAlign: TextAlign.center,
               // ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               CustomTextFormField(
@@ -63,7 +65,7 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
                   return errorText;
                 },
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               CustomTextFormField(
@@ -76,7 +78,7 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
                   return null;
                 },
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               CustomTextFormField(
@@ -86,6 +88,13 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Date of Birth is Required';
+                  }
+                  try {
+                    final data = DateFormat('dd/MM/yyyy').parseStrict(value);
+                    date = date?.copyWith(hour: data.hour,minute: data.minute);
+
+                  } catch (e) {
+                    return 'Invalid Format';
                   }
                   return null;
                 },
@@ -108,7 +117,7 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
                   },
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               CustomTextFormField(
@@ -124,7 +133,7 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
                   return null;
                 },
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               CustomTextFormField(
@@ -140,7 +149,7 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
                   return null;
                 },
               ),
-              SizedBox(
+              const SizedBox(
                 height: 30,
               ),
               CustomFilledButton(
@@ -149,17 +158,13 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
                   errorText = null;
                   setState(() {});
                   if (_formKey.currentState!.validate()) {
-                    await signUp(
+                    Users user = Users(id: "", email: emailCtrl.text, name: nameCtrl.text, dob: date!, emailVerified: false, provider: "email_login", password: passwordCtrl.text);
+                    await Provider.of<UserAPI>(context).signUp(
                       context,
-                      emailCtrl.text,
-                      nameCtrl.text,
-                      date!,
-                      passwordCtrl.text,
+                      user
                     ).then((value) {
-                      print(value);
                           errorText = value;
                         setState(() {});
-                        print(errorText);
                       // });
                     });
                     if (!_formKey.currentState!.validate()) {

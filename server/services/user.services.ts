@@ -7,7 +7,8 @@ class UserService {
         try {
 
             const createUser = new User({ name, email, password, dob, provider: 'email_login' });
-            return await createUser.save();
+            await createUser.save();
+            return createUser;
         } catch (error) {
             throw error;
         }
@@ -17,7 +18,6 @@ class UserService {
         try {
 
             const createUser = new User({ name, email, password, dob })
-
         } catch (error) {
             throw error;
         }
@@ -53,13 +53,14 @@ class UserService {
         }
     }
 
-    static verifyToken(token: string) {
+    static verifyToken(token: string, onError: Function = () => {}) {
         
         const publicKey = fs.readFileSync(path.join(__dirname, '..','keys', 'rsa.key.pub'), 'utf8');
         try {
             return jwt.verify(token, publicKey, { algorithms: ['RS256']});
         } catch (err) {
             console.log(err);
+            onError();
             return null;
         }
     }

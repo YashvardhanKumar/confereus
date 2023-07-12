@@ -1,19 +1,20 @@
 import 'dart:async';
 
+import 'package:confereus/API/user_api.dart';
 import 'package:confereus/constants.dart';
 import 'package:confereus/main.dart';
-import 'package:confereus/sign_up_APIs/email_and_password/verify_email.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../components/button/text_button.dart';
+import '../../models/user model/user_model.dart';
 import '../../provider/login_status_provider.dart';
 
 class OTPPage extends StatefulWidget {
-  const OTPPage({Key? key, required this.email}) : super(key: key);
-  final String email;
+  const OTPPage({Key? key, required this.user}) : super(key: key);
+  final Users user;
 
   @override
   State<OTPPage> createState() => _OTPPageState();
@@ -35,7 +36,7 @@ class _OTPPageState extends State<OTPPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    sendMail(widget.email).then((sent) {
+    Provider.of<UserAPI>(context,listen: false).sendMail(widget.user.email).then((sent) {
       isSent = sent;
       // _channel = channel;
       setState(() {});
@@ -114,194 +115,9 @@ class _OTPPageState extends State<OTPPage> {
                           continueFunction();
                           return;
                         }
-                        print('1 : ${controllers[0].text}');
-                        print('2 : ${controllers[1].text}');
-                        print('3 : ${controllers[2].text}');
-                        print('4 : ${controllers[3].text}');
-                        print('5 : ${controllers[4].text}');
-                        print('6 : ${controllers[5].text}');
                       },
                     ),
                   ),
-                  // [
-                  // Flexible(
-                  //   child: OTPBox(
-                  //     controller: controllers[0],
-                  //     focusNode: focusNode[0],
-                  //     onChanged: (value) {
-                  //       if (value.isNotEmpty) {
-                  //         c1.text = value.characters.first;
-                  //         if (c2.text.isEmpty &&
-                  //             c3.text.isEmpty &&
-                  //             c4.text.isEmpty &&
-                  //             c5.text.isEmpty &&
-                  //             c6.text.isEmpty) {
-                  //           errorText = null;
-                  //           setState(() {});
-                  //         }
-                  //         if (value.length >= 2) {
-                  //           c2.text = value.characters.elementAt(1);
-                  //         }
-                  //         focusNode2.requestFocus();
-                  //       } else {
-                  //         c1.text = '';
-                  //         focusNode1.unfocus();
-                  //       }
-                  //       setState(() {});
-                  //     },
-                  //   ),
-                  //   // child: TextFormField(
-                  //   //   // controller: widget.controller,
-                  //   //   cursorColor: Colors.black,
-                  //   //   // obscureText: widget.isPassword && !isVisible,
-                  //   //   // keyboardType: widget.keyboardType,
-                  //   //   // validator: widget.validator,
-                  //   //   decoration: InputDecoration(
-                  //   //     isCollapsed: true,
-                  //   //     contentPadding: const EdgeInsets.all(12),
-                  //   //     border: OutlineInputBorder(
-                  //   //       borderSide: const BorderSide(color: Colors.black),
-                  //   //       borderRadius: BorderRadius.circular(5),
-                  //   //     ),
-                  //   //     enabledBorder: OutlineInputBorder(
-                  //   //       borderSide: const BorderSide(color: Colors.black),
-                  //   //       borderRadius: BorderRadius.circular(5),
-                  //   //     ),
-                  //   //     focusedBorder: OutlineInputBorder(
-                  //   //       borderSide: const BorderSide(color: Colors.black, width: 2),
-                  //   //       borderRadius: BorderRadius.circular(5),
-                  //   //     ),
-                  //   //   ),
-                  //   // ),
-                  // ),
-                  //   Flexible(
-                  //     child: OTPBox(
-                  //       controller: c2,
-                  //       focusNode: focusNode2,
-                  //       onChanged: (value) {
-                  //         if (value.isNotEmpty) {
-                  //           c2.text = value.characters.first;
-                  //           if (c1.text.isEmpty &&
-                  //               c3.text.isEmpty &&
-                  //               c4.text.isEmpty &&
-                  //               c5.text.isEmpty &&
-                  //               c6.text.isEmpty) {
-                  //             errorText = null;
-                  //             setState(() {});
-                  //           }
-                  //           if (value.length == 2) {
-                  //             c3.text = value.characters.last;
-                  //           }
-                  //           focusNode3.requestFocus();
-                  //         } else {
-                  //           c2.text = '';
-                  //           focusNode1.requestFocus();
-                  //         }
-                  //         setState(() {});
-                  //       },
-                  //     ),
-                  //   ),
-                  //   Flexible(
-                  //     child: OTPBox(
-                  //       controller: c3,
-                  //       focusNode: focusNode3,
-                  //       onChanged: (value) {
-                  //         if (value.isNotEmpty) {
-                  //           c3.text = value.characters.first;
-                  //           if (c2.text.isEmpty &&
-                  //               c1.text.isEmpty &&
-                  //               c4.text.isEmpty &&
-                  //               c5.text.isEmpty &&
-                  //               c6.text.isEmpty) {
-                  //             errorText = null;
-                  //             setState(() {});
-                  //           }
-                  //           if (value.length == 2) {
-                  //             c4.text = value.characters.last;
-                  //           }
-                  //           focusNode4.requestFocus();
-                  //         } else {
-                  //           c3.text = '';
-                  //           focusNode2.requestFocus();
-                  //         }
-                  //         setState(() {});
-                  //       },
-                  //     ),
-                  //   ),
-                  //   Flexible(
-                  //     child: OTPBox(
-                  //       controller: c4,
-                  //       focusNode: focusNode4,
-                  //       onChanged: (value) {
-                  //         if (value.isNotEmpty) {
-                  //           c4.text = value.characters.first;
-                  //           if (c2.text.isEmpty &&
-                  //               c3.text.isEmpty &&
-                  //               c1.text.isEmpty &&
-                  //               c5.text.isEmpty &&
-                  //               c6.text.isEmpty) {
-                  //             errorText = null;
-                  //             setState(() {});
-                  //           }
-                  //           if (value.length == 2) {
-                  //             c5.text = value.characters.last;
-                  //           }
-                  //           focusNode5.requestFocus();
-                  //         } else {
-                  //           c4.text = '';
-                  //           focusNode3.requestFocus();
-                  //         }
-                  //         setState(() {});
-                  //       },
-                  //     ),
-                  //   ),
-                  //   Flexible(
-                  //     child: OTPBox(
-                  //       controller: c5,
-                  //       focusNode: focusNode5,
-                  //       onChanged: (value) {
-                  //         if (value.isNotEmpty) {
-                  //           c5.text = value.characters.first;
-                  //           if (c2.text.isEmpty &&
-                  //               c3.text.isEmpty &&
-                  //               c4.text.isEmpty &&
-                  //               c1.text.isEmpty &&
-                  //               c6.text.isEmpty) {
-                  //             errorText = null;
-                  //             setState(() {});
-                  //           }
-                  //           if (value.length == 2) {
-                  //             c6.text = value.characters.last;
-                  //             continueFunction();
-                  //           }
-                  //           focusNode6.requestFocus();
-                  //         } else {
-                  //           c5.text = '';
-                  //           focusNode4.requestFocus();
-                  //         }
-                  //         setState(() {});
-                  //       },
-                  //     ),
-                  //   ),
-                  //   Flexible(
-                  //     child: OTPBox(
-                  //       controller: c6,
-                  //       focusNode: focusNode6,
-                  //       onChanged: (value) {
-                  //         if (value.isNotEmpty) {
-                  //           c6.text = value.characters.first;
-                  //           setState(() {});
-                  //           focusNode6.unfocus();
-                  //           continueFunction();
-                  //         } else {
-                  //           c6.text = '';
-                  //           focusNode5.requestFocus();
-                  //           setState(() {});
-                  //         }
-                  //       },
-                  //     ),
-                  //   ),
-                  //   ],
                 ),
               ),
             ),
@@ -312,19 +128,10 @@ class _OTPPageState extends State<OTPPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CustomTextButton(
-                    child: Text(
-                      'Resend?',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: kColorDark,
-                      ),
-                    ),
                     onPressed: (tick == null || tick != 0)
                         ? null
                         : () async {
-                            sendMail(widget.email).then((value) {
+                      await Provider.of<UserAPI>(context).sendMail(widget.user.email).then((value) {
                               // _channel = value;
                               setState(() {});
                               timer = Timer.periodic(const Duration(minutes: 2),
@@ -345,7 +152,16 @@ class _OTPPageState extends State<OTPPage> {
                               });
                             });
                             setState(() {});
-                          }),
+                          },
+                    child: Text(
+                      'Resend?',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: kColorDark,
+                      ),
+                    )),
                 const SizedBox(
                   width: 5,
                 ),
@@ -380,7 +196,6 @@ class _OTPPageState extends State<OTPPage> {
     //     c5.text.isNotEmpty) {
     //   String otp = c1.text + c2.text + c3.text + c4.text + c5.text + c6.text;
     // print(verifyOTP);
-    print(otp);
 
     // _channel?.stream.listen((event) async {
     //   event = event.replaceAll(RegExp("'"), '"');
@@ -391,7 +206,7 @@ class _OTPPageState extends State<OTPPage> {
     //   print(verify["otp"]);
     // Check if the status is succesfull
 
-    errorText = await verifyOTP(context, otp);
+    errorText = await Provider.of<UserAPI>(context).verifyOTP(context, otp,widget.user);
     setState(() {});
     if(errorText == "Login Needed") {
       Provider.of<LoginStatus>(context).clearData();
@@ -486,7 +301,6 @@ class OTPBox extends StatelessWidget {
           } else {
             FocusScope.of(context).previousFocus();
           }
-          print(controller.text);
           onChanged(value);
         },
       ),

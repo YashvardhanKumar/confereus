@@ -8,11 +8,12 @@ class CustomFilledButton extends StatefulWidget {
     required this.child,
     required this.onPressed,
     this.width,
-    this.height,
+    this.height, this.color,
   }) : super(key: key);
   final double? width, height;
   final Widget child;
   final VoidCallback? onPressed;
+  final Color? color;
 
   @override
   State<CustomFilledButton> createState() => _CustomFilledButtonState();
@@ -30,7 +31,7 @@ class _CustomFilledButtonState extends State<CustomFilledButton> {
         borderRadius: BorderRadius.circular(5),
       ),
       clipBehavior: Clip.hardEdge,
-      color: (widget.onPressed != null) ? kColorDark : kColorDark.withOpacity(0.3),
+      color: (widget.onPressed != null) ? (widget.color ?? kColorDark) : kColorDark.withOpacity(0.3),
       child: InkWell(
         splashColor: kColorLight.withOpacity(0.7),
         highlightColor: kColorLight.withOpacity(0.7),
@@ -39,7 +40,7 @@ class _CustomFilledButtonState extends State<CustomFilledButton> {
           // margin: const EdgeInsets.all(10),
           height: widget.height ?? 55,
           alignment: Alignment.center,
-          width: double.infinity,
+          width: widget.width ?? double.infinity,
           // decoration: BoxDecoration(
           //   borderRadius: BorderRadius.circular(5),
           //   color: widget.onPressed == null

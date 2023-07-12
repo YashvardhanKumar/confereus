@@ -1,11 +1,16 @@
+import 'package:confereus/components/bottom_drawers/edit_skills.dart';
 import 'package:confereus/components/button/text_button.dart';
+import 'package:confereus/models/user%20model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
+import '../../API/user_profile_api.dart';
 
 class SkillTile extends StatelessWidget {
-  const SkillTile({Key? key, required this.skill, required this.expertise})
+  const SkillTile({Key? key, required this.data})
       : super(key: key);
-  final String skill, expertise;
+  final Skills data;
 
   @override
   Widget build(BuildContext context) {
@@ -17,43 +22,50 @@ class SkillTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                skill,
+                data.skill,
                 style: GoogleFonts.poppins(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 5,
               ),
               Text(
-                expertise,
+                data.expertise,
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w600,
-                  color: Color(0xff8B8B8B),
+                  color: const Color(0xff8B8B8B),
                 ),
               ),
             ],
           ),
         ),
-        Row(
-          children: [
-            CustomTextButton(
-              onPressed: () {},
-              child: Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: Icon(Icons.edit_rounded),
+        Consumer<UserProfileAPI>(builder: (context, userAPI, child) {
+          return Row(
+            children: [
+              CustomTextButton(
+                onPressed: () async {
+                  editSkills(context, data);
+                },
+                child: const Padding(
+                  padding: EdgeInsets.all(5.0),
+                  child: Icon(Icons.edit_rounded),
+                ),
               ),
-            ),
-            CustomTextButton(
-              child: Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: Icon(Icons.delete_forever_rounded),
+              CustomTextButton(
+                child: const Padding(
+                  padding: EdgeInsets.all(5.0),
+                  child: Icon(Icons.delete_forever_rounded),
+                ),
+                onPressed: () async {
+                  await userAPI.deleteSkills(context, data.id);
+
+                },
               ),
-              onPressed: () {},
-            ),
-          ],
-        ),
+            ],
+          );
+        }),
       ],
     );
   }

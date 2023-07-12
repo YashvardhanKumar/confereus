@@ -1,4 +1,3 @@
-import 'package:confereus/constants.dart';
 import 'package:confereus/secrets.dart';
 
 class LinkedInData {

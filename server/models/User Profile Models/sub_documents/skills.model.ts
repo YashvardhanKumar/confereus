@@ -5,7 +5,7 @@ export interface ISkills {
     expertise: string,
 }
 
-const SkillsSchema = new Schema<ISkills>({
+export const SkillsSchema = new Schema<ISkills>({
     skill: {
         type: String,
         required: true,

@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 
+import 'package:confereus/API/conference_api.dart';
+import 'package:confereus/API/http_client.dart';
+import 'package:confereus/API/user_api.dart';
+import 'package:confereus/API/user_profile_api.dart';
 import 'package:confereus/provider/login_status_provider.dart';
-import 'package:confereus/routes/add_about_you_page.dart';
-import 'package:confereus/sign_up_APIs/email_and_password/rebuild_token.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -19,7 +20,14 @@ void main() async {
   await GetStorage.init('user');
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => LoginStatus())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => LoginStatus()),
+        ChangeNotifierProvider(create: (_) => HTTPClientProvider()),
+        ChangeNotifierProvider(create: (_) => UserAPI()),
+        ChangeNotifierProvider(create: (_) => ConferenceAPI()),
+        ChangeNotifierProvider(create: (_) => EventAPI()),
+        ChangeNotifierProvider(create: (_) => UserProfileAPI()),
+      ],
       builder: (context, child) => const MyApp(),
     ),
   );
@@ -40,16 +48,16 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    if(storage.read('provider') == 'email_login') {
+    if (storage.read('provider') == 'email_login') {
       String? token = storage.read('token');
       Duration time = (token == null || !JwtDecoder.isExpired(token))
           ? const Duration()
           : JwtDecoder.getRemainingTime(token);
-      print(time);
       Timer(
         time,
-            () async {
-          String? message = await refreshToken();
+        () async {
+          String? message =
+              await Provider.of<UserAPI>(context, listen: false).refreshToken();
           needsLogin = message != null;
           if (token == null && (storage.read('isLoggedIn') ?? false)) {
             needsLogin = false;
@@ -59,9 +67,9 @@ class _MyAppState extends State<MyApp> {
       );
       _timer = Timer.periodic(
         const Duration(minutes: 15),
-            (timer) async {
-          String? message = await refreshToken();
-          print(message);
+        (timer) async {
+          String? message =
+              await Provider.of<UserAPI>(context, listen: false).refreshToken();
           needsLogin = message != null;
           if (token == null && (storage.read('isLoggedIn') ?? false)) {
             needsLogin = false;
@@ -69,8 +77,8 @@ class _MyAppState extends State<MyApp> {
           setState(() {});
         },
       );
-    } else if(storage.read('provider') == 'linkedin_login') {
-      if(storage.read('isLoggedIn')) {
+    } else if (storage.read('provider') == 'linkedin_login') {
+      if (storage.read('isLoggedIn')) {
         needsLogin = false;
       }
     }
@@ -98,14 +106,12 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff332D72)),
         useMaterial3: true,
       ),
-      home: Consumer<LoginStatus>(
-        builder:(_,status,child) {
-          // storage.erase().then((value) => status.syncVariables());
-          return LogoPage(
-            needsLogin: needsLogin,
-          );
-        }
-      ),
+      home: Consumer<LoginStatus>(builder: (_, status, child) {
+        // storage.erase().then((value) => status.syncVariables());
+        return LogoPage(
+          needsLogin: needsLogin,
+        );
+      }),
     );
   }
 }
@@ -128,12 +134,7 @@ class _LogoPageState extends State<LogoPage> {
     // isLoggedIn = !widget.needsLogin;
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       isLoggedIn = Provider.of<LoginStatus>(context, listen: false).isLoggedIn;
-      String? data;
-      if(storage.read('provider') == 'email_login') {
-        String? token = storage.read('token');
-        data =
-        (token == null) ? null : JwtDecoder.tryDecode(token)?['email'];
-        print(data);
+      if (storage.read('provider') == 'email_login') {
       }
       // print(storage.getValues());
       // print(storage.getKeys());
@@ -143,11 +144,9 @@ class _LogoPageState extends State<LogoPage> {
           context,
           MaterialPageRoute(
             builder: (context) => (isLoggedIn)
-                ? MainPage(
-                    email: data,
-                  )
+                ? const MainPage()
                 // ? AddAboutYou()
-                : LoginSignUpPage(),
+                : const LoginSignUpPage(),
           ),
         ),
       );
@@ -169,7 +168,7 @@ class _LogoPageState extends State<LogoPage> {
           child: const Text('Made In India'),
         ),
       ),
-      body: Container(
+      body: SizedBox(
         height: size.height,
         width: size.width,
         child: Center(

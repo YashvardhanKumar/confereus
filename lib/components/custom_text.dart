@@ -23,6 +23,7 @@ class CustomText extends Text {
       text,
       overflow: overflow,
       maxLines: maxLines,
+      softWrap: true,
       textAlign: textAlign,
       style: TextStyle(
         fontWeight: fontWeight,

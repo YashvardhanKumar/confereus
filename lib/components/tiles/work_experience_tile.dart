@@ -1,23 +1,20 @@
+import 'package:confereus/components/bottom_drawers/edit_work_experience.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
+import '../../API/user_profile_api.dart';
+import '../../models/user model/user_model.dart';
 import '../button/text_button.dart';
 
 class WorkExperienceTile extends StatelessWidget {
   const WorkExperienceTile({
     super.key,
-    required this.position,
-    required this.jobType,
-    required this.location,
-    required this.start,
-    required this.end,
-    required this.company,
+    required this.data,
   });
 
-  final String position, jobType, company, location;
-  final DateTime start;
-  final DateTime? end;
+  final WorkExperience data;
 
   @override
   Widget build(BuildContext context) {
@@ -29,75 +26,76 @@ class WorkExperienceTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                position,
+                data.position,
                 style: GoogleFonts.poppins(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 5,
               ),
               Text(
-                company,
+                data.company,
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 5,
               ),
               Text(
-                jobType,
+                data.jobType,
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 5,
               ),
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.calendar_today_rounded,
                     size: 15,
                     color: Color(0xff8B8B8B),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 5,
                   ),
                   Text(
-                    '${DateFormat.yMMMM().format(start)} - ${(end == null ? 'Present' : DateFormat.yMMM().format(end!))}',
+                    '${DateFormat.yMMMM().format(data.start)} - ${(data.end == null ? 'Present' : DateFormat.yMMM().format(data.end!))}',
                     style: GoogleFonts.poppins(
                       fontSize: 12,
-                      color: Color(0xff8B8B8B),
+                      color: const Color(0xff8B8B8B),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 5,
               ),
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.location_on_rounded,
                     size: 15,
                     color: Color(0xff8B8B8B),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 5,
                   ),
-                  Text(
-                    location,
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      color: Color(0xff8B8B8B),
-                      // fontWeight: FontWeight.w600,
+                  if (data.location != null)
+                    Text(
+                      data.location!,
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: const Color(0xff8B8B8B),
+                        // fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ],
@@ -106,19 +104,25 @@ class WorkExperienceTile extends StatelessWidget {
         Row(
           children: [
             CustomTextButton(
-              onPressed: () {},
-              child: Padding(
-                padding: const EdgeInsets.all(5.0),
+              onPressed: () async {
+                editWorkExperience(context, data);
+              },
+              child: const Padding(
+                padding: EdgeInsets.all(5.0),
                 child: Icon(Icons.edit_rounded),
               ),
             ),
-            CustomTextButton(
-              child: Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: Icon(Icons.delete_forever_rounded),
-              ),
-              onPressed: () {},
-            ),
+            Consumer<UserProfileAPI>(builder: (context, userAPI, child) {
+              return CustomTextButton(
+                child: const Padding(
+                  padding: EdgeInsets.all(5.0),
+                  child: Icon(Icons.delete_forever_rounded),
+                ),
+                onPressed: () async {
+                  await userAPI.deleteWorkExperience(context, data.id);
+                },
+              );
+            }),
           ],
         ),
       ],

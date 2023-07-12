@@ -6,6 +6,9 @@ import UserService from './services/user.services';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import deeplinkRouter from './routes/user/deeplink/r/deeplink.router';
+import conferenceRoute from './routes/user/conference/conference.router';
+import profileRouter from './routes/user/profile/profile.router';
+import eventRoute from './routes/user/conference/event.router';
 
 declare module 'express-session' {
     interface SessionData {
@@ -22,10 +25,15 @@ app.use(cors(
 }
 ));
 app.use(bodyParser.urlencoded({extended: true}));
+// app.use(express.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 app.use('/', userRouter);
 app.use('/applink/r', deeplinkRouter);
+app.use('/:id/conferences',conferenceRoute);
+app.use('/:id/conferences/:confId/events',eventRoute);
+app.use('/:id/profile',profileRouter);
+
 // app.use('/:id/profile');
 // app.use('/:id/home');
 

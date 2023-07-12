@@ -19,7 +19,7 @@ class _CustomTextButtonState extends State<CustomTextButton> {
   Widget build(BuildContext context) {
     return AnimatedOpacity(
       opacity: opacity,
-      duration: Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 100),
       curve: Curves.bounceInOut,
       onEnd: () {
         opacity = 1;

@@ -123,30 +123,97 @@ export async function verifyOTP(req: Request, res: Response, next: NextFunction)
 }
 
 export async function isTokenNotExpired(req: Request, res: Response, next: NextFunction) {
-    const accessToken = req.body.login_access_token;
-    
-    if (UserService.verifyToken(accessToken)) {
-        res.json({ status: true, token: accessToken, success: "Not Expired Yet" });
-    } else {
+    let accessToken = req.headers['authorization'];
+    console.log(accessToken);
+    accessToken = accessToken.slice(7, accessToken.length)
+
+    try {
+
+        let aData = UserService.verifyToken(accessToken, async () => {
+            const refreshToken = req.body.login_refresh_token;
+            let blacklist = await Blacklist.findOne({ refreshToken: refreshToken });
+            let data = UserService.verifyToken(refreshToken) as JwtPayload;
+            console.log(data);
+
+            if (blacklist || !data) {
+                res.json({ status: false, success: "Session Expired!" })
+            }
+            else {
+                //@ts-ignore
+                req.data = data.email;
+                accessToken = UserService.generateToken({ email: data.email }, 15 * 60);
+                res.cookie(`login_access_token`, accessToken);
+                next();
+                // res.json({ status: true, token: accessToken });
+                // res.json({ status: false, success: "Session Expired!" })
+
+            }
+        });
+        if (aData) {
+            //@ts-ignore
+            req.data = aData.email;
+            next();
+        }
+    } catch (e) {
+        // if (aData) {
+        //     //@ts-ignore
+        //     req.data = aData.email;
+        //     next();
+        // } else {
         const refreshToken = req.body.login_refresh_token;
         let blacklist = await Blacklist.findOne({ refreshToken: refreshToken });
         let data = UserService.verifyToken(refreshToken) as JwtPayload;
         console.log(data);
-        
+
         if (blacklist || !data) {
             res.json({ status: false, success: "Session Expired!" })
         }
         else {
             //@ts-ignore
             req.data = data.email;
+            accessToken = UserService.generateToken({ email: data.email }, 15 * 60);
+            res.cookie(`login_access_token`, accessToken);
             next();
+            // res.json({ status: true, token: accessToken });
+            // res.json({ status: false, success: "Session Expired!" })
+
+        }
+    }
+}
+
+export async function checkTokenForLogin(req: Request, res: Response, next: NextFunction) {
+    let accessToken = req.headers['authorization'];
+    console.log(accessToken);
+    accessToken = accessToken.slice(7, accessToken.length)
+    let aData = UserService.verifyToken(accessToken);
+
+    if (UserService.verifyToken(accessToken)) {
+        //@ts-ignore
+        // req.data = aData.email;
+        // next();
+        res.json({ status: true, token: accessToken, success: "Not Expired Yet" });
+    } else {
+        const refreshToken = req.body.login_refresh_token;
+        let blacklist = await Blacklist.findOne({ refreshToken: refreshToken });
+        let data = UserService.verifyToken(refreshToken) as JwtPayload;
+        console.log(data);
+
+        if (blacklist || !data) {
+            res.json({ status: false, success: "Session Expired!" })
+        }
+        else {
+            //@ts-ignore
+            req.data = data.email;
+            // res.json({ status: false, success: "Session Expired!" })
+            next();
+
         }
     }
 }
 
 export async function isAuthenticated(req: Request, res: Response, next: NextFunction) {
     console.log(req.body.login_refresh_token);
-    if(req.body.login_refresh_token) {
+    if (UserService.verifyToken(req.body.login_refresh_token)) {
         return next();
     }
     res.json({ status: false, success: "Login Needed" });

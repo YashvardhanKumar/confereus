@@ -17,7 +17,7 @@ class _AddButtonState extends State<AddButton> {
   Widget build(BuildContext context) {
     return Material(
       shape: RoundedRectangleBorder(
-        side: BorderSide(width: 2, color: kColorDark),
+        side: const BorderSide(width: 2, color: kColorDark),
         borderRadius: BorderRadius.circular(5),
       ),
       color: kColorLight,
@@ -28,20 +28,21 @@ class _AddButtonState extends State<AddButton> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
+              const Icon(
                 Icons.add_rounded,
                 size: 24,
                 color: kColorDark,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Text(
                 widget.text,
                 style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: kColorDark),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: kColorDark,
+                ),
               ),
             ],
           ),

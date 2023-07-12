@@ -1,57 +1,113 @@
-// import 'package:realm/realm.dart';
-//
-// part 'user_model.g.dart';
-//
-// @RealmModel()
-// class _Users {
-//   @PrimaryKey()
-//   late ObjectId id;
-//
-//   late String email, name;
-//   late String? password;
-//   late DateTime dob;
-//   late bool emailVerified;
-//   late String? profileImageURL;
-//   late String provider;
-//
-//   late List<_WorkExperience> workExperience;
-//   late List<_Education> education;
-//   late List<_Skills> skills;
-// }
-//
-// @RealmModel()
-// class _WorkExperience {
-//   @PrimaryKey()
-//   late ObjectId id;
-//
-//   late String position, company, jobType;
-//   late String? location;
-//   late DateTime start, end;
-//
-//   @Backlink(#workExperience)
-//   late Iterable<_Users> linkedUser;
-// }
-//
-// @RealmModel()
-// class _Education {
-//   @PrimaryKey()
-//   late ObjectId id;
-//
-//   late String institution, degree, field;
-//   late String? location;
-//   late DateTime start, end;
-//
-//   @Backlink(#education)
-//   late Iterable<_Users> linkedUser;
-// }
-//
-// @RealmModel()
-// class _Skills {
-//   @PrimaryKey()
-//   late ObjectId id;
-//
-//   late String skill, expertise;
-//
-//   @Backlink(#skills)
-//   late Iterable<_Users> linkedUser;
-// }
+import 'package:json_annotation/json_annotation.dart';
+
+part 'user_model.g.dart';
+
+@JsonSerializable()
+class Users {
+  final String id;
+
+  final String email, name;
+  final String? password;
+  final DateTime? dob;
+  final bool emailVerified;
+  final String? profileImageURL;
+  final String provider;
+
+  final List<WorkExperience>? workExperience;
+  final List<Education>? education;
+  final List<Skills>? skills;
+
+  Users({
+    required this.id,
+    required this.email,
+    required this.name,
+    required this.password,
+    required this.dob,
+    required this.emailVerified,
+    this.profileImageURL,
+    required this.provider,
+     this.workExperience,
+     this.education,
+     this.skills,
+  });
+
+  factory Users.fromJson(Map<String, dynamic> json) => _$UsersFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UsersToJson(this);
+  @override
+  bool operator == (covariant Users other) {
+    return other.id == id;
+  }
+
+
+
+
+
+}
+
+@JsonSerializable()
+class WorkExperience {
+  final String id;
+
+  final String position, company, jobType;
+  final String? location;
+  final DateTime start;
+  final DateTime? end;
+
+  WorkExperience({
+    required this.id,
+    required this.position,
+    required this.company,
+    required this.jobType,
+    this.location,
+    required this.start,
+    required this.end,
+  });
+
+  factory WorkExperience.fromJson(Map<String, dynamic> json) =>
+      _$WorkExperienceFromJson(json);
+
+  Map<String, dynamic> toJson() => _$WorkExperienceToJson(this);
+}
+
+@JsonSerializable()
+class Education {
+  final String id;
+
+  final String institution, degree, field;
+  final String? location;
+  final DateTime start;
+  final DateTime? end;
+
+  Education({
+    required this.id,
+    required this.institution,
+    required this.degree,
+    required this.field,
+    this.location,
+    required this.start,
+    required this.end,
+  });
+
+  factory Education.fromJson(Map<String, dynamic> json) =>
+      _$EducationFromJson(json);
+
+  Map<String, dynamic> toJson() => _$EducationToJson(this);
+}
+
+@JsonSerializable()
+class Skills {
+  final String id;
+
+  final String skill, expertise;
+
+  Skills({
+    required this.id,
+    required this.skill,
+    required this.expertise,
+  });
+
+  factory Skills.fromJson(Map<String, dynamic> json) => _$SkillsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SkillsToJson(this);
+}

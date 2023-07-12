@@ -5,13 +5,13 @@ class LoginStatus with ChangeNotifier {
   final storage = GetStorage('user');
   String? authProvider;
   late bool isLoggedIn;
-  String? token;
+  String? token, userId;
 
   LoginStatus() {
     authProvider = storage.read('auth_provider');
     isLoggedIn = storage.read('isLoggedIn') ?? false;
     token = storage.read('token');
-
+    userId = storage.read('userId');
   }
 
   void setAuthProvider(String? val) async {
@@ -32,17 +32,27 @@ class LoginStatus with ChangeNotifier {
     await storage.write('token', val);
     notifyListeners();
   }
+
+  void setUserId(String? val) async {
+    token = val;
+    await storage.write('userId', val);
+    notifyListeners();
+  }
+
   void clearData() async {
     await storage.erase();
     authProvider = null;
     token = null;
     isLoggedIn = false;
+    userId = null;
     notifyListeners();
   }
+
   void syncVariables() {
     authProvider = storage.read('auth_provider');
     isLoggedIn = storage.read('isLoggedIn') ?? false;
     token = storage.read('token');
+    userId = storage.read('userId');
     // notifyListeners();
   }
 }

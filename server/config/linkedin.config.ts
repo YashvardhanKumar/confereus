@@ -2,15 +2,19 @@ import { Request, Response } from "express";
 import axios from "axios";
 import * as qs from "querystring";
 import { User } from "../models/User Profile Models/user.model";
+import UserService from "../services/user.services";
 const urlToGetLinkedInAccessToken = 'https://www.linkedin.com/oauth/v2/accessToken';
 const urlToGetUserProfile = 'https://api.linkedin.com/v2/me?projection=(id,localizedFirstName,localizedLastName,profilePicture(displayImage~digitalmediaAsset:playableStreams))'
 const urlToGetUserEmail = 'https://api.linkedin.com/v2/clientAwareMemberHandles?q=members&projection=(elements*(primary,type,handle~))';
 
 export async function getLinkedinUser(req: Request, res: Response) {
-  let user = {};
   const { firstName, lastName, profilePicture, email } = req.body;
 
   console.log(req.body);
+  const accessToken = UserService.generateToken({ email }, 15 * 60);
+  const refreshToken = UserService.generateToken({ email }, 30 * 24 * 60 * 60);
+  res.cookie("login_access_token", accessToken);
+  res.cookie("login_refresh_token", refreshToken);
   // const accessToken = getAccessToken(code);
   // const userProfile = getUserProfile(accessToken);
   // const userEmail = getUserEmail(accessToken);
@@ -18,13 +22,11 @@ export async function getLinkedinUser(req: Request, res: Response) {
 
   // let resStatus = 400;
   // if(!(accessToken === null || userProfile === null || userEmail === null)) {
-  user = await userBuilder({
-    firstName, lastName, profilePicture
-  }, email);
+  let user = await userBuilder({ firstName, lastName, profilePicture }, email);
   let resStatus = 200;
-  console.log(user);
+  console.log(user._id);
   // }
-  res.status(resStatus).json({ user });
+  res.status(resStatus).json({ user, token: accessToken, userId: user });
 }
 
 // function getAccessToken(code) {
@@ -89,22 +91,36 @@ export async function getLinkedinUser(req: Request, res: Response) {
 //   return email;
 // }
 async function userBuilder(userProfile, userEmail) {
-  let user = await User.findOne({ email: userEmail,provider: {$ne: 'linkedin_login'}});
+  let user = await User.findOne({
+    email: userEmail,
+    // provider: 'linkedin_login'
+  });
   let data = {
     name: `${userProfile.firstName} ${userProfile.lastName}`,
-    profileImageURL: userProfile.profileImageURL,
+    profileImageURL: userProfile.profilePicture,
     email: userEmail,
     password: null,
-    dob: null,
+    // dob: user.dob,
     emailVerified: true,
     provider: 'linkedin_login'
   }
-  if (user == null) {
+  if (!user) {
     await User.insertMany(data);
+    user = await User.findOne({
+      email: userEmail,
+      // provider: 'linkedin_login'
+    });
+    return user._id;
+  }
+  if (user.provider == 'linkedin_login') {
+    // await User.insertMany(data);
+    // user = await User.findOne({ email: userEmail, provider: { $ne: 'linkedin_login' } });
+    return user._id;
   } else {
-    user.updateOne({
+   
+    await user.updateOne({
       $set: data,
     })
   }
-  return data;
+  return user._id;
 }

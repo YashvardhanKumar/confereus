@@ -1,5 +1,8 @@
-import { Schema, model, } from "mongoose";
+import { Model, Schema, model, } from "mongoose";
 import * as bcrypt from "bcrypt";
+import { IWorkExperience, WorkExperienceSchema } from "./sub_documents/work_experience.model";
+import { EducationSchema, IEducation } from "./sub_documents/education.model";
+import { ISkills, SkillsSchema } from "./sub_documents/skills.model";
 
 export interface IUser {
     email: string;
@@ -9,12 +12,12 @@ export interface IUser {
     emailVerified: boolean,
     profileImageURL: string,
     provider: string,
-    workExperience: Schema.Types.ObjectId,
-    education: Schema.Types.ObjectId,
-    skills: Schema.Types.ObjectId,
+    workExperience?: Array<IWorkExperience>,
+    education?: Array<IEducation>,
+    skills?: Array<ISkills>,
 }
 
-const UserSchema = new Schema<IUser>({
+const UserSchema = new Schema<IUser, Model<IUser>>({
     emailVerified: Boolean,
     name: {
         type: String,
@@ -28,20 +31,10 @@ const UserSchema = new Schema<IUser>({
     dob: Date,
     profileImageURL: String,
     provider: String,
-    workExperience:
-    {
-        type: Schema.Types.ObjectId,
-        ref: 'workExperience',
-    },
-    education: {
-        type: Schema.Types.ObjectId,
-        ref: 'education'
-    },
-    skills: {
-        type: Schema.Types.ObjectId,
-        ref: 'skills'
-    }
-    
+    workExperience: [WorkExperienceSchema],
+    education: [EducationSchema],
+    skills: [SkillsSchema],
+
 }, { timestamps: true });
 
-export const User = model<IUser>('users', UserSchema);
+export const User = model<IUser, Model<IUser>>('users', UserSchema);

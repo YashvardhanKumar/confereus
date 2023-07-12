@@ -6,13 +6,14 @@ class CustomDropDownField extends StatefulWidget {
   final String label;
   final String? hint;
   final TextEditingController controller;
+  final ValueChanged<int>? onChanged;
 
   const CustomDropDownField({
     Key? key,
     required this.listItems,
     required this.label,
     this.hint,
-    required this.controller,
+    required this.controller, this.onChanged,
   }) : super(key: key);
 
   @override
@@ -84,22 +85,26 @@ class _CustomDropDownFieldState extends State<CustomDropDownField>
             showDialog(
               context: context,
               builder: (_) => SimpleDialog(
+
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5)
                 ),
                 // title: Text('Select One'),
-                children: widget.listItems.map((e) {
+                children: List.generate(widget.listItems.length, (index)  {
                   return SimpleDialogOption(
                     onPressed: () {
-                      widget.controller.text = e;
+                      widget.controller.text = widget.listItems[index];
                       setState(() {});
+                      if(widget.onChanged != null) {
+                        widget.onChanged!(index);
+                      }
                       Navigator.pop(context);
                     },
-                    padding: EdgeInsets.all(15),
+                    padding: const EdgeInsets.all(15),
                     child: Row(
                       children: [
                         Text(
-                          e,
+                          widget.listItems[index],
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.w600,
                           ),
@@ -112,7 +117,7 @@ class _CustomDropDownFieldState extends State<CustomDropDownField>
             );
           },
           child: Container(
-            padding: EdgeInsets.all(12),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border.all(
@@ -133,7 +138,7 @@ class _CustomDropDownFieldState extends State<CustomDropDownField>
                     color: widget.controller.text.isEmpty ? Colors.grey.shade400 : Colors.black,
                   ),
                 ),
-                Icon(Icons.arrow_drop_down),
+                const Icon(Icons.arrow_drop_down),
               ],
             ),
           ),
@@ -189,7 +194,7 @@ class _CustomDropDownFieldState extends State<CustomDropDownField>
                             setState(() {});
                             closeMenu();
                           },
-                          child: Container(
+                          child: SizedBox(
                             width: buttonSize.width,
                             height: buttonSize.height,
                             child: Text(

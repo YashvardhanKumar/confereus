@@ -39,8 +39,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 clipBehavior: Clip.hardEdge,
                 child: InkWell(
                   onTap: widget.onAddClicked,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
+                  child: const Padding(
+                    padding: EdgeInsets.all(10.0),
                     child: Icon(
                       Icons.add,
                       color: kColorDark,
@@ -78,7 +78,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
 class _CustomBottomBarItem extends StatelessWidget {
   const _CustomBottomBarItem({
-    super.key,
     required this.icon,
     required this.selected,
     required this.onTap,

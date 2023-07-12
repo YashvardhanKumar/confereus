@@ -1,18 +1,14 @@
-import 'package:confereus/provider/login_status_provider.dart';
-import 'package:confereus/routes/auth/add_dob_for_sso_login.dart';
-import 'package:confereus/secrets.dart';
-import 'package:confereus/sign_up_APIs/email_and_password/login.dart';
+import 'package:confereus/API/user_api.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:linkedin_login/linkedin_login.dart';
 import 'package:provider/provider.dart';
 
 import '../../components/button/filled_button.dart';
+import '../../components/button/linked_in_button.dart';
 import '../../components/button/outline_button.dart';
 import '../../components/button/text_button.dart';
 import '../../components/input_fields/text_form_field.dart';
 import '../../constants.dart';
-import '../../sign_up_APIs/linkedin/linkedin_login.dart';
 import '../main_page.dart';
 import 'signup_page.dart';
 
@@ -100,7 +96,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                   setState(() {});
 
                   if (_formKey.currentState!.validate()) {
-                    await login(
+                    await Provider.of<UserAPI>(context).login(
                       context,
                       emailCtrl.text,
                       passwordCtrl.text,
@@ -109,6 +105,9 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                       setState(() {});
                     });
                     if (!_formKey.currentState!.validate()) {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => const MainPage()));
                       return;
                     }
                     // });
@@ -161,7 +160,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                 // margin: const EdgeInsets.all(10),
                 onPressed: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => SignUpWithEmail()));
+                      MaterialPageRoute(builder: (_) => const SignUpWithEmail()));
                 },
                 child: (color) => Text(
                   'Create your Account',
@@ -206,7 +205,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                   const SizedBox(
                     width: 10,
                   ),
-                  Flexible(child: LinkedInButtonCustom()),
+                  const Flexible(child: LinkedInButtonCustom()),
                 ],
               ),
             )
@@ -215,88 +214,4 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
       ),
     );
   }
-}
-
-class LinkedInButtonCustom extends StatefulWidget {
-  const LinkedInButtonCustom({Key? key}) : super(key: key);
-
-  @override
-  State<LinkedInButtonCustom> createState() => _LinkedInButtonCustomState();
-}
-
-class _LinkedInButtonCustomState extends State<LinkedInButtonCustom> {
-  AuthCodeObject? authorizationCode;
-  UserObject? user;
-  bool logoutUser = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomOutlinedButton(
-      // margin: const EdgeInsets.all(10),
-      color: const Color(0xff0077B7),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute<void>(
-            builder: (final BuildContext context) => Consumer<LoginStatus>(
-              builder: (context,status,child) {
-                return LinkedInUserWidget(
-                  useVirtualDisplay: true,
-                  appBar: AppBar(),
-                  destroySession: !status.isLoggedIn,
-                  redirectUrl: linkedinLoginRoute,
-                  clientId: LinkedinAPI.CLIENT_ID,
-                  clientSecret: LinkedinAPI.CLIENT_SECRET,
-                  onGetUserProfile:
-                      (final UserSucceededAction response) async {
-                    final data = await linkedInLogin(response.user);
-                    status.setIsLoggedIn(true);
-                    status.setAuthProvider('linkedin_login');
-                    status.setToken(null);
-                    setState(() {});
-                    print(status.storage.getValues());
-                    print(status.storage.getKeys());
-                    Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => (data['dob'] == null)
-                              ? AddDOBForSSOLogin()
-                              : MainPage(email: data['email']),
-                        ),
-                        (route) => false);
-                  },
-                );
-              }
-            ),
-            fullscreenDialog: true,
-          ),
-        );
-      },
-      child: (_) => Image.asset(
-        'images/linkedinlogo.png',
-        height: 28,
-      ),
-    );
-  }
-}
-
-class AuthCodeObject {
-  AuthCodeObject({required this.code, required this.state});
-
-  final String? code;
-  final String? state;
-}
-
-class UserObject {
-  UserObject({
-    required this.firstName,
-    required this.lastName,
-    required this.email,
-    required this.profileImageUrl,
-  });
-
-  final String firstName;
-  final String lastName;
-  final String email;
-  final String profileImageUrl;
 }

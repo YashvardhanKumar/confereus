@@ -39,7 +39,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         Text(
           widget.label,
           style: GoogleFonts.poppins(
-              color: widget.enabled ? Colors.black : Color(0xffD8DADC),
+              color: widget.enabled ? Colors.black : const Color(0xffD8DADC),
               fontWeight: FontWeight.w500),
         ),
         const SizedBox(
@@ -61,7 +61,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
             hintText: widget.hint,
             hintStyle: GoogleFonts.poppins(
               fontWeight: FontWeight.w600,
-              color: widget.enabled ? Colors.grey.shade400 : Color(0xffD8DADC),
+              color: widget.enabled ? Colors.grey.shade400 : const Color(0xffD8DADC),
             ),
             suffixIcon: (widget.isPassword)
                 ? GestureDetector(
@@ -79,7 +79,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
             isCollapsed: true,
             contentPadding: const EdgeInsets.all(12),
             border: OutlineInputBorder(
-              borderSide: BorderSide(
+              borderSide: const BorderSide(
                 color:
     // (widget.controller.text.isNotEmpty)
                     // ?
@@ -89,7 +89,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
               borderRadius: BorderRadius.circular(5),
             ),
             enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
+              borderSide: const BorderSide(
                 color:
                 // (widget.controller.text.isNotEmpty)
                 //     ?
@@ -99,7 +99,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
               borderRadius: BorderRadius.circular(5),
             ),
             focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
+              borderSide: const BorderSide(
                 color: Colors.black,
                 width: 2,
               ),

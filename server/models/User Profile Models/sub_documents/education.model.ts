@@ -9,7 +9,7 @@ export interface IEducation {
     location: string,
 }
 
-const EducationSchema = new Schema<IEducation>({
+export const EducationSchema = new Schema<IEducation>({
     institution: {
         type: String,
         required: true,

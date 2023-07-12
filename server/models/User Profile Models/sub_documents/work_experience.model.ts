@@ -9,7 +9,7 @@ export interface IWorkExperience {
     location: string,
 }
 
-const WorkExperienceSchema = new Schema<IWorkExperience>({
+export const WorkExperienceSchema = new Schema<IWorkExperience>({
     position: {
         type: String,
         required: true,

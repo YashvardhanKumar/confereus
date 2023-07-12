@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../constants.dart';
-import '../../button/filled_button.dart';
-import '../../custom_text.dart';
+import '../../constants.dart';
+import '../../main.dart';
+import '../../models/conference model/conference.model.dart';
+import '../button/filled_button.dart';
+import '../common_pages/conference_page.dart';
+import '../custom_text.dart';
 
 class UnregisteredConferenceCardSmall extends StatelessWidget {
   const UnregisteredConferenceCardSmall({
     super.key,
-    required this.eventLogo,
-    required this.eventName,
-    required this.location,
-    required this.start,
-    required this.end,
     required this.onRegisterPressed,
+    required this.data,
   });
 
-  final String eventLogo;
-  final String eventName, location;
-  final DateTime start, end;
+  final Conference data;
+
+  // final String eventLogo;
+  // final String eventName, location, description;
+  // final DateTime start, end;
   final VoidCallback? onRegisterPressed;
 
   @override
@@ -36,7 +37,14 @@ class UnregisteredConferenceCardSmall extends StatelessWidget {
         child: InkWell(
           splashColor: kColorLight,
           highlightColor: kColorLight,
-          onTap: () {},
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ConferencePage(data: data),
+              ),
+            );
+          },
           child: Padding(
             padding: const EdgeInsets.all(10.0),
             child: Column(
@@ -53,13 +61,13 @@ class UnregisteredConferenceCardSmall extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10)),
                         child: Padding(
                           padding: const EdgeInsets.all(5.0),
-                          child: Image.asset(eventLogo),
+                          child: data.eventLogo != null ? Image.asset(data.eventLogo!) : const Icon(Icons.image,size: 120,color: Colors.grey,),
                         ),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     CustomText(
-                      eventName,
+                      data.subject,
                       fontWeight: FontWeight.w600,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -70,27 +78,26 @@ class UnregisteredConferenceCardSmall extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.calendar_today_rounded,
                           size: 15,
                           color: Color(0xff8B8B8B),
                         ),
-                        SizedBox(width: 5),
+                        const SizedBox(width: 5),
                         CustomText(
-                          '${DateFormat.MMMd().format(start)} '
+                          '${DateFormat.MMMd().format(data.startTime)} '
                           '-'
-                          ' ${DateFormat.yMMMd().format(end)}',
+                          ' ${DateFormat.yMMMd().format(data.endTime)}',
                           fontSize: 12,
-                          color: Color(0xff8B8B8B),
+                          color: const Color(0xff8B8B8B),
                           fontWeight: FontWeight.w600,
                         ),
                       ],
                     ),
-                    SizedBox(height: 5),
-                    Row(
+                    const SizedBox(height: 5),
+                    const Row(
                       children: [
                         Icon(
                           Icons.location_on_rounded,
@@ -101,7 +108,7 @@ class UnregisteredConferenceCardSmall extends StatelessWidget {
                           width: 5,
                         ),
                         CustomText(
-                          location,
+                          "Online",
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
                           color: Color(0xff8B8B8B),
@@ -109,18 +116,20 @@ class UnregisteredConferenceCardSmall extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 5,
                     ),
+                    if(data.admin.toString().compareTo(storage.read('userId')) !=
+                        0)
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 5.0),
                       child: CustomFilledButton(
                         height: 30,
-                        child: CustomText(
+                        onPressed: onRegisterPressed,
+                        child: const CustomText(
                           'Register',
                           color: Colors.white,
                         ),
-                        onPressed: onRegisterPressed,
                       ),
                     ),
                   ],

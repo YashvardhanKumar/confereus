@@ -1,5 +1,5 @@
 import 'package:confereus/components/custom_text.dart';
-import 'package:confereus/components/tiles/registered_tile_event/registered_event_tiles_big.dart';
+import 'package:confereus/components/tiles/event_tiles_big.dart';
 import 'package:flutter/material.dart';
 
 class Explore extends StatelessWidget {
@@ -9,18 +9,18 @@ class Explore extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: CustomText('Explore conferences'),
+        title: const CustomText('Explore conferences'),
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(Icons.search_rounded),
+            icon: const Icon(Icons.search_rounded),
           )
         ],
       ),
       body: ListView(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         children: [
-          RegisteredConferenceBigCard(
+          ConferenceBigCard(
             eventLogo: 'images/firebaselogo.png',
             eventName: 'Firebase Summit 2023',
             location: 'Los Angles, USA',
@@ -28,7 +28,7 @@ class Explore extends StatelessWidget {
             end: DateTime(2023, 8, 25),
             onRegisterPressed: null,
           ),
-          RegisteredConferenceBigCard(
+          ConferenceBigCard(
             eventLogo: 'images/microsoft.png',
             eventName: 'Microsoft 365 EduCon DC 2023',
             location: 'Los Angles, USA',
@@ -36,7 +36,7 @@ class Explore extends StatelessWidget {
             end: DateTime(2023, 9, 15),
             onRegisterPressed: null,
           ),
-          RegisteredConferenceBigCard(
+          ConferenceBigCard(
             eventLogo: 'images/gdsclogo.png',
             eventName: 'Android Dev Summit 2023',
             location: 'Los Angles, USA',
@@ -44,7 +44,7 @@ class Explore extends StatelessWidget {
             end: DateTime(2023, 8, 15),
             onRegisterPressed: () {},
           ),
-          RegisteredConferenceBigCard(
+          ConferenceBigCard(
             eventLogo: 'images/microsoft.png',
             eventName: 'Microsoft Build',
             location: 'Los Angles, USA',
