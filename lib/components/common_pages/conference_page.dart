@@ -274,12 +274,6 @@ class _ConferencePageState extends State<ConferencePage> {
                   : Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: CustomFilledButton(
-                        child: CustomText(
-                          (widget.isRegistered) ? 'Registered' : "Register",
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500,
-                        ),
                         onPressed: (widget.onRegister != null &&
                                 (widget.isRegistered || !isClicked))
                             ? () async {
@@ -298,6 +292,12 @@ class _ConferencePageState extends State<ConferencePage> {
                                 );
                               }
                             : null,
+                        child: CustomText(
+                          (widget.isRegistered) ? 'Registered' : "Register",
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
             );

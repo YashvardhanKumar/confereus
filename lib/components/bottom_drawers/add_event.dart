@@ -290,7 +290,7 @@ class _AddEventsState extends State<AddEvents> {
                 },
               );
             }
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }),
     );
   }

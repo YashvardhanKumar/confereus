@@ -1,5 +1,4 @@
 import 'package:confereus/routes/bottom_nav/add_conference/add_conference.dart';
-import 'package:confereus/routes/bottom_nav/communities/communities.dart';
 import 'package:confereus/routes/bottom_nav/explore/explore.dart';
 import 'package:confereus/routes/bottom_nav/home/home.dart';
 import 'package:confereus/routes/bottom_nav/notification/notification.dart';

@@ -1,4 +1,3 @@
-import 'package:confereus/components/bottom_drawers/edit_skills.dart';
 import 'package:confereus/components/button/text_button.dart';
 import 'package:confereus/models/user%20model/user_model.dart';
 import 'package:flutter/material.dart';

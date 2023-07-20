@@ -306,7 +306,6 @@ class _EditEventsState extends State<EditEvents> {
                     return CustomFilledButton(
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          print(start.toIso8601String());
                           final data = await confAPI.editEvent(
                             widget.data.id,
                             widget.event,

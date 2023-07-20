@@ -70,7 +70,6 @@ class _AddEventsState extends State<AddEvents> {
                             final e = widget.data.startTime.day < today.day
                                 ? today
                                 : widget.data.startTime;
-                            print(event.data?.map((e) => e.toJson()));
                             return ListView.builder(
                               itemCount: widget.data.endTime.day - e.day + 1,
                               itemBuilder: (context, index) {
@@ -125,7 +124,7 @@ class _AddEventsState extends State<AddEvents> {
                               },
                             );
                           }
-                          return Center(
+                          return const Center(
                             child: CircularProgressIndicator(),
                           );
                         });

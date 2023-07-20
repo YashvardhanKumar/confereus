@@ -54,7 +54,7 @@ class _HomeState extends State<Home> {
                     GestureDetector(
                       onTap: () {
                         Navigator.push(context,
-                            MaterialPageRoute(builder: (_) => Profile()));
+                            MaterialPageRoute(builder: (_) => const Profile()));
                       },
                       child: CircleAvatar(
                         backgroundColor: Colors.grey.shade200,
@@ -130,7 +130,6 @@ class _HomeState extends State<Home> {
                       .getRegisteredConferences(storage.read('userId'))
                       .asStream(),
                   builder: (context, snapshot) {
-                    print(snapshot.data);
                     if (!snapshot.hasData) {
                       return const Center(
                         child: CircularProgressIndicator(),
@@ -151,7 +150,6 @@ class _HomeState extends State<Home> {
                     if (data.isEmpty) {
                       return Container();
                     }
-                    print(data.map((e) => e.toJson()));
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -200,7 +198,7 @@ class _HomeState extends State<Home> {
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(2.5),
                                     ),
-                                    duration: Duration(milliseconds: 200),
+                                    duration: const Duration(milliseconds: 200),
                                   ),
                                   Container(
                                     height: 5,
@@ -225,7 +223,6 @@ class _HomeState extends State<Home> {
                       .getRegisteredConferences(storage.read('userId'))
                       .asStream(),
                   builder: (context, snapshot) {
-                    print(snapshot.data);
                     if (!snapshot.hasData) {
                       return const Center(
                         child: CircularProgressIndicator(),
@@ -238,7 +235,6 @@ class _HomeState extends State<Home> {
                         .where((e) =>
                             e.registered!.contains(storage.read('userId')))
                         .toList();
-                    print(data.map((e) => e.toJson()));
                     return Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: Column(

@@ -15,12 +15,9 @@ class UserProfileAPI extends HTTPClientProvider {
     Map<String, dynamic> reqBody = {
       'login_refresh_token': refreshToken,
     };
-    print("$userId => ${Uri.parse(fetchProfile(userId!))} => $refreshToken => $accessToken");
     final encoded = utf8.encode(jsonEncode(reqBody));
     HttpClientRequest request =
         await client.getUrl(Uri.parse(fetchProfile(userId!))).catchError((error, stackTrace) {
-          print(error);
-          print(stackTrace);
           // return ;
         });
     request.headers.contentType = ContentType.json;
@@ -29,14 +26,13 @@ class UserProfileAPI extends HTTPClientProvider {
     request.add(encoded);
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
-    print(data);
     if (data['status']) {
       await updateCookie(res);
       return Users.fromJson(data['data']);
     } else {
-      print(data['message']);
       // return data['message'];
     }
+    return null;
     // return null;
   }
 
@@ -141,7 +137,6 @@ class UserProfileAPI extends HTTPClientProvider {
     request.add(utf8.encode(jsonEncode(reqBody)));
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
-    print(data);
     if (data['status']) {
       await updateCookie(res);
       return WorkExperience.fromJson(data['data']);

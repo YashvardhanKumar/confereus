@@ -386,7 +386,6 @@ class _CreateNewConferenceState extends State<CreateNewConference> {
                       if (eventLogoFile != null) {
                         String? uploadS = await conferenceAPI.uploadConf(
                             eventLogoFile!, widget.old!.id, storage.read('userId'));
-                        print(uploadS);
                       }
                           Navigator.pop(context);
                         });
@@ -405,7 +404,6 @@ class _CreateNewConferenceState extends State<CreateNewConference> {
                     if (eventLogoFile != null) {
                       String? uploadS = await conferenceAPI.uploadConf(
                           eventLogoFile!, data.id, storage.read('userId'));
-                      print(uploadS);
                     }
                     Navigator.push(
                       context,

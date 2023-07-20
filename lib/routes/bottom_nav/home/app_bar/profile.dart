@@ -167,7 +167,7 @@ class _ProfileState extends State<Profile> {
                               ),
                             ],
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           if (userData.workExperience![0].end == null)
@@ -186,13 +186,13 @@ class _ProfileState extends State<Profile> {
                                 )
                               ],
                             ),
-                          SizedBox(height: 10),
-                          CustomText(
+                          const SizedBox(height: 10),
+                          const CustomText(
                             'About You',
                             fontSize: 22,
                             fontWeight: FontWeight.w500,
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           AboutTile(
                             title: 'Work Experience',
                             items: List.generate(
@@ -217,7 +217,7 @@ class _ProfileState extends State<Profile> {
                               setState(() {});
                             },
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           AboutTile(
                             title: 'Education',
                             items: List.generate(
@@ -242,7 +242,7 @@ class _ProfileState extends State<Profile> {
                               setState(() {});
                             },
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           AboutTile(
                             title: 'Skills',
                             items: List.generate(
@@ -267,7 +267,7 @@ class _ProfileState extends State<Profile> {
                               setState(() {});
                             },
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Column(
@@ -322,7 +322,7 @@ class _ProfileState extends State<Profile> {
                               ),
                             ],
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Column(

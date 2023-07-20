@@ -106,7 +106,6 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                         passwordCtrl.text,
                       )
                           .then((value) {
-                        print(_formKey.currentState!.validate());
                         setState(() {});
                         if (!_formKey.currentState!.validate()) {
                           return;
@@ -115,7 +114,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => AddDOBForSSOLogin(),
+                            builder: (_) => const AddDOBForSSOLogin(),
                           ),
                           (route) => false,
                         );
@@ -185,40 +184,40 @@ class _LoginSignUpPageState extends State<LoginSignUpPage> {
                   ),
                 ),
               ),
-              Padding(
+              const Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+                    EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
                 child: Row(
                   children: [
-                    Flexible(
-                      child: CustomOutlinedButton(
-                        // margin: const EdgeInsets.all(10),
-                        color: const Color(0xff1877F2),
-                        onPressed: () {},
-                        child: (_) => Image.asset(
-                          'images/facebooklogo.png',
-                          height: 35,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Flexible(
-                      child: CustomOutlinedButton(
-                        // margin: const EdgeInsets.all(10),
-                        color: const Color(0xff0077B7),
-                        onPressed: () {},
-                        child: (_) => Image.asset(
-                          'images/twitterlogo.png',
-                          height: 35,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    const Flexible(child: LinkedInButtonCustom()),
+                    // Flexible(
+                    //   child: CustomOutlinedButton(
+                    //     // margin: const EdgeInsets.all(10),
+                    //     color: const Color(0xff1877F2),
+                    //     onPressed: () {},
+                    //     child: (_) => Image.asset(
+                    //       'images/facebooklogo.png',
+                    //       height: 35,
+                    //     ),
+                    //   ),
+                    // ),
+                    // const SizedBox(
+                    //   width: 10,
+                    // ),
+                    // Flexible(
+                    //   child: CustomOutlinedButton(
+                    //     // margin: const EdgeInsets.all(10),
+                    //     color: const Color(0xff0077B7),
+                    //     onPressed: () {},
+                    //     child: (_) => Image.asset(
+                    //       'images/twitterlogo.png',
+                    //       height: 35,
+                    //     ),
+                    //   ),
+                    // ),
+                    // const SizedBox(
+                    //   width: 10,
+                    // ),
+                    Flexible(child: LinkedInButtonCustom()),
                   ],
                 ),
               )

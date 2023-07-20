@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 final FirebaseMessaging _fcm = FirebaseMessaging.instance;
@@ -11,17 +10,15 @@ initializeMessaging() async {
   await Firebase.initializeApp();
   _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings("@mipmap/ic_launcher");
-  final InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
+  final InitializationSettings initializationSettings = const InitializationSettings(android: initializationSettingsAndroid);
   await _flutterLocalNotificationsPlugin.initialize(initializationSettings, onDidReceiveNotificationResponse: selectionNotification);
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    print("onMessage: $message");
     await handleMessage(message);
   });
 }
 
 void selectionNotification(NotificationResponse notificationResponse) async {
-  print('payload: ${notificationResponse.payload}');
 }
 
 handleMessage(RemoteMessage message) async {

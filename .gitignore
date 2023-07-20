@@ -45,7 +45,4 @@ app.*.map.json
 
 # Secret files
 /lib/secrets.dart
-/server/.env
-/server/node_modules/
-/server/package-lock.json
-/server/keys/
+/server/

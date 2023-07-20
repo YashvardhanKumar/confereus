@@ -38,7 +38,7 @@ class CurrentConferenceCard extends StatelessWidget {
                               height: 100,
                               width: 100,
                               alignment: Alignment.center,
-                              child: Icon(
+                              child: const Icon(
                                 Icons.image_rounded,
                                 size: 80,
                                 color: Colors.grey,
@@ -84,16 +84,16 @@ class CurrentConferenceCard extends StatelessWidget {
                           if (data.location != null)
                             Row(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.location_on_rounded,
                                   size: 14,
                                   color: Color(0xff8B8B8B),
                                 ),
-                                SizedBox(width: 5),
+                                const SizedBox(width: 5),
                                 CustomText(
                                   data.location!,
                                   fontSize: 10,
-                                  color: Color(0xff8B8B8B),
+                                  color: const Color(0xff8B8B8B),
                                 ),
                               ],
                             ),
@@ -103,7 +103,7 @@ class CurrentConferenceCard extends StatelessWidget {
                               GestureDetector(
                                 onTap: () {},
                                 child: Container(
-                                  padding: EdgeInsets.symmetric(
+                                  padding: const EdgeInsets.symmetric(
                                     horizontal: 8,
                                     vertical: 4,
                                   ),
@@ -181,7 +181,7 @@ class CurrentConferenceCard extends StatelessWidget {
                       if (data.events![0].startTime
                               .compareTo(DateTime.now().toUtc()) <=
                           0)
-                        CustomText(
+                        const CustomText(
                           'Ongoing',
                           fontSize: 12,
                           color: Colors.green,

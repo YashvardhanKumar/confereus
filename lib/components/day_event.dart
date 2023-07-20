@@ -135,8 +135,8 @@ class _DayEventState extends State<DayEvent>
                       children: widget.items,
                     ),
                   if (widget.items.isEmpty)
-                    Center(child: Padding(
-                      padding: const EdgeInsets.all(10.0),
+                    const Center(child: Padding(
+                      padding: EdgeInsets.all(10.0),
                       child: CustomText('No Events on this day!'),
                     )),
                   if (widget.isAdmin)

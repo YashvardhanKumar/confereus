@@ -57,7 +57,6 @@ class _AddAboutYouState extends State<AddAboutYou> {
     return StreamBuilder<Users?>(
         stream: Provider.of<UserAPI>(context).getCurUsers().asStream(),
         builder: (context, snapshot) {
-          print(snapshot.data?.toJson());
           if (!snapshot.hasData) {
             return const Center(
               child: CircularProgressIndicator(),

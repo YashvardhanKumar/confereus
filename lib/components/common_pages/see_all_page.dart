@@ -52,7 +52,7 @@ class _SeeAllPageState extends State<SeeAllPage> {
                 return ListView.builder(
                   shrinkWrap: true,
                   // primary: true,
-                  itemCount: data.length ?? 0,
+                  itemCount: data.length,
                   itemBuilder: (_, i) {
 
                     bool isRegistered =

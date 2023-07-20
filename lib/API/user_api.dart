@@ -7,8 +7,6 @@ import 'package:linkedin_login/linkedin_login.dart';
 
 import '../constants.dart';
 import '../models/user model/user_model.dart';
-import '../routes/add_about_you_page.dart';
-import '../routes/auth/otp_page.dart';
 class UserAPI extends HTTPClientProvider {
   Future<String?> login(BuildContext context, String mail,
       String cpwd) async {
@@ -21,7 +19,6 @@ class UserAPI extends HTTPClientProvider {
     request.add(utf8.encode(jsonEncode(reqBody)));
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
-    print(data);
     // print('cookies of res = ${res.cookies}');
     // print('cookies of req = ${request.cookies}');
     // await secstore.write(key: 'cookies', value: res.cookies.join('; '));
@@ -59,7 +56,7 @@ class UserAPI extends HTTPClientProvider {
     request.headers.contentType = ContentType.json;
     request.headers.add('Authorization', 'Bearer $accessToken');
     request.add(utf8.encode(jsonEncode(reqBody)));
-    final res = await request.close();
+    await request.close();
   }
 
   Future<String?> refreshToken() async {
@@ -107,7 +104,6 @@ class UserAPI extends HTTPClientProvider {
       await storage.write('isLoggedIn', true);
       await storage.write('auth_provider', 'email_login');
       await updateCookie(res);
-      print(data);
       notifyListeners();
     } else {
       return data['success'];
@@ -150,9 +146,6 @@ class UserAPI extends HTTPClientProvider {
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if(data['status']) {
-      String? userId = storage.read('userId');
-      print(storage.getKeys());
-      print(storage.getValues());
     } else {
       return data['success'];
     }
@@ -192,12 +185,10 @@ class UserAPI extends HTTPClientProvider {
     String? refreshToken = await secstore.read(key: 'login_refresh_token');
     String? accessToken = await secstore.read(key: 'login_access_token');
     String? userId = storage.read('userId');
-    print(userId);
     Map<String, dynamic> reqBody = {
       'login_refresh_token': refreshToken,
     };
     final encoded = utf8.encode(jsonEncode(reqBody));
-    print(encoded);
     HttpClientRequest request = await client.getUrl(Uri.parse(fetchProfile(userId!)));
     request.headers.contentType = ContentType.json;
     request.headers.contentLength = encoded.length;
@@ -205,7 +196,6 @@ class UserAPI extends HTTPClientProvider {
     request.add(encoded);
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
-    print(data);
     if (data['status']) {
       await updateCookie(res);
       return Users.fromJson(data['data']);

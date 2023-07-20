@@ -78,10 +78,7 @@ String _validateUrl(String url) {
 class ConferenceAPI extends HTTPClientProvider {
   
   Future<String?> uploadConf(XFile file,String confId,String id) async {
-    print(uploadConfLogoRoute(id,confId));
-    String? refreshToken = await secstore.read(key: 'login_refresh_token');
     String? accessToken = await secstore.read(key: 'login_access_token');
-    String base64Image = base64Encode(await file.readAsBytes());
     String fileName = file.path.split("/").last;
     MultipartRequest request = MultipartRequest('PATCH', Uri.parse(uploadConfLogoRoute(id,confId)));
     request.files.add(
@@ -95,7 +92,6 @@ class ConferenceAPI extends HTTPClientProvider {
       "Content-type": "multipart/form-data",
       "Authorization": "Bearer $accessToken"
     });
-    print(uploadConfLogoRoute(id,confId));
     var res = await request.send();
     return res.reasonPhrase;
     // HttpClientRequest request =
@@ -292,6 +288,7 @@ class ConferenceAPI extends HTTPClientProvider {
       // print((data['data'] as List)[1]);
       return (data['data'] as List).map((e) => Conference.fromJson(e)).toList();
     }
+    return null;
   }
 }
 
@@ -320,7 +317,6 @@ class EventAPI extends HTTPClientProvider {
 
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
-    print(data);
     if (data['status']) {
       // await storage.write('token', data['token']);
       // await storage.write('isLoggedIn', true);

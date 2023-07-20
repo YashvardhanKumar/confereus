@@ -19,8 +19,8 @@ class _SearchSuggestionsState extends State<SearchSuggestions> {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: [
-        const Padding(
+      children: const [
+        Padding(
           padding: EdgeInsets.all(20.0),
           child: CustomText(
             'Recent Search',
@@ -28,55 +28,55 @@ class _SearchSuggestionsState extends State<SearchSuggestions> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        const RecentSearchListTile(
+        RecentSearchListTile(
           query: '3D Character',
         ),
-        const RecentSearchListTile(
+        RecentSearchListTile(
           query: 'CryptoPunks',
         ),
-        const RecentSearchListTile(
+        RecentSearchListTile(
           query: 'Anime',
         ),
-        const RecentSearchListTile(
+        RecentSearchListTile(
           query: 'Cartoon',
         ),
-        const RecentSearchListTile(
+        RecentSearchListTile(
           query: 'Cartoon',
         ),
-        const RecentSearchListTile(
+        RecentSearchListTile(
           query: 'Cartoon',
         ),
-        const RecentSearchListTile(
+        RecentSearchListTile(
           query: 'Cartoon',
         ),
-        const RecentSearchListTile(
+        RecentSearchListTile(
           query: 'Cartoon',
         ),
-        const RecentSearchListTile(
+        RecentSearchListTile(
           query: 'Cartoon',
         ),
-        const RecentSearchListTile(
+        RecentSearchListTile(
           query: 'Cartoon',
         ),
-        const RecentSearchListTile(
+        RecentSearchListTile(
           query: 'Cartoon',
         ),
-        const RecentSearchListTile(
+        RecentSearchListTile(
           query: 'Cartoon',
         ),
-        const RecentSearchListTile(
+        RecentSearchListTile(
           query: 'Cartoon',
         ),
-        const RecentSearchListTile(
+        RecentSearchListTile(
           query: 'Cartoon',
         ),
-        const RecentSearchListTile(
+        RecentSearchListTile(
           query: 'Cartoon',
         ),
-        const RecentSearchListTile(
+        RecentSearchListTile(
           query: 'Cartoon',
         ),
-        const RecentSearchListTile(
+        RecentSearchListTile(
           query: 'Cartoon',
         ),
       ],

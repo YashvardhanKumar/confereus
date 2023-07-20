@@ -28,7 +28,6 @@ class _AddDOBForSSOLoginState extends State<AddDOBForSSOLogin> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Provider.of<UserAPI>(context,listen: false).getCurUsers().then((value) => print(value?.toJson()));
     // await userAPI.linkedInLogin(response.user).then(
     //     (value) async =>
     // await userAPI.getCurUsers().then(
@@ -65,7 +64,6 @@ class _AddDOBForSSOLoginState extends State<AddDOBForSSOLogin> {
     return FutureBuilder<Users?>(
         future: Provider.of<UserAPI>(context,listen: false).getCurUsers(),
         builder: (context, snapshot) {
-          print(snapshot.connectionState);
           if (snapshot.data?.dob != null) {
             return const AddAboutYou();
           }

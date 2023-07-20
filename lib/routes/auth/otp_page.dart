@@ -3,14 +3,12 @@ import 'dart:async';
 import 'package:confereus/API/user_api.dart';
 import 'package:confereus/constants.dart';
 import 'package:confereus/routes/add_about_you_page.dart';
-import 'package:confereus/routes/main_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../components/button/text_button.dart';
-import '../../main.dart';
 import '../../models/user model/user_model.dart';
 import '../../provider/login_status_provider.dart';
 
@@ -219,9 +217,8 @@ class _OTPPageState extends State<OTPPage> {
     if (errorText == "Login Needed") {
       Provider.of<LoginStatus>(context).clearData();
     }
-    print(storage.read('userId'));
     Navigator.pushAndRemoveUntil(context,
-        MaterialPageRoute(builder: (_) => AddAboutYou()), (route) => false);
+        MaterialPageRoute(builder: (_) => const AddAboutYou()), (route) => false);
     // if (errorText == null) {
     //   errorText = null;
     //   setState(() {});
