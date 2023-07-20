@@ -1,4 +1,3 @@
-
 import 'package:confereus/API/user_api.dart';
 import 'package:confereus/models/user%20model/user_model.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../components/button/filled_button.dart';
 import '../../components/input_fields/text_form_field.dart';
+import 'otp_page.dart';
 
 class SignUpWithEmail extends StatefulWidget {
   const SignUpWithEmail({Key? key}) : super(key: key);
@@ -91,8 +91,7 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
                   }
                   try {
                     final data = DateFormat('dd/MM/yyyy').parseStrict(value);
-                    date = date?.copyWith(hour: data.hour,minute: data.minute);
-
+                    date = date?.copyWith(hour: data.hour, minute: data.minute);
                   } catch (e) {
                     return 'Invalid Format';
                   }
@@ -152,36 +151,43 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
               const SizedBox(
                 height: 30,
               ),
-              CustomFilledButton(
-                // margin: const EdgeInsets.all(10),
-                onPressed: () async {
-                  errorText = null;
-                  setState(() {});
-                  if (_formKey.currentState!.validate()) {
-                    Users user = Users(id: "", email: emailCtrl.text, name: nameCtrl.text, dob: date!, emailVerified: false, provider: "email_login", password: passwordCtrl.text);
-                    await Provider.of<UserAPI>(context).signUp(
-                      context,
-                      user
-                    ).then((value) {
-                          errorText = value;
-                        setState(() {});
-                      // });
-                    });
-                    if (!_formKey.currentState!.validate()) {
-                      return;
-                    }
+              Consumer<UserAPI>(builder: (context, userApi, _) {
+                return CustomFilledButton(
+                  // margin: const EdgeInsets.all(10),
+                  onPressed: () async {
+                    errorText = null;
                     setState(() {});
-                  }
-                },
-                child: Text(
-                  'Create Account',
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
+                    if (_formKey.currentState!.validate()) {
+                      Users user = Users(
+                          id: "",
+                          email: emailCtrl.text,
+                          name: nameCtrl.text,
+                          dob: date!,
+                          emailVerified: false,
+                          provider: "email_login",
+                          password: passwordCtrl.text);
+                      await userApi.signUp(context, user).then((value) {
+                        errorText = value;
+                        setState(() {});
+                        // });
+                      });
+                      if (!_formKey.currentState!.validate()) {
+                        return;
+                      }
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => OTPPage(user: user,)));
+                      setState(() {});
+                    }
+                  },
+                  child: Text(
+                    'Create Account',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-              ),
+                );
+              }),
             ],
           ),
         ),

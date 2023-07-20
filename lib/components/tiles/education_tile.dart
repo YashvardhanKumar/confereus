@@ -11,9 +11,11 @@ import '../button/text_button.dart';
 class EducationTile extends StatelessWidget {
   const EducationTile({
     Key? key,
-    required this.data,
+    required this.data, required this.updateState, required this.onEditClicked,
   }) : super(key: key);
   final Education data;
+  final VoidCallback updateState;
+  final VoidCallback onEditClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -104,9 +106,7 @@ class EducationTile extends StatelessWidget {
         Row(
           children: [
             CustomTextButton(
-              onPressed: () async {
-                editEducation(context, data);
-              },
+              onPressed: onEditClicked,
               child: const Padding(
                 padding: EdgeInsets.all(5.0),
                 child: Icon(Icons.edit_rounded),
@@ -121,6 +121,7 @@ class EducationTile extends StatelessWidget {
                 onPressed: () async {
                   await userAPI
                       .deleteEducation(context, data.id);
+                  updateState();
                 },
               );
             }),

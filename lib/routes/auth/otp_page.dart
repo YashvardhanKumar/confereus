@@ -2,13 +2,15 @@ import 'dart:async';
 
 import 'package:confereus/API/user_api.dart';
 import 'package:confereus/constants.dart';
-import 'package:confereus/main.dart';
+import 'package:confereus/routes/add_about_you_page.dart';
+import 'package:confereus/routes/main_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../components/button/text_button.dart';
+import '../../main.dart';
 import '../../models/user model/user_model.dart';
 import '../../provider/login_status_provider.dart';
 
@@ -27,6 +29,7 @@ class _OTPPageState extends State<OTPPage> {
   Timer? timer;
   Timer? resendTimer;
   bool isSent = false;
+
   // String? verifyOTP;
   int? tick;
 
@@ -36,11 +39,13 @@ class _OTPPageState extends State<OTPPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Provider.of<UserAPI>(context,listen: false).sendMail(widget.user.email).then((sent) {
+    Provider.of<UserAPI>(context, listen: false)
+        .sendMail(widget.user.email)
+        .then((sent) {
       isSent = sent;
       // _channel = channel;
       setState(() {});
-      if(!isSent) {
+      if (!isSent) {
         return;
       }
       timer = Timer.periodic(const Duration(minutes: 2), (timer) {
@@ -52,7 +57,7 @@ class _OTPPageState extends State<OTPPage> {
       });
       resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
         tick = 60 - timer.tick;
-        setState(() {});
+        // setState(() {});
         if (timer.tick == 60) {
           timer.cancel();
         }
@@ -79,10 +84,10 @@ class _OTPPageState extends State<OTPPage> {
 
   @override
   Widget build(BuildContext context) {
-    if(!isSent) {
-      Provider.of<LoginStatus>(context).clearData();
-      return const LogoPage(needsLogin: true);
-    }
+    // if(!isSent) {
+    //   Provider.of<LoginStatus>(context).clearData();
+    //   return const LogoPage(needsLogin: true);
+    // }
     return Scaffold(
       appBar: AppBar(
         leading: Container(),
@@ -112,7 +117,7 @@ class _OTPPageState extends State<OTPPage> {
                       onChanged: (value) {
                         if (index == 5) {
                           FocusScope.of(context).unfocus();
-                          continueFunction();
+                          continueFunction(context);
                           return;
                         }
                       },
@@ -131,7 +136,9 @@ class _OTPPageState extends State<OTPPage> {
                     onPressed: (tick == null || tick != 0)
                         ? null
                         : () async {
-                      await Provider.of<UserAPI>(context).sendMail(widget.user.email).then((value) {
+                            await Provider.of<UserAPI>(context)
+                                .sendMail(widget.user.email)
+                                .then((value) {
                               // _channel = value;
                               setState(() {});
                               timer = Timer.periodic(const Duration(minutes: 2),
@@ -180,7 +187,7 @@ class _OTPPageState extends State<OTPPage> {
     );
   }
 
-  void continueFunction() async {
+  void continueFunction(BuildContext context) async {
     String otp = '';
     for (int i = 0; i < 6; i++) {
       if (controllers[i].text.isEmpty) {
@@ -206,11 +213,15 @@ class _OTPPageState extends State<OTPPage> {
     //   print(verify["otp"]);
     // Check if the status is succesfull
 
-    errorText = await Provider.of<UserAPI>(context).verifyOTP(context, otp,widget.user);
+    errorText = await Provider.of<UserAPI>(context, listen: false)
+        .verifyOTP(context, otp);
     setState(() {});
-    if(errorText == "Login Needed") {
+    if (errorText == "Login Needed") {
       Provider.of<LoginStatus>(context).clearData();
     }
+    print(storage.read('userId'));
+    Navigator.pushAndRemoveUntil(context,
+        MaterialPageRoute(builder: (_) => AddAboutYou()), (route) => false);
     // if (errorText == null) {
     //   errorText = null;
     //   setState(() {});

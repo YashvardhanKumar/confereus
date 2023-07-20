@@ -9,8 +9,8 @@ import 'package:provider/provider.dart';
 import '../../API/user_profile_api.dart';
 import '../input_fields/dropdown_text_field.dart';
 
-void editWorkExperience(BuildContext context, WorkExperience data) {
-  showModalBottomSheet(
+Future editWorkExperience(BuildContext context, WorkExperience data) async {
+  return await showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     // useRootNavigator: true,
@@ -53,9 +53,9 @@ class _EditWorkExperienceDrawerState extends State<EditWorkExperienceDrawer> {
   @override
   Widget build(BuildContext context) {
     return AnimatedPadding(
-        padding:
-        EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-    duration: kThemeAnimationDuration,
+      padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      duration: kThemeAnimationDuration,
       child: BottomSheet(
         onClosing: () {},
         builder: (BuildContext context) {
@@ -77,8 +77,8 @@ class _EditWorkExperienceDrawerState extends State<EditWorkExperienceDrawer> {
                     ),
                   ),
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 5.0, horizontal: 10),
                     child: CustomTextFormField(
                       label: 'Title',
                       controller: titleCtrl,
@@ -92,8 +92,8 @@ class _EditWorkExperienceDrawerState extends State<EditWorkExperienceDrawer> {
                     ),
                   ),
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 5.0, horizontal: 10),
                     child: CustomDropDownField(
                       label: 'Employee Type',
                       controller: empTypeCtrl,
@@ -106,8 +106,8 @@ class _EditWorkExperienceDrawerState extends State<EditWorkExperienceDrawer> {
                     ),
                   ),
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 5.0, horizontal: 10),
                     child: CustomTextFormField(
                       label: 'Company Name',
                       controller: compNameCtrl,
@@ -121,8 +121,8 @@ class _EditWorkExperienceDrawerState extends State<EditWorkExperienceDrawer> {
                     ),
                   ),
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 5.0, horizontal: 10),
                     child: CustomTextFormField(
                       label: 'Work Location (optional)',
                       controller: workLocCtrl,
@@ -144,7 +144,7 @@ class _EditWorkExperienceDrawerState extends State<EditWorkExperienceDrawer> {
                           child: CustomTextFormField(
                             label: 'Start',
                             controller: startDateCtrl,
-                            validator:  (val) {
+                            validator: (val) {
                               if (val == null || val.isEmpty) {
                                 return "Field Required";
                               }
@@ -193,8 +193,8 @@ class _EditWorkExperienceDrawerState extends State<EditWorkExperienceDrawer> {
                                       return "Field Required";
                                     }
                                     try {
-                                      start =
-                                          DateFormat('MM/yyyy').parseStrict(val);
+                                      start = DateFormat('MM/yyyy')
+                                          .parseStrict(val);
                                       setState(() {});
                                     } catch (e) {
                                       return "Invalid Format";
@@ -261,13 +261,25 @@ class _EditWorkExperienceDrawerState extends State<EditWorkExperienceDrawer> {
                     child: Consumer<UserProfileAPI>(
                         builder: (context, userAPI, child) {
                       return CustomFilledButton(
-                        onPressed: () {
-                          userAPI.editWorkExperience(context, widget.data,
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            await userAPI.editWorkExperience(
+                              context,
+                              widget.data,
                               position: titleCtrl.text,
                               company: compNameCtrl.text,
                               jobType: empTypeCtrl.text,
                               start: start,
-                              end: end);
+                              end: end,
+                            );
+                            // await userAPI.editWorkExperience(context, widget.data,
+                            //     position: titleCtrl.text,
+                            //     company: compNameCtrl.text,
+                            //     jobType: empTypeCtrl.text,
+                            //     start: start,
+                            //     end: end);
+                            Navigator.pop(context);
+                          }
                         },
                         child: Text(
                           'Add',

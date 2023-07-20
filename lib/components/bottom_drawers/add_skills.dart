@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import '../../API/user_profile_api.dart';
 import '../input_fields/dropdown_text_field.dart';
 
-Future<Skills> addSkills(BuildContext context) async {
+Future<Skills?> addSkills(BuildContext context) async {
   return await showModalBottomSheet(
     context: context,
     isScrollControlled: true,

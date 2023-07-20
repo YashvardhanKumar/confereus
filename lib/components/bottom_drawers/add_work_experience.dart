@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../input_fields/dropdown_text_field.dart';
 
-Future<WorkExperience> addWorkExperience(BuildContext context) async {
+Future<WorkExperience?> addWorkExperience(BuildContext context) async {
   return await showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -257,7 +257,7 @@ class _AddWorkExperienceDrawerState extends State<AddWorkExperienceDrawer> {
                             company: compNameCtrl.text,
                             jobType: empTypeCtrl.text,
                             start: start!,
-                            end: end!,
+                            end: end,
                             location: workLocCtrl.text,
                           );
                           final data = await userAPI.addWorkExperience(

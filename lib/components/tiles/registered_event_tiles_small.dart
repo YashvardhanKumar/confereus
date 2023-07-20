@@ -34,7 +34,7 @@ class RegisteredConferenceCard extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (_) => ConferencePage(
-                  data: data,
+                  data: data, isRegistered: true,
                 ),
               ),
             );
@@ -55,7 +55,11 @@ class RegisteredConferenceCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10)),
                         child: Padding(
                           padding: const EdgeInsets.all(5.0),
-                          child: data.eventLogo != null ? Image.asset(data.eventLogo!) : null,
+                          child: data.eventLogo != null ? Image.network('$url/${data.eventLogo}',fit: BoxFit.cover) : const Icon(
+                          Icons.image,
+                          size: 120,
+                          color: Colors.grey,
+                        ),
                         ),
                       ),
                     ),
@@ -84,7 +88,7 @@ class RegisteredConferenceCard extends StatelessWidget {
                         CustomText(
                           '${DateFormat.MMMd().format(data.startTime)} '
                           '-'
-                          ' ${DateFormat.yMMMd().format(data.startTime)}',
+                          ' ${DateFormat.yMMMd().format(data.endTime)}',
                           fontSize: 12,
                           color: const Color(0xff8B8B8B),
                           fontWeight: FontWeight.w600,

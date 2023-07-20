@@ -2,6 +2,7 @@ import 'package:confereus/routes/bottom_nav/add_conference/add_conference.dart';
 import 'package:confereus/routes/bottom_nav/communities/communities.dart';
 import 'package:confereus/routes/bottom_nav/explore/explore.dart';
 import 'package:confereus/routes/bottom_nav/home/home.dart';
+import 'package:confereus/routes/bottom_nav/notification/notification.dart';
 import 'package:flutter/material.dart';
 
 import '../components/bottom_nav.dart';
@@ -25,7 +26,7 @@ class _MainPageState extends State<MainPage> {
           Icons.home_rounded,
           Icons.explore_rounded,
           Icons.notifications_rounded,
-          Icons.groups_rounded,
+          // Icons.groups_rounded,
         ],
 
         onChanged: (int value) {
@@ -38,8 +39,8 @@ class _MainPageState extends State<MainPage> {
       body: [
         const Home(),
         const Explore(),
-        const Home(),
-        const Communities(),
+        const Notifications(),
+        // const Communities(),
       ][idx],
     );
   }

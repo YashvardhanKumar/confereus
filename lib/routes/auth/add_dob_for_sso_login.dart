@@ -28,7 +28,7 @@ class _AddDOBForSSOLoginState extends State<AddDOBForSSOLogin> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    Provider.of<UserAPI>(context,listen: false).getCurUsers().then((value) => print(value?.toJson()));
     // await userAPI.linkedInLogin(response.user).then(
     //     (value) async =>
     // await userAPI.getCurUsers().then(
@@ -63,18 +63,20 @@ class _AddDOBForSSOLoginState extends State<AddDOBForSSOLogin> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Users?>(
-        future: Provider.of<UserAPI>(context).getCurUsers(),
+        future: Provider.of<UserAPI>(context,listen: false).getCurUsers(),
         builder: (context, snapshot) {
+          print(snapshot.connectionState);
+          if (snapshot.data?.dob != null) {
+            return const AddAboutYou();
+          }
           return Scaffold(
             appBar: AppBar(
               title: const CustomText('Add Date of Birth'),
             ),
-            body: Builder(
-              builder: (context) {
+            body:FutureBuilder<Users?>(
+              future: Provider.of<UserAPI>(context).getCurUsers(),
+              builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  if (snapshot.data?.dob != null) {
-                    return const AddAboutYou();
-                  }
                   return Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Form(
@@ -144,11 +146,11 @@ class _AddDOBForSSOLoginState extends State<AddDOBForSSOLogin> {
                           if (_formKey.currentState!.validate()) {
                             // if (widget.old != null) {
                             await userAPI
-                                .editProfile(context, snapshot.data!)
-                                .then((value) => Navigator.push(
+                                .editProfile(context, snapshot.data!, dob: date)
+                                .then((value) => Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (_) => const AddAboutYou())));
+                                        builder: (_) => const AddAboutYou()),(_) => false));
                           }
                         },
                       );

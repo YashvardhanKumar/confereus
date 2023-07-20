@@ -8,9 +8,10 @@ import 'package:provider/provider.dart';
 import '../../API/user_profile_api.dart';
 
 class SkillTile extends StatelessWidget {
-  const SkillTile({Key? key, required this.data})
+  const SkillTile({Key? key, required this.data, required this.updateState, required this.onEditClicked})
       : super(key: key);
   final Skills data;
+  final VoidCallback updateState,onEditClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -45,9 +46,7 @@ class SkillTile extends StatelessWidget {
           return Row(
             children: [
               CustomTextButton(
-                onPressed: () async {
-                  editSkills(context, data);
-                },
+                onPressed: onEditClicked,
                 child: const Padding(
                   padding: EdgeInsets.all(5.0),
                   child: Icon(Icons.edit_rounded),
@@ -60,7 +59,7 @@ class SkillTile extends StatelessWidget {
                 ),
                 onPressed: () async {
                   await userAPI.deleteSkills(context, data.id);
-
+                  updateState();
                 },
               ),
             ],

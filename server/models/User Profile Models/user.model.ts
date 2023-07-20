@@ -12,9 +12,9 @@ export interface IUser {
     emailVerified: boolean,
     profileImageURL: string,
     provider: string,
-    workExperience?: Array<IWorkExperience>,
-    education?: Array<IEducation>,
-    skills?: Array<ISkills>,
+    workExperience?: [Schema.Types.ObjectId],
+    education?: [Schema.Types.ObjectId],
+    skills?: [Schema.Types.ObjectId],
 }
 
 const UserSchema = new Schema<IUser, Model<IUser>>({
@@ -31,9 +31,9 @@ const UserSchema = new Schema<IUser, Model<IUser>>({
     dob: Date,
     profileImageURL: String,
     provider: String,
-    workExperience: [WorkExperienceSchema],
-    education: [EducationSchema],
-    skills: [SkillsSchema],
+    workExperience: [{ type: Schema.Types.ObjectId, ref: "work_experiences" }],
+    education: [{ type: Schema.Types.ObjectId, ref: "educations" }],
+    skills: [{ type: Schema.Types.ObjectId, ref: "skills" }],
 
 }, { timestamps: true });
 

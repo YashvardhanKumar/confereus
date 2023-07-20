@@ -39,6 +39,8 @@ export async function verifiedEmail(req: Request, res: Response) {
         let accessToken = req.headers['authorization'];
         accessToken = accessToken.slice(7, accessToken.length);
         const data = UserService.verifyToken(accessToken) as JwtPayload;
+        console.log(data);
+        
         if (!data) {
             return res.json({ status: false, success: "Session Expired" });
         }
@@ -47,6 +49,7 @@ export async function verifiedEmail(req: Request, res: Response) {
                 emailVerified: true,
             }
         });
+        console.log(user);
         res.status(200).json({ status: true, user });
     } catch (error) {
         console.log(error.message);
@@ -76,7 +79,7 @@ export async function refreshToken(req: Request, res: Response) {
 
 export async function getAllUsers(req: Request, res: Response) {
     try {
-        const data = await User.find();
+        const data = await User.find().populate(['workExperience', 'education', 'skills']);
         console.log(data);
 
         res.json({ status: true, data });

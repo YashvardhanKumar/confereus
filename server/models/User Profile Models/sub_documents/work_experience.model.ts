@@ -26,11 +26,8 @@ export const WorkExperienceSchema = new Schema<IWorkExperience>({
         type: Date,
         required: true,
     },
-    end: {
-        type: Date,
-        required: true,
-    },
+    end: Date,
     location: String,
 });
 
-export const WorkExperience = model<IWorkExperience>('work_experience',WorkExperienceSchema);
+export const WorkExperience = model<IWorkExperience>('work_experiences',WorkExperienceSchema);

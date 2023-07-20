@@ -11,7 +11,7 @@ Users _$UsersFromJson(Map<String, dynamic> json) => Users(
       email: json['email'] as String,
       name: json['name'] as String,
       password: json['password'] as String?,
-      dob: json['dob'] == null ? null : DateTime.parse(json['dob'] as String),
+      dob: json['dob'] == null ? null : DateTime.parse(json['dob'] as String).toLocal(),
       emailVerified: json['emailVerified'] as bool,
       profileImageURL: json['profileImageURL'] as String?,
       provider: json['provider'] as String,
@@ -31,7 +31,7 @@ Map<String, dynamic> _$UsersToJson(Users instance) => <String, dynamic>{
       'email': instance.email,
       'name': instance.name,
       'password': instance.password,
-      'dob': instance.dob?.toIso8601String(),
+      'dob': instance.dob?.toLocal().toIso8601String(),
       'emailVerified': instance.emailVerified,
       'profileImageURL': instance.profileImageURL,
       'provider': instance.provider,
@@ -48,19 +48,19 @@ WorkExperience _$WorkExperienceFromJson(Map<String, dynamic> json) =>
       company: json['company'] as String,
       jobType: json['jobType'] as String,
       location: json['location'] as String?,
-      start: DateTime.parse(json['start'] as String),
-      end: DateTime.parse(json['end'] as String),
+      start: DateTime.parse(json['start'] as String).toLocal(),
+      end: json['end'] == null ? null : DateTime.parse(json['end'] as String).toLocal(),
     );
 
 Map<String, dynamic> _$WorkExperienceToJson(WorkExperience instance) =>
     <String, dynamic>{
-      '_id': instance.id,
+      // '_id': instance.id,
       'position': instance.position,
       'company': instance.company,
       'jobType': instance.jobType,
       'location': instance.location,
-      'start': instance.start.toIso8601String(),
-      'end': instance.end?.toIso8601String(),
+      'start': instance.start.toLocal().toIso8601String(),
+      'end': instance.end?.toLocal().toIso8601String(),
     };
 
 Education _$EducationFromJson(Map<String, dynamic> json) => Education(
@@ -69,18 +69,18 @@ Education _$EducationFromJson(Map<String, dynamic> json) => Education(
       degree: json['degree'] as String,
       field: json['field'] as String,
       location: json['location'] as String?,
-      start: DateTime.parse(json['start'] as String),
-      end: DateTime.parse(json['end'] as String),
+      start: DateTime.parse(json['start'] as String).toLocal(),
+      end: json['end'] == null ? null : DateTime.parse(json['end'] as String).toLocal(),
     );
 
 Map<String, dynamic> _$EducationToJson(Education instance) => <String, dynamic>{
-      '_id': instance.id,
+      // '_id': instance.id,
       'institution': instance.institution,
       'degree': instance.degree,
       'field': instance.field,
       'location': instance.location,
-      'start': instance.start.toIso8601String(),
-      'end': (instance.end ?? instance.start).toIso8601String(),
+      'start': instance.start.toLocal().toIso8601String(),
+      'end': (instance.end ?? instance.start).toLocal().toIso8601String(),
     };
 
 Skills _$SkillsFromJson(Map<String, dynamic> json) => Skills(
@@ -90,7 +90,7 @@ Skills _$SkillsFromJson(Map<String, dynamic> json) => Skills(
     );
 
 Map<String, dynamic> _$SkillsToJson(Skills instance) => <String, dynamic>{
-      '_id': instance.id,
+      // '_id': instance.id,
       'skill': instance.skill,
       'expertise': instance.expertise,
     };

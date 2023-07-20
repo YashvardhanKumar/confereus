@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "548479425439",
+    "project_id": "confereus",
+    "storage_bucket": "confereus.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:548479425439:android:1f5b0c20b25fc9bc6c3baa",
+        "android_client_info": {
+          "package_name": "com.example.confereus.confereus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "548479425439-qtbvgrljd7rjlca8m703p3jau4n288ln.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4YiuDjrzH5GDKhTIPu1Xhx8bFgtLPdBQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "548479425439-qtbvgrljd7rjlca8m703p3jau4n288ln.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

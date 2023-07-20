@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-Future<Education> addEducation(BuildContext context) async {
+Future<Education?> addEducation(BuildContext context) async {
   return await showModalBottomSheet(
     context: context,
     isScrollControlled: true,

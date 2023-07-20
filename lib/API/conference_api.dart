@@ -1,18 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart';
-import 'package:html/parser.dart';
+
 import 'package:confereus/API/http_client.dart';
 import 'package:flutter/foundation.dart';
+import 'package:html/parser.dart';
+import 'package:http/http.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../constants.dart';
 import '../models/conference model/conference.model.dart';
 
-Future<Map<String,dynamic>?> fetch(String url) async {
+Future<Map<String, dynamic>?> fetch(String url) async {
   // if(url == null) return null;
   final client = Client();
   final response = await client.get(Uri.parse(_validateUrl(url)));
-
 
   final document = parse(response.body);
 
@@ -67,8 +68,7 @@ Future<Map<String,dynamic>?> fetch(String url) async {
 }
 
 String _validateUrl(String url) {
-  if (url.startsWith('http://') == true ||
-      url.startsWith('https://') == true) {
+  if (url.startsWith('http://') == true || url.startsWith('https://') == true) {
     return url;
   } else {
     return 'http://$url';
@@ -76,6 +76,36 @@ String _validateUrl(String url) {
 }
 
 class ConferenceAPI extends HTTPClientProvider {
+  
+  Future<String?> uploadConf(XFile file,String confId,String id) async {
+    print(uploadConfLogoRoute(id,confId));
+    String? refreshToken = await secstore.read(key: 'login_refresh_token');
+    String? accessToken = await secstore.read(key: 'login_access_token');
+    String base64Image = base64Encode(await file.readAsBytes());
+    String fileName = file.path.split("/").last;
+    MultipartRequest request = MultipartRequest('PATCH', Uri.parse(uploadConfLogoRoute(id,confId)));
+    request.files.add(
+        MultipartFile.fromBytes(
+            'picture',
+            await file.readAsBytes(),
+            filename: fileName,
+        )
+    );
+    request.headers.addAll({
+      "Content-type": "multipart/form-data",
+      "Authorization": "Bearer $accessToken"
+    });
+    print(uploadConfLogoRoute(id,confId));
+    var res = await request.send();
+    return res.reasonPhrase;
+    // HttpClientRequest request =
+    //     await client.postUrl(Uri.parse(uploadConfLogoRoute));
+    // request.headers.contentType = ContentType.binary;
+    // request.headers.add('Authorization', 'Bearer $accessToken');
+    // request.add(encoded);
+    // HttpClientResponse res = await request.close();
+  }
+  
   Future<List<Conference>?> fetchConference(
     // Conference conference,
     String visibility,
@@ -93,16 +123,17 @@ class ConferenceAPI extends HTTPClientProvider {
       //   'endTime': endTime,
       // }
     };
+    final encoded = utf8.encode(jsonEncode(reqBody));
     HttpClientRequest request =
         await client.getUrl(Uri.parse(conferenceGetRoute(userId!, visibility)));
     request.headers.contentType = ContentType.json;
-    request.headers.contentLength = 496;
+    request.headers.contentLength = encoded.length;
     request.headers.add('Authorization', 'Bearer $accessToken');
-    request.add(utf8.encode(jsonEncode(reqBody)));
+    request.add(encoded);
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
       return (data['data'] as List).map((e) => Conference.fromJson(e)).toList();
     } else {
       // return data['message'];
@@ -135,7 +166,7 @@ class ConferenceAPI extends HTTPClientProvider {
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
       return Conference.fromJson(data['data']);
     } else {
       // return data['message'];
@@ -159,13 +190,17 @@ class ConferenceAPI extends HTTPClientProvider {
     Map<String, dynamic> reqBody = {
       'login_refresh_token': refreshToken,
       'data': {
-        if (subject != conference.subject && subject!= null) 'subject': subject,
+        if (subject != conference.subject && subject != null)
+          'subject': subject,
         if (about != conference.about && about != null) 'about': about,
-        if (eventLogo != conference.eventLogo && eventLogo != null) 'eventLogo': about,
-        if(location != conference.location && location != null) 'location': location,
+        if (eventLogo != conference.eventLogo && eventLogo != null)
+          'eventLogo': about,
+        if (location != conference.location && location != null)
+          'location': location,
         // if(!listEquals(presenters, conference.presenters)) 'presenters': presenters,
         // if(registeredID != null && !(conference.registered?.contains(registeredID) ?? false)) 'registered': registeredID,
-        if (visibility != conference.visibility && visibility != null) 'visibility': visibility,
+        if (visibility != conference.visibility && visibility != null)
+          'visibility': visibility,
         if (abstractLink != conference.abstractLink && abstractLink != null)
           'abstractLink': abstractLink,
         if ((startTime ?? conference.startTime)
@@ -185,7 +220,8 @@ class ConferenceAPI extends HTTPClientProvider {
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
+
       return Conference.fromJson(data['data']);
     } else {
       // return data['message'];
@@ -208,9 +244,54 @@ class ConferenceAPI extends HTTPClientProvider {
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
     }
     return data['status'];
+  }
+
+  Future<bool> registerConference(String confId) async {
+    String? refreshToken = await secstore.read(key: 'login_refresh_token');
+    String? accessToken = await secstore.read(key: 'login_access_token');
+    String? userId = storage.read('userId');
+    Map<String, dynamic> reqBody = {
+      'login_refresh_token': refreshToken,
+    };
+    HttpClientRequest request = await client
+        .postUrl(Uri.parse(conferenceRegisterRoute(userId!, confId)));
+    request.headers.contentType = ContentType.json;
+    request.headers.add('Authorization', 'Bearer $accessToken');
+    request.add(utf8.encode(jsonEncode(reqBody)));
+    HttpClientResponse res = await request.close();
+    var data = jsonDecode(await res.transform(utf8.decoder).join());
+    if (data['status']) {
+      await updateCookie(res);
+    }
+    return data['status'];
+  }
+
+  Future<List<Conference>?> getRegisteredConferences(String confId) async {
+    String? refreshToken = await secstore.read(key: 'login_refresh_token');
+    String? accessToken = await secstore.read(key: 'login_access_token');
+    String? userId = storage.read('userId');
+    Map<String, dynamic> reqBody = {
+      'login_refresh_token': refreshToken,
+    };
+    final encoded = utf8.encode(jsonEncode(reqBody));
+    // print(encoded);
+    HttpClientRequest request =
+        await client.getUrl(Uri.parse(getRegisteredConferencesRoute(userId!)));
+    request.headers.contentType = ContentType.json;
+    request.headers.contentLength = encoded.length;
+    request.headers.add('Authorization', 'Bearer $accessToken');
+    request.add(encoded);
+    HttpClientResponse res = await request.close();
+    var data = jsonDecode(await res.transform(utf8.decoder).join());
+    // print("=>$data");
+    if (data['status']) {
+      await updateCookie(res);
+      // print((data['data'] as List)[1]);
+      return (data['data'] as List).map((e) => Conference.fromJson(e)).toList();
+    }
   }
 }
 
@@ -229,20 +310,22 @@ class EventAPI extends HTTPClientProvider {
       //   'endTime': endTime,
       // }
     };
+    final encoded = utf8.encode(jsonEncode(reqBody));
     HttpClientRequest request =
         await client.getUrl(Uri.parse(eventGetRoute(userId!, confId)));
     request.headers.contentType = ContentType.json;
-    request.headers.contentLength = 496;
+    request.headers.contentLength = encoded.length;
     request.headers.add('Authorization', 'Bearer $accessToken');
-    request.add(utf8.encode(jsonEncode(reqBody)));
+    request.add(encoded);
 
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
+    print(data);
     if (data['status']) {
       // await storage.write('token', data['token']);
       // await storage.write('isLoggedIn', true);
       // await storage.write('auth_provider', 'email_login');
-      updateCookie(res);
+      await updateCookie(res);
       return (data['data'] as List).map((e) => Event.fromJson(e)).toList();
     } else {
       // return data['message'];
@@ -277,7 +360,7 @@ class EventAPI extends HTTPClientProvider {
       // await storage.write('token', data['token']);
       // await storage.write('isLoggedIn', true);
       // await storage.write('auth_provider', 'email_login');
-      updateCookie(res);
+      await updateCookie(res);
       return Event.fromJson(data['data']);
     } else {
       // return data['message'];
@@ -301,7 +384,8 @@ class EventAPI extends HTTPClientProvider {
       'login_refresh_token': refreshToken,
       'data': {
         if (subject != event.subject && subject != null) 'subject': subject,
-        if (location != event.location && location != null) 'location': location,
+        if (location != event.location && location != null)
+          'location': location,
         if (listEquals(presenter, event.presenter)) 'presenter': presenter,
         if ((startTime ?? event.startTime).compareTo(event.startTime) != 0)
           'startTime': startTime!.toIso8601String(),
@@ -317,7 +401,7 @@ class EventAPI extends HTTPClientProvider {
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
       return Event.fromJson(data['data']);
     } else {
       return data['message'];
@@ -339,7 +423,7 @@ class EventAPI extends HTTPClientProvider {
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
     }
     return data['status'];
   }

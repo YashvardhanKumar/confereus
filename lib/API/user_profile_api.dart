@@ -8,27 +8,36 @@ import 'package:flutter/material.dart';
 import '../constants.dart';
 
 class UserProfileAPI extends HTTPClientProvider {
-  Future<Map<String, dynamic>?> userProfile(BuildContext context) async {
+  Future<Users?> userProfile(BuildContext context) async {
     String? refreshToken = await secstore.read(key: 'login_refresh_token');
     String? accessToken = await secstore.read(key: 'login_access_token');
     String? userId = storage.read('userId');
     Map<String, dynamic> reqBody = {
       'login_refresh_token': refreshToken,
     };
+    print("$userId => ${Uri.parse(fetchProfile(userId!))} => $refreshToken => $accessToken");
+    final encoded = utf8.encode(jsonEncode(reqBody));
     HttpClientRequest request =
-        await client.getUrl(Uri.parse(fetchProfile(userId!)));
+        await client.getUrl(Uri.parse(fetchProfile(userId!))).catchError((error, stackTrace) {
+          print(error);
+          print(stackTrace);
+          // return ;
+        });
     request.headers.contentType = ContentType.json;
+    request.headers.contentLength = encoded.length;
     request.headers.add('Authorization', 'Bearer $accessToken');
-    request.add(utf8.encode(jsonEncode(reqBody)));
+    request.add(encoded);
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
+    print(data);
     if (data['status']) {
-      updateCookie(res);
-      return data['data'];
+      await updateCookie(res);
+      return Users.fromJson(data['data']);
     } else {
+      print(data['message']);
       // return data['message'];
     }
-    return null;
+    // return null;
   }
 
   Future<Map<String, dynamic>?> editProfile(
@@ -53,14 +62,14 @@ class UserProfileAPI extends HTTPClientProvider {
       }
     };
     HttpClientRequest request =
-        await client.getUrl(Uri.parse(fetchProfile(userId!)));
+        await client.patchUrl(Uri.parse(editProfileRoute(userId!)));
     request.headers.contentType = ContentType.json;
     request.headers.add('Authorization', 'Bearer $accessToken');
     request.add(utf8.encode(jsonEncode(reqBody)));
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
       return data['data'];
     } else {
       // return data['message'];
@@ -93,7 +102,7 @@ class UserProfileAPI extends HTTPClientProvider {
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
       return WorkExperience.fromJson(data['data']);
     } else {
       // return data['message'];
@@ -121,7 +130,7 @@ class UserProfileAPI extends HTTPClientProvider {
         if (old.start.compareTo(start ?? old.start) != 0)
           'start': start!.toIso8601String(),
         if ((old.end?.compareTo(end ?? old.end!) ?? 0) != 0)
-          'end': end!.toIso8601String(),
+          'end': end?.toIso8601String(),
         if (location != old.location && location != null) 'location': location,
       }
     };
@@ -132,8 +141,9 @@ class UserProfileAPI extends HTTPClientProvider {
     request.add(utf8.encode(jsonEncode(reqBody)));
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
+    print(data);
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
       return WorkExperience.fromJson(data['data']);
     } else {
       // return data['message'];
@@ -156,7 +166,7 @@ class UserProfileAPI extends HTTPClientProvider {
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
       return data['status'];
     } else {
       // return data['message'];
@@ -189,7 +199,7 @@ class UserProfileAPI extends HTTPClientProvider {
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
       return Education.fromJson(data['data']);
     } else {
       // return data['message'];
@@ -229,7 +239,7 @@ class UserProfileAPI extends HTTPClientProvider {
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
       return Education.fromJson(data['data']);
     } else {
       // return data['message'];
@@ -252,7 +262,7 @@ class UserProfileAPI extends HTTPClientProvider {
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
     }
     return data['status'];
   }
@@ -277,7 +287,7 @@ class UserProfileAPI extends HTTPClientProvider {
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
       return Skills.fromJson(data['data']);
     } else {
       // return data['message'];
@@ -306,7 +316,7 @@ class UserProfileAPI extends HTTPClientProvider {
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
       return Skills.fromJson(data['data']);
     } else {
       // return data['message'];
@@ -329,7 +339,7 @@ class UserProfileAPI extends HTTPClientProvider {
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
     }
     return data['status'];
   }

@@ -6,10 +6,10 @@ import catchAsync from "../../services/catchAsync";
 
 const userRouter = Router({ mergeParams : true });
 
-userRouter.post('/signup', canCreateUser, hashPassword, catchAsync(signUp))
-userRouter.post('/login',doesUserExist,checkPassword,catchAsync(login));
-userRouter.post('/sendmail',isAuthenticated,sendOTPToMail,catchAsync(sendMail));
-userRouter.post('/verifymail',isAuthenticated,verifyOTP,catchAsync(verifiedEmail));
+userRouter.post('/signup', canCreateUser, hashPassword, signUp)
+userRouter.post('/login',doesUserExist,checkPassword,login);
+userRouter.post('/sendmail',isAuthenticated,sendOTPToMail,sendMail);
+userRouter.post('/verifymail',isAuthenticated,verifyOTP,verifiedEmail);
 userRouter.post('/logout', isAuthenticated,catchAsync(logout));
 userRouter.put('/refreshtoken',isAuthenticated,checkTokenForLogin,catchAsync(refreshToken));
 userRouter.get('/getAllUsers', isAuthenticated,isTokenNotExpired, catchAsync(getAllUsers));

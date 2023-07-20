@@ -26,7 +26,7 @@ export async function getLinkedinUser(req: Request, res: Response) {
   let resStatus = 200;
   console.log(user._id);
   // }
-  res.status(resStatus).json({ user, token: accessToken, userId: user });
+  res.status(resStatus).json({ token: accessToken, userId: user });
 }
 
 // function getAccessToken(code) {
@@ -105,11 +105,8 @@ async function userBuilder(userProfile, userEmail) {
     provider: 'linkedin_login'
   }
   if (!user) {
-    await User.insertMany(data);
-    user = await User.findOne({
-      email: userEmail,
-      // provider: 'linkedin_login'
-    });
+    user = new User(data);
+    await user.save();
     return user._id;
   }
   if (user.provider == 'linkedin_login') {

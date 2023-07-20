@@ -10,8 +10,8 @@ Conference _$ConferenceFromJson(Map<String, dynamic> json) => Conference(
       id: json['_id'] as String,
       subject: json['subject'] as String,
       about: json['about'] as String,
-      startTime: DateTime.parse(json['startTime'] as String),
-      endTime: DateTime.parse(json['endTime'] as String),
+      startTime: DateTime.parse(json['startTime'] as String).toLocal(),
+      endTime: DateTime.parse(json['endTime'] as String).toLocal(),
       admin: json['admin'],
       visibility: json['visibility'] as String?,
       abstractLink: json['abstractLink'] as String?,
@@ -25,11 +25,11 @@ Conference _$ConferenceFromJson(Map<String, dynamic> json) => Conference(
 
 Map<String, dynamic> _$ConferenceToJson(Conference instance) =>
     <String, dynamic>{
-      '_id': instance.id,
+      // '_id': instance.id,
       'subject': instance.subject,
       'about': instance.about,
-      'startTime': instance.startTime.toIso8601String(),
-      'endTime': instance.endTime.toIso8601String(),
+      'startTime': instance.startTime.toLocal().toIso8601String(),
+      'endTime': instance.endTime.toLocal().toIso8601String(),
       'admin': instance.admin,
       'visibility': instance.visibility,
       'abstractLink': instance.abstractLink,
@@ -43,16 +43,16 @@ Event _$EventFromJson(Map<String, dynamic> json) => Event(
       id: json['_id'] as String,
       subject: json['subject'] as String,
       presenter: json['presenter'] as List<dynamic>?,
-      startTime: DateTime.parse(json['startTime'] as String),
-      endTime: DateTime.parse(json['endTime'] as String),
+      startTime: DateTime.parse(json['startTime'] as String).toLocal(),
+      endTime: DateTime.parse(json['endTime'] as String).toLocal(),
       location: json['location'] as String,
     );
 
 Map<String, dynamic> _$EventToJson(Event instance) => <String, dynamic>{
-      '_id': instance.id,
+      // '_id': instance.id,
       'subject': instance.subject,
       'presenter': instance.presenter,
-      'startTime': instance.startTime.toIso8601String(),
-      'endTime': instance.endTime.toIso8601String(),
+      'startTime': instance.startTime.toLocal().toIso8601String(),
+      'endTime': instance.endTime.toLocal().toIso8601String(),
       'location': instance.location,
     };

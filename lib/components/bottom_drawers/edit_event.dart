@@ -12,9 +12,9 @@ import 'package:provider/provider.dart';
 
 import '../../models/conference model/conference.model.dart';
 
-void editEvents(BuildContext context, Conference data, DateTime date, Event event,
-    List<Users> users) async {
-  showModalBottomSheet(
+Future editEvents(BuildContext context, Conference data, DateTime date,
+    Event event, List<Users> users) async {
+  return await showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
@@ -23,7 +23,8 @@ void editEvents(BuildContext context, Conference data, DateTime date, Event even
       return EditEvents(
         data: data,
         users: users,
-        date: date, event: event,
+        date: date,
+        event: event,
       );
     },
   );
@@ -34,7 +35,8 @@ class EditEvents extends StatefulWidget {
     super.key,
     required this.data,
     required this.users,
-    required this.date, required this.event,
+    required this.date,
+    required this.event,
   });
 
   final Conference data;
@@ -48,13 +50,16 @@ class EditEvents extends StatefulWidget {
 
 class _EditEventsState extends State<EditEvents> {
   late final subjectCtrl = TextEditingController(text: widget.event.subject);
+
   // late final presenterCtrl = TextEditingController(text: widget.event.presenter.join(','));
   late final locCtrl = TextEditingController(text: widget.event.location);
-  late final startDateCtrl = TextEditingController(text: DateFormat.Hm().format(widget.event.startTime));
-  late final endDateCtrl = TextEditingController(text: DateFormat.Hm().format(widget.event.endTime));
+  late final startDateCtrl = TextEditingController(
+      text: DateFormat.Hm().format(widget.event.startTime));
+  late final endDateCtrl =
+      TextEditingController(text: DateFormat.Hm().format(widget.event.endTime));
   List<Users> selected = [];
-  late DateTime start = widget.date;
-  late DateTime end = widget.date;
+  late DateTime start = widget.event.startTime;
+  late DateTime end = widget.event.endTime;
   bool isSameDay = false;
   final _formKey = GlobalKey<FormState>();
 
@@ -62,16 +67,15 @@ class _EditEventsState extends State<EditEvents> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    for(Users e in widget.users) {
-      for(var z in widget.event.presenter!) {
-        if(e.id == z) selected.add(e);
+    for (Users e in widget.users) {
+      for (var z in widget.event.presenter!) {
+        if (e.id == z) selected.add(e);
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     return SafeArea(
       child: BottomSheet(
         backgroundColor: kColorLight,
@@ -176,7 +180,9 @@ class _EditEventsState extends State<EditEvents> {
                               // }
                               final time = await showTimePicker(
                                 context: context,
-                                initialTime: TimeOfDay(hour: widget.date.hour, minute: widget.date.minute),
+                                initialTime: TimeOfDay(
+                                    hour: widget.date.hour,
+                                    minute: widget.date.minute),
                                 // firstDate: DateTime(1800),
                                 // lastDate: DateTime.now(),
                               );
@@ -223,7 +229,8 @@ class _EditEventsState extends State<EditEvents> {
                               // }
                               final time = await showTimePicker(
                                 context: context,
-                                initialTime: TimeOfDay(hour: start.hour, minute: start.minute),
+                                initialTime: TimeOfDay(
+                                    hour: start.hour, minute: start.minute),
                                 // firstDate: DateTime(1800),
                                 // lastDate: DateTime.now(),
                               );
@@ -299,15 +306,15 @@ class _EditEventsState extends State<EditEvents> {
                     return CustomFilledButton(
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          Event event = Event(
-                              id: "",
-                              subject: subjectCtrl.text,
-                              presenter: selected.map((e) => e.id).toList(),
-                              startTime: start,
-                              endTime: end,
-                              location: locCtrl.text);
-                          final data =
-                              await confAPI.addEvent(widget.data.id, event);
+                          print(start.toIso8601String());
+                          final data = await confAPI.editEvent(
+                            widget.data.id,
+                            widget.event,
+                            location: locCtrl.text,
+                            subject: subjectCtrl.text,
+                            startTime: start,
+                            endTime: end,
+                          );
                           Navigator.pop(context, data);
                         }
                       },

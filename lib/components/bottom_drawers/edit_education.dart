@@ -8,8 +8,8 @@ import 'package:provider/provider.dart';
 
 import '../../API/user_profile_api.dart';
 
-void editEducation(BuildContext context, Education data) {
-  showModalBottomSheet(
+Future editEducation(BuildContext context, Education data) async {
+  return await showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     // useRootNavigator: true,

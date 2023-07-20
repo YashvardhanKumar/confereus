@@ -21,6 +21,7 @@ class UserAPI extends HTTPClientProvider {
     request.add(utf8.encode(jsonEncode(reqBody)));
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
+    print(data);
     // print('cookies of res = ${res.cookies}');
     // print('cookies of req = ${request.cookies}');
     // await secstore.write(key: 'cookies', value: res.cookies.join('; '));
@@ -38,7 +39,8 @@ class UserAPI extends HTTPClientProvider {
       await storage.write('isLoggedIn', true);
       await storage.write('auth_provider', 'email_login');
       // final auth = JwtDecoder.decode(token);
-      updateCookie(res);
+      await updateCookie(res);
+      notifyListeners();
     } else {
       return data['success'];
     }
@@ -57,6 +59,7 @@ class UserAPI extends HTTPClientProvider {
     request.headers.contentType = ContentType.json;
     request.headers.add('Authorization', 'Bearer $accessToken');
     request.add(utf8.encode(jsonEncode(reqBody)));
+    final res = await request.close();
   }
 
   Future<String?> refreshToken() async {
@@ -77,6 +80,7 @@ class UserAPI extends HTTPClientProvider {
       var token = data['token'];
       if (data['success'] == null) {
         await storage.write('token', token);
+        notifyListeners();
       }
     } else {
       return data['success'];
@@ -91,6 +95,7 @@ class UserAPI extends HTTPClientProvider {
     //   "password": _cpwd,
     //   "dob": _dob,
     // };
+
     HttpClientRequest request = await client.postUrl(Uri.parse(signupRoute));
     request.headers.contentType = ContentType.json;
     request.add(utf8.encode(jsonEncode(reqBody)));
@@ -101,8 +106,9 @@ class UserAPI extends HTTPClientProvider {
       await storage.write('userId', data['userId']);
       await storage.write('isLoggedIn', true);
       await storage.write('auth_provider', 'email_login');
-      updateCookie(res);
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => OTPPage(user: user,)));
+      await updateCookie(res);
+      print(data);
+      notifyListeners();
     } else {
       return data['success'];
     }
@@ -121,11 +127,11 @@ class UserAPI extends HTTPClientProvider {
     request.add(utf8.encode(jsonEncode(reqBody)));
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
-    updateCookie(res);
+    await updateCookie(res);
     return data['status'];
   }
 
-  Future<String?> verifyOTP(BuildContext context, String otp, Users user) async {
+  Future<String?> verifyOTP(BuildContext context, String otp) async {
     String? refreshToken = await secstore.read(key: 'login_refresh_token');
     String? accessToken = await secstore.read(key: 'login_access_token');
     String? encryptedOTP = await secstore.read(key: 'encrypted_otp_token');
@@ -144,8 +150,9 @@ class UserAPI extends HTTPClientProvider {
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if(data['status']) {
-
-      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const AddAboutYou()), (route) => false);
+      String? userId = storage.read('userId');
+      print(storage.getKeys());
+      print(storage.getValues());
     } else {
       return data['success'];
     }
@@ -161,7 +168,7 @@ class UserAPI extends HTTPClientProvider {
         //   .identifiers?[0].file,
       'email': user.email?.elements?[0].handleDeep?.emailAddress,
     };
-    HttpClient client = HttpClient();
+    // HttpClient client = HttpClient();
     HttpClientRequest reqFinal =
     await client.postUrl(Uri.parse(linkedinServerLoginRoute));
     reqFinal.headers.contentType = ContentType.json;
@@ -185,18 +192,22 @@ class UserAPI extends HTTPClientProvider {
     String? refreshToken = await secstore.read(key: 'login_refresh_token');
     String? accessToken = await secstore.read(key: 'login_access_token');
     String? userId = storage.read('userId');
+    print(userId);
     Map<String, dynamic> reqBody = {
       'login_refresh_token': refreshToken,
     };
+    final encoded = utf8.encode(jsonEncode(reqBody));
+    print(encoded);
     HttpClientRequest request = await client.getUrl(Uri.parse(fetchProfile(userId!)));
     request.headers.contentType = ContentType.json;
-    request.headers.contentLength = 496;
+    request.headers.contentLength = encoded.length;
     request.headers.add('Authorization', 'Bearer $accessToken');
-    request.add(utf8.encode(jsonEncode(reqBody)));
+    request.add(encoded);
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
+    print(data);
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
       return Users.fromJson(data['data']);
     } else {
       // return data['message'];
@@ -210,16 +221,17 @@ class UserAPI extends HTTPClientProvider {
     Map<String, dynamic> reqBody = {
       'login_refresh_token': refreshToken,
     };
+    final encoded = utf8.encode(jsonEncode(reqBody));
     HttpClientRequest request = await client.getUrl(Uri.parse(getAllUsersRoute));
     request.headers.contentType = ContentType.json;
-    request.headers.contentLength = 496;
+    request.headers.contentLength = encoded.length;
     request.headers.add('Authorization', 'Bearer $accessToken');
-    request.add(utf8.encode(jsonEncode(reqBody)));
+    request.add(encoded);
     HttpClientResponse res = await request.close();
     // print(await res.transform(utf8.decoder).join());
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
-      updateCookie(res);
+      await updateCookie(res);
       return (data['data'] as List).map((e) => Users.fromJson(e)).toList();
     } else {
       // return data['message'];

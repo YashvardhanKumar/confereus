@@ -1,29 +1,33 @@
+import 'package:confereus/API/conference_api.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../API/user_api.dart';
 import '../../models/conference model/conference.model.dart';
-import '../bottom_drawers/edit_event.dart';
 import '../button/text_button.dart';
 import '../custom_text.dart';
 
-class EventTile extends StatelessWidget {
+class EventTile extends StatefulWidget {
   const EventTile({
     super.key,
     required this.event,
     required this.isAdmin,
     required this.data,
+    required this.updateState,
+    required this.onEdit,
   });
 
   final Event event;
   final bool isAdmin;
   final Conference data;
+  final VoidCallback updateState;
+  final VoidCallback onEdit;
 
-  // final String eventName, location;
-  // final String? presenter;
-  // final DateTime start, end;
+  @override
+  State<EventTile> createState() => _EventTileState();
+}
 
+class _EventTileState extends State<EventTile> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -34,7 +38,7 @@ class EventTile extends StatelessWidget {
             SizedBox(
               width: 50,
               child: CustomText(
-                DateFormat.Hm().format(event.startTime),
+                DateFormat.Hm().format(widget.event.startTime),
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -48,15 +52,17 @@ class EventTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CustomText(
-                    event.subject,
+                    widget.event.subject,
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                   ),
-                  if (event.presenter != null && event.presenter!.isEmpty)
+                  if (widget.event.presenter != null &&
+                      widget.event.presenter!.isEmpty)
                     const SizedBox(
                       height: 5,
                     ),
-                  if (event.presenter != null && event.presenter!.isEmpty)
+                  if (widget.event.presenter != null &&
+                      widget.event.presenter!.isEmpty)
                     Row(
                       children: [
                         const Icon(
@@ -67,7 +73,7 @@ class EventTile extends StatelessWidget {
                           width: 5,
                         ),
                         CustomText(
-                          event.presenter!.join(", "),
+                          widget.event.presenter!.join(", "),
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           // fontWeight: FontWeight.w600,
@@ -86,9 +92,9 @@ class EventTile extends StatelessWidget {
                       ),
                       const SizedBox(width: 5),
                       CustomText(
-                        '${DateFormat.Hm().format(event.startTime)} '
-                            '-'
-                            ' ${DateFormat.Hm().format(event.endTime)}',
+                        '${DateFormat.Hm().format(widget.event.startTime)} '
+                        '-'
+                        ' ${DateFormat.Hm().format(widget.event.endTime)}',
                         fontSize: 12,
                         color: const Color(0xff8B8B8B),
                         fontWeight: FontWeight.w600,
@@ -107,7 +113,7 @@ class EventTile extends StatelessWidget {
                         width: 5,
                       ),
                       CustomText(
-                        event.location,
+                        widget.event.location,
                         fontSize: 10,
                         fontWeight: FontWeight.w500,
                         color: const Color(0xff8B8B8B),
@@ -118,22 +124,13 @@ class EventTile extends StatelessWidget {
                 ],
               ),
             ),
-            if (isAdmin)
+            if (widget.isAdmin)
               Column(
                 children: [
                   CustomTextButton(
                     onPressed: () {
-                      Provider.of<UserAPI>(context, listen: false)
-                          .getAllUsers(context)
-                          .then(
-                            (value) => editEvents(
-                          context,
-                          data,
-                          event.startTime,
-                          event,
-                          value ?? [],
-                        ),
-                      );
+                      widget.onEdit();
+                      setState(() {});
                     },
                     child: const Padding(
                       padding: EdgeInsets.all(5.0),
@@ -141,7 +138,11 @@ class EventTile extends StatelessWidget {
                     ),
                   ),
                   CustomTextButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      await Provider.of<EventAPI>(context, listen: false)
+                          .deleteEvent(widget.data.id, widget.event.id);
+                      widget.updateState();
+                    },
                     child: const Padding(
                       padding: EdgeInsets.all(5.0),
                       child: Icon(Icons.delete_forever_rounded),

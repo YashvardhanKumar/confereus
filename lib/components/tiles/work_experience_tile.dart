@@ -12,9 +12,12 @@ class WorkExperienceTile extends StatelessWidget {
   const WorkExperienceTile({
     super.key,
     required this.data,
+    required this.updateState, required this.onEditClicked,
   });
 
   final WorkExperience data;
+  final VoidCallback updateState;
+  final VoidCallback onEditClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -104,9 +107,7 @@ class WorkExperienceTile extends StatelessWidget {
         Row(
           children: [
             CustomTextButton(
-              onPressed: () async {
-                editWorkExperience(context, data);
-              },
+              onPressed: onEditClicked,
               child: const Padding(
                 padding: EdgeInsets.all(5.0),
                 child: Icon(Icons.edit_rounded),
@@ -120,6 +121,7 @@ class WorkExperienceTile extends StatelessWidget {
                 ),
                 onPressed: () async {
                   await userAPI.deleteWorkExperience(context, data.id);
+                  updateState();
                 },
               );
             }),

@@ -51,6 +51,12 @@ dependencies:
   linkedin_login: ^2.2.1
   html: ^0.15.4
   url_launcher: ^6.1.12
+  image_picker: ^1.0.1
+  socket_io_client: ^2.0.2
+  firebase_core: ^2.15.0
+  firebase_messaging: ^14.6.5
+  flutter_local_notifications: ^15.1.0+1
+  timezone: ^0.9.2
 
 dev_dependencies:
   flutter_test:

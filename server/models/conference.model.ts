@@ -11,7 +11,7 @@ export interface IConference {
     startTime: Date,
     endTime: Date,
     eventLogo: String,
-    events: [IEvent]
+    events: [Schema.Types.ObjectId],
 }
 export interface IEvent {
     subject: string,
@@ -23,7 +23,7 @@ export interface IEvent {
 
 const EventSchema = new Schema<IEvent>({
     subject: { type: String, required: true },
-    presenter: { type: [Schema.Types.ObjectId], ref: "users" },
+    presenter: [{ type: Schema.Types.ObjectId, ref: "users" }],
     location: { type: String, required: true },
     startTime: { type: Date, required: true },
     endTime: { type: Date, required: true },
@@ -36,12 +36,12 @@ const ConferenceSchema = new Schema<IConference, Model<IConference>>({
     about: { type: String, required: true },
     admin: { type: Schema.Types.ObjectId, required: true , ref: "users"},
     location: String,
-    registered: { type: [Schema.Types.ObjectId], ref: "users" },
+    registered: [{ type: Schema.Types.ObjectId, ref: "users" }],
     visibility: String,
     abstractLink: String,
     startTime: { type: Date, required: true },
     endTime: { type: Date, required: true },
-    events: [EventSchema]
+    events: [{type: Schema.Types.ObjectId, ref: "events"}]
 
 }, { timestamps: true });
 

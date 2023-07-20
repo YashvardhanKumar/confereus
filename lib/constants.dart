@@ -13,6 +13,8 @@ const logoutRoute = "$url/logout";
 const refreshTokenRoute = "$url/refreshtoken";
 const getAllUsersRoute = "$url/getAllUsers";
 String _conferenceRoute (String id) => "$url/$id/conferences";
+String uploadConfLogoRoute (String id, String confId) => "${_conferenceRoute(id)}/$confId/uploadLogo";
+
 String _eventRoute (String id, String confId) => "${_conferenceRoute(id)}/$confId";
 String _profileRoute (String id) => "$url/$id/profile";
 String conferenceGetRoute (String id, String? type) => '${_conferenceRoute(id)}?type=$type';
@@ -20,13 +22,17 @@ String conferenceAddRoute (String id) => '${_conferenceRoute(id)}/add';
 String conferenceEditRoute (String id, String confId) => '${_conferenceRoute(id)}/edit/$confId';
 String conferenceDeleteRoute (String id, String confId) => '${_conferenceRoute(id)}/delete/$confId';
 
+String conferenceRegisterRoute (String id, String confId) => '${_conferenceRoute(id)}/$confId/register';
+String getRegisteredConferencesRoute (String id) => '${_conferenceRoute(id)}/registered';
+
+
 String eventGetRoute (String id, String confId) => '${_eventRoute(id,confId)}/events';
 String eventAddRoute (String id, String confId) => '${_eventRoute(id,confId)}/events/add';
 String eventEditRoute (String id, String confId, String eventId) => '${_eventRoute(id,confId)}/events/edit/$eventId';
 String eventDeleteRoute (String id, String confId,String eventId) => '${_eventRoute(id,confId)}/events/delete/$eventId';
 
 String fetchProfile (String id) => _profileRoute(id);
-String editProfile (String id) => '${_profileRoute(id)}/edit';
+String editProfileRoute (String id) => '${_profileRoute(id)}/edit';
 
 String workspaceAddRoute (String id) => '${_profileRoute(id)}/workspace/add';
 String workspaceEditRoute (String id, String wid) => '${_profileRoute(id)}/workspace/$wid/edit';

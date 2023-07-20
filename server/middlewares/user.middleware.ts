@@ -26,7 +26,6 @@ export async function canCreateUser(req: Request, res: Response, next: NextFunct
         } else {
             res.json({ status: false, success: "Already have account!", });
         }
-
     } catch (e) {
         throw e;
     }
@@ -115,6 +114,7 @@ export async function verifyOTP(req: Request, res: Response, next: NextFunction)
     let bcryptOTP = UserService.verifyToken(bcrypt_otp_token) as JwtPayload;
     console.log(bcryptOTP);
     const success = await bcrypt.compare(req.body.otp, bcryptOTP.otp);
+    console.log(success)
     if (success) {
         return next();
     } else {
@@ -178,6 +178,19 @@ export async function isTokenNotExpired(req: Request, res: Response, next: NextF
             // res.json({ status: false, success: "Session Expired!" })
 
         }
+    }
+}
+export async function checkAccessToken(req: Request, res: Response, next: NextFunction) {
+    let accessToken = req.headers['authorization'];
+    console.log(accessToken);
+    accessToken = accessToken.slice(7, accessToken.length)
+
+    if (UserService.verifyToken(accessToken)) {
+        //@ts-ignore
+        // req.data = aData.email;
+        next();
+    } else {
+        res.json({ status: false, success: "Expired" });
     }
 }
 

@@ -8,8 +8,8 @@ import 'package:provider/provider.dart';
 import '../../API/user_profile_api.dart';
 import '../input_fields/dropdown_text_field.dart';
 
-void editSkills(BuildContext context, Skills data) {
-    showModalBottomSheet(
+Future editSkills(BuildContext context, Skills data) async {
+    return await showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     // useRootNavigator: true,
@@ -105,7 +105,7 @@ class _EditSkillsDrawerState extends State<EditSkillsDrawer> {
                       return CustomFilledButton(
                         onPressed: () async {
                           if(_formKey.currentState!.validate()) {
-                            await userAPI.editSkills(context, widget.data);
+                            await userAPI.editSkills(context, widget.data,skill: skillCtrl.text,expertise: expertiseCtrl.text);
                             Navigator.pop(context);
                           }
                         },

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addEvent, deleteEvent, editEvent, getEvent } from "../../../controller/conference.controller";
+import { addEvent, deleteEvent, editEvent, getEvent } from "../../../controller/event.controller";
 import { isAuthenticated, isTokenNotExpired } from "../../../middlewares/user.middleware";
 import catchAsync from "../../../services/catchAsync";
 

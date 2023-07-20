@@ -5,11 +5,14 @@ import 'package:confereus/API/http_client.dart';
 import 'package:confereus/API/user_api.dart';
 import 'package:confereus/API/user_profile_api.dart';
 import 'package:confereus/provider/login_status_provider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:provider/provider.dart';
+import 'package:timezone/data/latest.dart';
 
+import 'fire_messaging.dart';
 import 'routes/auth/login_signup_page.dart';
 import 'routes/main_page.dart';
 
@@ -17,6 +20,10 @@ final storage = GetStorage('user');
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  NotificationService().initNotification();
+  initializeTimeZones();
+  initializeMessaging();
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   await GetStorage.init('user');
   runApp(
     MultiProvider(
