@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 import '../search_bar.dart';
 import 'search_suggestions_recent.dart';
 
-class SearchPage extends StatefulWidget {
-  const SearchPage({
+class SearchUser extends StatefulWidget {
+  const SearchUser({
     Key? key,
     this.appendInQuery = '',
     required this.isNFTResults,
@@ -14,10 +14,10 @@ class SearchPage extends StatefulWidget {
   final bool isNFTResults;
 
   @override
-  State<SearchPage> createState() => _SearchPageState();
+  State<SearchUser> createState() => _SearchUserState();
 }
 
-class _SearchPageState extends State<SearchPage> {
+class _SearchUserState extends State<SearchUser> {
   late String query;
   bool searchClicked = false;
   bool nextPage = false;

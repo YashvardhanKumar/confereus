@@ -47,7 +47,7 @@ class _SeeAllPageState extends State<SeeAllPage> {
                 }
                 var data = snapshot.requireData ?? [];
                 if(widget.isCreated) {
-                  data = data.where((e) => e.admin==storage.read('userId')).toList();
+                  data = data.where((e) => e.admin.contains(storage.read('userId'))).toList();
                 }
                 return ListView.builder(
                   shrinkWrap: true,

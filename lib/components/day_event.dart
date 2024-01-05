@@ -34,7 +34,7 @@ class _DayEventState extends State<DayEvent>
     with SingleTickerProviderStateMixin {
   late AnimationController expandController;
   late Animation<double> animation;
-  bool expand = false;
+  bool expand = true;
 
   @override
   void initState() {
@@ -111,7 +111,7 @@ class _DayEventState extends State<DayEvent>
                       _runExpandCheck();
                       setState(() {});
                     },
-                    icon: const Icon(Icons.arrow_drop_down_rounded),
+                    icon: Icon((expand) ? Icons.arrow_drop_up_rounded : Icons.arrow_drop_down_rounded),
                   )
                 ],
               ),

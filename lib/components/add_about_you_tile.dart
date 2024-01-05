@@ -8,12 +8,13 @@ class AboutTile extends StatefulWidget {
     super.key,
     required this.title,
     required this.items,
-    required this.addFunction,
+    required this.addFunction, this.isAdmin = true,
   });
 
   final String title;
   final List<Widget> items;
   final VoidCallback addFunction;
+  final bool isAdmin;
 
   @override
   State<AboutTile> createState() => _AboutTileState();
@@ -23,7 +24,7 @@ class _AboutTileState extends State<AboutTile>
     with SingleTickerProviderStateMixin {
   late AnimationController expandController;
   late Animation<double> animation;
-  bool expand = false;
+  bool expand = true;
 
   @override
   void initState() {
@@ -95,6 +96,7 @@ class _AboutTileState extends State<AboutTile>
                       ),
                     ),
                   ),
+                  if(widget.isAdmin)
                   GestureDetector(
                     onTap: widget.addFunction,
                     child: const Icon(Icons.add_rounded),

@@ -65,8 +65,8 @@ class _AddAboutYouState extends State<AddAboutYou> {
           // if (snapshot.hasData) {
 
           final users = snapshot.data!;
-          if ((users.workExperience?.isNotEmpty ?? false) &&
-              (users.education?.isNotEmpty ?? false) &&
+          if ((users.workExperience?.isNotEmpty ?? false) ||
+              (users.education?.isNotEmpty ?? false) ||
               (users.skills?.isNotEmpty ?? false)) {
             return const MainPage();
           }

@@ -35,8 +35,9 @@ class _ConferenceBigCardState extends State<ConferenceBigCard> {
       child: Material(
         // color: kColorLight,
         // elevation: 10,
+        shape: RoundedRectangleBorder(side: BorderSide(color: Colors.grey.shade200), borderRadius: BorderRadius.circular(10)),
         shadowColor: Colors.black12,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         clipBehavior: Clip.hardEdge,
         child: InkWell(
           splashColor: kColorLight,
@@ -48,6 +49,7 @@ class _ConferenceBigCardState extends State<ConferenceBigCard> {
                   builder: (_) => ConferencePage(
                     data: widget.data,
                     isRegistered: widget.isRegistered,
+                    onRegister: widget.onRegisterPressed,
                   ),
                 ),
               );
@@ -66,7 +68,7 @@ class _ConferenceBigCardState extends State<ConferenceBigCard> {
                     child: Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: widget.data.eventLogo != null
-                          ? Image.network('$url/${widget.data.eventLogo}', fit: BoxFit.cover,)
+                          ? Image.network('${widget.data.eventLogo}', fit: BoxFit.cover,)
                           : const Icon(
                         Icons.image,
                         size: 120,

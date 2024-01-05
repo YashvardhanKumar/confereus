@@ -1,30 +1,30 @@
 import 'package:confereus/API/conference_api.dart';
-import 'package:confereus/components/bottom_drawers/add_abstract_link.dart';
 import 'package:confereus/components/common_pages/conference_register_page.dart';
 import 'package:confereus/components/custom_text.dart';
+import 'package:confereus/constants.dart';
 import 'package:confereus/main.dart';
+import 'package:confereus/routes/bottom_nav/home/app_bar/public_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-import '../../constants.dart';
 import '../../models/conference model/conference.model.dart';
 import '../../routes/bottom_nav/add_conference/add_conference.dart';
 import '../../routes/bottom_nav/add_conference/add_events.dart';
 import '../button/filled_button.dart';
+import 'abstract_page.dart';
 
 class ConferencePage extends StatefulWidget {
   const ConferencePage({
     Key? key,
     required this.data,
     required this.isRegistered,
-    this.onRegister,
+    required this.onRegister,
   }) : super(key: key);
 
   final Conference data;
   final bool isRegistered;
-  final Future<void> Function()? onRegister;
+  final Future<void> Function() onRegister;
 
   @override
   State<ConferencePage> createState() => _ConferencePageState();
@@ -51,8 +51,11 @@ class _ConferencePageState extends State<ConferencePage> {
             final data = snapshot.data!
                 .where((element) => element.id == widget.data.id)
                 .first;
-            final isAdmin = (data.admin.compareTo(storage.read('userId')) == 0);
+            print(storage.read('userId'));
+            final isAdmin = (data.admin
+                .where((e) => (e.contains(storage.read('userId'))))).isNotEmpty;
             return Scaffold(
+              backgroundColor: Colors.white,
               floatingActionButton: FloatingActionButton.extended(
                 // isExtended: false,
                 onPressed: () async {
@@ -60,10 +63,10 @@ class _ConferencePageState extends State<ConferencePage> {
                     context,
                     MaterialPageRoute(
                       builder: (_) => AddEvents(
-                        data: data,
-                        isAdmin: isAdmin,
-                        isEdit: true,
-                      ),
+                          data: data,
+                          isAdmin: isAdmin,
+                          isEdit: true,
+                          isRegistered: !isAdmin && widget.isRegistered),
                     ),
                   );
                   setState(() {});
@@ -102,17 +105,33 @@ class _ConferencePageState extends State<ConferencePage> {
                       style:
                           IconButton.styleFrom(backgroundColor: Colors.black26),
                     ),
-                  if (isAdmin)
-                    IconButton(
-                      onPressed: () async {
-                        await addAbstract(context, data);
-                        setState(() {});
-                      },
-                      icon: const Icon(Icons.edit_document),
-                      color: Colors.white,
-                      style:
-                          IconButton.styleFrom(backgroundColor: Colors.black26),
-                    ),
+                  // if (!isAdmin && widget.isRegistered)
+                  //   FutureBuilder<Users?>(
+                  //     future: Provider.of<UserAPI>(context).getCurUsers(),
+                  //     builder: (context, snapshot) {
+                  //       if (snapshot.hasData) {
+                  //         return IconButton(
+                  //           onPressed: () async {
+                  //             Navigator.push(
+                  //               context,
+                  //               MaterialPageRoute(
+                  //                 builder: (_) =>
+                  //                     AddAbstractLinkDrawer(
+                  //                       data: data, curUser: snapshot.requireData!,),
+                  //               ),
+                  //             );
+                  //             setState(() {});
+                  //           },
+                  //           icon: const Icon(Icons.edit_document),
+                  //           color: Colors.white,
+                  //           style:
+                  //           IconButton.styleFrom(
+                  //               backgroundColor: Colors.black26),
+                  //         );
+                  //       }
+                  //       return CircularProgressIndicator();
+                  //     }
+                  //   ),
                 ],
                 backgroundColor: Colors.transparent,
               ),
@@ -127,7 +146,7 @@ class _ConferencePageState extends State<ConferencePage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       if (data.eventLogo != null)
-                        Image.network("$url/${data.eventLogo}"),
+                        Image.network("${data.eventLogo}"),
                       // SizedBox(
                       //   height: 10,
                       // ),
@@ -143,11 +162,13 @@ class _ConferencePageState extends State<ConferencePage> {
                                 CircleAvatar(
                                   backgroundColor: Colors.grey.shade200,
                                   radius: 30,
+                                  foregroundImage: data.eventLogo != null
+                                      ? NetworkImage('${data.eventLogo}')
+                                      : null,
                                   child: Padding(
                                     padding: const EdgeInsets.all(5.0),
                                     child: data.eventLogo != null
-                                        ? Image.network(
-                                            '$url/${data.eventLogo}')
+                                        ? null
                                         : const Icon(
                                             Icons.image,
                                             color: Colors.grey,
@@ -189,25 +210,26 @@ class _ConferencePageState extends State<ConferencePage> {
                                       ],
                                     ),
                                     const SizedBox(height: 5),
-                                    const Row(
-                                      children: [
-                                        Icon(
-                                          Icons.location_on_rounded,
-                                          size: 18,
-                                          color: Color(0xff8B8B8B),
-                                        ),
-                                        SizedBox(
-                                          width: 5,
-                                        ),
-                                        CustomText(
-                                          'Online',
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xff8B8B8B),
-                                          // fontWeight: FontWeight.w600,
-                                        ),
-                                      ],
-                                    ),
+                                    if (data.location != null)
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.location_on_rounded,
+                                            size: 18,
+                                            color: Color(0xff8B8B8B),
+                                          ),
+                                          SizedBox(
+                                            width: 5,
+                                          ),
+                                          CustomText(
+                                            data.location!,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xff8B8B8B),
+                                            // fontWeight: FontWeight.w600,
+                                          ),
+                                        ],
+                                      ),
                                   ],
                                 ),
                               ],
@@ -215,36 +237,39 @@ class _ConferencePageState extends State<ConferencePage> {
                           ),
                         ),
                       ),
-                      FutureBuilder<Map<String, dynamic>?>(
-                          future: data.abstractLink != null
-                              ? fetch(data.abstractLink!)
-                              : null,
-                          builder: (context, snapshot) {
-                            final data = snapshot.data?['title'];
-                            if (data == null) return Container();
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10.0),
-                              child: InputChip(
-                                label: CustomText(data ?? 'Abstract'),
-                                avatar: const Icon(Icons.attach_file),
-                                backgroundColor: Colors.white,
-                                elevation: 1,
-                                shadowColor: Colors.black,
-                                side: BorderSide.none,
-                                onPressed: () async {
-                                  await launchUrl(
-                                      Uri.parse(data.abstractLink!));
-                                  setState(() {});
-                                },
-                              ),
-                            );
-                          }),
+                      // FutureBuilder<Map<String, dynamic>?>(
+                      //     future: data.abstractLink != null
+                      //         ? fetch(data.abstractLink!)
+                      //         : null,
+                      //     builder: (context, snapshot) {
+                      //       final data = snapshot.data?['title'];
+                      //       if (data == null) return Container();
+                      //       return Padding(
+                      //         padding:
+                      //             const EdgeInsets.symmetric(horizontal: 10.0),
+                      //         child: InputChip(
+                      //           label: CustomText(data ?? 'Abstract'),
+                      //           avatar: const Icon(Icons.attach_file),
+                      //           backgroundColor: Colors.white,
+                      //           elevation: 1,
+                      //           shadowColor: Colors.black,
+                      //           side: BorderSide.none,
+                      //           onPressed: () async {
+                      //             await launchUrl(
+                      //                 Uri.parse(data.abstractLink!));
+                      //             setState(() {});
+                      //           },
+                      //         ),
+                      //       );
+                      //     }),
                       Padding(
-                        padding: const EdgeInsets.all(10.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
                         child: Card(
                           elevation: 0,
                           color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(color: Colors.grey.shade200),
+                              borderRadius: BorderRadius.circular(10)),
                           clipBehavior: Clip.hardEdge,
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
@@ -264,42 +289,93 @@ class _ConferencePageState extends State<ConferencePage> {
                             ),
                           ),
                         ),
-                      )
+                      ),
+                      if (data.admin_data != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+                          child: Card(
+                            elevation: 0,
+                            color: Colors.white,
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(color: Colors.grey.shade200),
+                                borderRadius: BorderRadius.circular(10)),
+                            clipBehavior: Clip.hardEdge,
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const CustomText(
+                                    'Admininstrators',
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  Row(
+                                    children: List.generate(
+                                      data.admin_data!.length,
+                                      (index) => InputChip(
+                                        labelPadding: EdgeInsets.zero,
+                                        visualDensity: VisualDensity.compact,
+                                        label: CustomText(
+                                            data.admin_data![index].name),
+                                        onPressed: () {
+                                          Navigator.push(context, MaterialPageRoute(builder: (_) => PublicProfile(userId: data.admin_data![index].id, email: data.admin_data![index].email,)));
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
               ),
-              bottomNavigationBar: isAdmin
-                  ? null
-                  : Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: CustomFilledButton(
-                        onPressed: (widget.onRegister != null &&
-                                (widget.isRegistered || !isClicked))
-                            ? () async {
-                                isClicked = true;
-                                setState(() {});
-                                await widget.onRegister!().then((value) {
-                                  isClicked = false;
-                                  setState(() {});
-                                });
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        const ConferenceRegisterPage(),
-                                  ),
-                                );
-                              }
-                            : null,
-                        child: CustomText(
-                          (widget.isRegistered) ? 'Registered' : "Register",
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
+              bottomNavigationBar: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: CustomFilledButton(
+                  color: (widget.isRegistered) ? kColorLight : null,
+                  onPressed: isClicked
+                      ? null
+                      : () async {
+                          if (!widget.isRegistered) {
+                            isClicked = true;
+                            setState(() {});
+
+                            await widget.onRegister().then((value) {
+                              isClicked = false;
+                              setState(() {});
+                            });
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const ConferenceRegisterPage(),
+                              ),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => AbstractPage(
+                                  isAdmin: isAdmin,
+                                  conference: data,
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                  child: CustomText(
+                    !isAdmin
+                        ? (widget.isRegistered ? 'Your Abstracts' : "Register")
+                        : 'Show Abstracts',
+                    color: (widget.isRegistered) ? kColorDark : Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
             );
           },
         );

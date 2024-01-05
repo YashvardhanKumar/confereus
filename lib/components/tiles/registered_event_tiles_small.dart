@@ -25,7 +25,7 @@ class RegisteredConferenceCard extends StatelessWidget {
         elevation: 1,
         shadowColor: Colors.black12,
         clipBehavior: Clip.hardEdge,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(side: BorderSide(color: Colors.grey.shade200), borderRadius: BorderRadius.circular(10)),
         child: InkWell(
           splashColor: kColorLight,
           highlightColor: kColorLight,
@@ -34,7 +34,7 @@ class RegisteredConferenceCard extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (_) => ConferencePage(
-                  data: data, isRegistered: true,
+                  data: data, isRegistered: true, onRegister:  () async {},
                 ),
               ),
             );
@@ -55,7 +55,7 @@ class RegisteredConferenceCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10)),
                         child: Padding(
                           padding: const EdgeInsets.all(5.0),
-                          child: data.eventLogo != null ? Image.network('$url/${data.eventLogo}',fit: BoxFit.cover) : const Icon(
+                          child: data.eventLogo != null ? Image.network('${data.eventLogo}',fit: BoxFit.cover) : const Icon(
                           Icons.image,
                           size: 120,
                           color: Colors.grey,
@@ -76,7 +76,7 @@ class RegisteredConferenceCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const SizedBox(width: 5),
+                    // const SizedBox(width: 5),
                     Row(
                       children: [
                         const Icon(

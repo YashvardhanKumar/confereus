@@ -49,12 +49,16 @@ class _LinkedInButtonCustomState extends State<LinkedInButtonCustom> {
                     redirectUrl: linkedinLoginRoute,
                     clientId: LinkedinAPI.CLIENT_ID,
                     clientSecret: LinkedinAPI.CLIENT_SECRET,
+                    onError: (userFailed) {
+                      print(userFailed.stackTrace);
+                      Navigator.pop(context);
+                    },
                     onGetUserProfile:
                         (final UserSucceededAction response) async {
-                      isLoading = true;
+                      // isLoading = true;
+                      // setState(() {});
                       await userAPI.linkedInLogin(response.user);
-
-                      setState(() {});
+                      Navigator.maybePop(context);
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(

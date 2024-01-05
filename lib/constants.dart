@@ -3,9 +3,9 @@ import 'package:flutter/painting.dart';
 const kColorDark = Color(0xff332D72);
 const kColorLight = Color(0xffE8E7F9);
 
-// const url = "http://10.0.2.2:3000";
+const url = "http://10.0.2.2:3000";
 // const url = "http://192.168.64.144:3000";
-const url = "https://confereus.onrender.com";
+// const url = "https://confereus.onrender.com";
 const signupRoute = "$url/signup";
 const loginRoute = "$url/login";
 const sendMailRoute = "$url/sendmail";
@@ -25,6 +25,12 @@ String conferenceDeleteRoute (String id, String confId) => '${_conferenceRoute(i
 
 String conferenceRegisterRoute (String id, String confId) => '${_conferenceRoute(id)}/$confId/register';
 String getRegisteredConferencesRoute (String id) => '${_conferenceRoute(id)}/registered';
+
+String abstractGetRoute (String id, String confId, [String? eventId]) => '${_eventRoute(id,confId)}/abstract/${eventId ?? ""}';
+String abstractAddRoute (String id,String confId) => '${_eventRoute(id,confId)}/abstract/add';
+String abstractEditRoute (String id, String confId,String absId) => '${_eventRoute(id,confId)}/edit/$absId';
+String abstractApproveRoute (String id, String confId,String absId) => '${_eventRoute(id,confId)}/approve/$absId';
+String abstractDeleteRoute (String id, String confId, String absId) => '${_eventRoute(id,confId)}/delete/$absId';
 
 
 String eventGetRoute (String id, String confId) => '${_eventRoute(id,confId)}/events';

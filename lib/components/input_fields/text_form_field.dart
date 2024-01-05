@@ -12,7 +12,7 @@ class CustomTextFormField extends StatefulWidget {
     this.keyboardType,
     this.suffix,
     this.onTap,
-    this.enabled = true, this.minLines, this.maxLines,
+    this.enabled = true, this.minLines, this.maxLines, this.onChanged,
   }) : super(key: key);
   final Widget? suffix;
   final String label;
@@ -24,6 +24,7 @@ class CustomTextFormField extends StatefulWidget {
   final VoidCallback? onTap;
   final bool enabled;
   final int? minLines, maxLines;
+  final ValueChanged<String>? onChanged;
   @override
   State<CustomTextFormField> createState() => _CustomTextFormFieldState();
 }
@@ -46,10 +47,12 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           height: 3,
         ),
         TextFormField(
+          onChanged: widget.onChanged,
           onTap: widget.onTap,
           controller: widget.controller,
           cursorColor: Colors.black,
           obscureText: widget.isPassword && !isVisible,
+          textCapitalization: widget.isPassword ? TextCapitalization.none : TextCapitalization.sentences,
           keyboardType: widget.keyboardType,
           validator: widget.validator,
           minLines: widget.minLines,

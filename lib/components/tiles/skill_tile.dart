@@ -7,10 +7,16 @@ import 'package:provider/provider.dart';
 import '../../API/user_profile_api.dart';
 
 class SkillTile extends StatelessWidget {
-  const SkillTile({Key? key, required this.data, required this.updateState, required this.onEditClicked})
+  const SkillTile(
+      {Key? key,
+      required this.data,
+      required this.updateState,
+      required this.onEditClicked,
+      this.isAdmin = true})
       : super(key: key);
   final Skills data;
-  final VoidCallback updateState,onEditClicked;
+  final bool isAdmin;
+  final VoidCallback updateState, onEditClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -41,29 +47,30 @@ class SkillTile extends StatelessWidget {
             ],
           ),
         ),
-        Consumer<UserProfileAPI>(builder: (context, userAPI, child) {
-          return Row(
-            children: [
-              CustomTextButton(
-                onPressed: onEditClicked,
-                child: const Padding(
-                  padding: EdgeInsets.all(5.0),
-                  child: Icon(Icons.edit_rounded),
+        if (isAdmin)
+          Consumer<UserProfileAPI>(builder: (context, userAPI, child) {
+            return Row(
+              children: [
+                CustomTextButton(
+                  onPressed: onEditClicked,
+                  child: const Padding(
+                    padding: EdgeInsets.all(5.0),
+                    child: Icon(Icons.edit_rounded),
+                  ),
                 ),
-              ),
-              CustomTextButton(
-                child: const Padding(
-                  padding: EdgeInsets.all(5.0),
-                  child: Icon(Icons.delete_forever_rounded),
+                CustomTextButton(
+                  child: const Padding(
+                    padding: EdgeInsets.all(5.0),
+                    child: Icon(Icons.delete_forever_rounded),
+                  ),
+                  onPressed: () async {
+                    await userAPI.deleteSkills(context, data.id);
+                    updateState();
+                  },
                 ),
-                onPressed: () async {
-                  await userAPI.deleteSkills(context, data.id);
-                  updateState();
-                },
-              ),
-            ],
-          );
-        }),
+              ],
+            );
+          }),
       ],
     );
   }

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:confereus/API/conference_api.dart';
@@ -33,24 +34,27 @@ class _CreateNewConferenceState extends State<CreateNewConference> {
       text: widget.old != null
           ? DateFormat("dd/MM/yy").format(widget.old!.endTime)
           : null);
-  late final startTimeCtrl = TextEditingController(
-      text: widget.old != null
-          ? DateFormat.Hm().format(widget.old!.startTime)
-          : null);
-  late final endTimeCtrl = TextEditingController(
-      text: widget.old != null
-          ? DateFormat.Hm().format(widget.old!.endTime)
-          : null);
+  // late final startTimeCtrl = TextEditingController(
+  //     text: widget.old != null
+  //         ? DateFormat.Hm().format(widget.old!.startTime)
+  //         : null);
+  // late final endTimeCtrl = TextEditingController(
+  //     text: widget.old != null
+  //         ? DateFormat.Hm().format(widget.old!.endTime)
+  //         : null);
   late final _formKey = GlobalKey<FormState>();
-  DateTime? start, end;
+  late DateTime? start = widget.old?.startTime, end = widget.old?.endTime;
   bool isSameDay = false;
-  XFile? eventLogoFile;
+  File? eventLogoFile;
   Uint8List? eventLogoBytes;
+  bool isClicked = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: const CustomText('Create New Conference'),
       ),
       body: Form(
@@ -58,53 +62,56 @@ class _CreateNewConferenceState extends State<CreateNewConference> {
         child: ListView(
           padding: const EdgeInsets.all(20.0),
           children: [
-            GestureDetector(
-              onTap: () async {
-                eventLogoFile =
-                    await ImagePicker().pickImage(source: ImageSource.gallery);
-                eventLogoBytes = await eventLogoFile?.readAsBytes();
-                setState(() {});
-              },
-              child: (eventLogoBytes != null)
-                  ? Image.memory(eventLogoBytes!)
-                  : Row(
-                      children: [
-                        Stack(
-                          alignment: Alignment.topRight,
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.all(10),
-                              height: 120,
-                              width: 120,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.grey.shade200,
+            if (widget.old == null)
+              GestureDetector(
+                onTap: () async {
+                  var data = await ImagePicker()
+                      .pickImage(source: ImageSource.gallery);
+                  if (data == null) return;
+                  eventLogoFile = File(data.path);
+                  eventLogoBytes = await eventLogoFile?.readAsBytes();
+                  setState(() {});
+                },
+                child: (eventLogoBytes != null)
+                    ? Image.memory(eventLogoBytes!)
+                    : Row(
+                        children: [
+                          Stack(
+                            alignment: Alignment.topRight,
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.all(10),
+                                height: 120,
+                                width: 120,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.grey.shade200,
+                                ),
+                                child: const Icon(
+                                  Icons.image_rounded,
+                                  size: 96,
+                                  color: Colors.grey,
+                                ),
                               ),
-                              child: const Icon(
-                                Icons.image_rounded,
-                                size: 96,
+                              const Icon(
+                                Icons.add_circle_rounded,
                                 color: Colors.grey,
+                                size: 32,
                               ),
-                            ),
-                            const Icon(
-                              Icons.add_circle_rounded,
-                              color: Colors.grey,
-                              size: 32,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 20),
-                        const Flexible(
-                          child: CustomText(
-                            'Add Company logo/ Poster of Conference',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                            ],
                           ),
-                        )
-                      ],
-                    ),
-            ),
+                          const SizedBox(width: 20),
+                          const Flexible(
+                            child: CustomText(
+                              'Add Company logo/ Poster of Conference',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          )
+                        ],
+                      ),
+              ),
             const SizedBox(height: 10),
             CustomTextFormField(
               label: 'Subject of Conference',
@@ -131,7 +138,7 @@ class _CreateNewConferenceState extends State<CreateNewConference> {
             ),
             const SizedBox(height: 10),
             CustomTextFormField(
-              label: 'location',
+              label: 'Location',
               controller: locCtrl,
               validator: (val) {
                 if (val == null || val.isEmpty) {
@@ -176,43 +183,43 @@ class _CreateNewConferenceState extends State<CreateNewConference> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
-                Flexible(
-                  child: CustomTextFormField(
-                    label: 'Start Time',
-                    controller: startTimeCtrl,
-                    hint: 'HH/MM',
-                    validator: (val) {
-                      if (val == null || val.isEmpty) {
-                        return "Field Required";
-                      }
-                      return null;
-                    },
-                    suffix: GestureDetector(
-                      child: const Icon(Icons.calendar_today_rounded),
-                      onTap: () async {
-                        final time = await showTimePicker(
-                          context: context,
-                          initialTime: const TimeOfDay(hour: 0, minute: 0),
-                          // firstDate: DateTime(1800),
-                          // lastDate: DateTime.now(),
-                        );
-
-                        if (start != null) {
-                          if (time != null) {
-                            start = start!
-                                .copyWith(hour: time.hour, minute: time.minute);
-                            setState(() {});
-                          }
-                          String formattedDate = DateFormat.Hm().format(start!);
-                          setState(() {
-                            startTimeCtrl.text = formattedDate;
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                ),
+                // const SizedBox(width: 10),
+                // Flexible(
+                //   child: CustomTextFormField(
+                //     label: 'Start Time',
+                //     controller: startTimeCtrl,
+                //     hint: 'HH/MM',
+                //     validator: (val) {
+                //       if (val == null || val.isEmpty) {
+                //         return "Field Required";
+                //       }
+                //       return null;
+                //     },
+                //     suffix: GestureDetector(
+                //       child: const Icon(Icons.calendar_today_rounded),
+                //       onTap: () async {
+                //         final time = await showTimePicker(
+                //           context: context,
+                //           initialTime: const TimeOfDay(hour: 0, minute: 0),
+                //           // firstDate: DateTime(1800),
+                //           // lastDate: DateTime.now(),
+                //         );
+                //
+                //         if (start != null) {
+                //           if (time != null) {
+                //             start = start!
+                //                 .copyWith(hour: time.hour, minute: time.minute);
+                //             setState(() {});
+                //           }
+                //           String formattedDate = DateFormat.Hm().format(start!);
+                //           setState(() {
+                //             startTimeCtrl.text = formattedDate;
+                //           });
+                //         }
+                //       },
+                //     ),
+                //   ),
+                // ),
               ],
             ),
             const SizedBox(height: 10),
@@ -266,64 +273,64 @@ class _CreateNewConferenceState extends State<CreateNewConference> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
-                Flexible(
-                  child: CustomTextFormField(
-                    label: 'End Time',
-                    controller: endTimeCtrl,
-                    validator: (val) {
-                      if (val == null || val.isEmpty) {
-                        return "Field Required";
-                      }
-                      try {
-                        final data = DateFormat.Hm().parseStrict(val);
-                        if (isSameDay && start != null) {
-                          end = start!
-                              .copyWith(hour: data.hour, minute: data.minute);
-                        }
-                        setState(() {});
-                      } catch (e) {
-                        return "Invalid Format";
-                      }
-                      return null;
-                    },
-                    hint: 'HH/MM',
-                    suffix: GestureDetector(
-                      child: const Icon(Icons.calendar_today_rounded),
-                      onTap: () async {
-                        final time = await showTimePicker(
-                          context: context,
-                          initialTime: const TimeOfDay(hour: 0, minute: 0),
-                          // firstDate: DateTime(1800),
-                          // lastDate: DateTime.now(),
-                        );
-                        // if (time != null) {
-                        //   end?.copyWith(hour: time.hour, minute: time.minute);
-                        //   setState(() {});
-                        //   print(end);
-                        // }
-                        if (isSameDay && start != null) {
-                          end = start!.copyWith();
-                          endDateCtrl.text =
-                              DateFormat('dd/MM/yyyy').format(end!);
-                        }
-                        setState(() {});
-                        if (end != null) {
-                          if (time != null) {
-                            end = end!
-                                .copyWith(hour: time.hour, minute: time.minute);
-
-                            setState(() {});
-                          }
-                          String formattedDate = DateFormat.Hm().format(end!);
-                          setState(() {
-                            endTimeCtrl.text = formattedDate;
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                ),
+                // const SizedBox(width: 10),
+                // Flexible(
+                //   child: CustomTextFormField(
+                //     label: 'End Time',
+                //     controller: endTimeCtrl,
+                //     validator: (val) {
+                //       if (val == null || val.isEmpty) {
+                //         return "Field Required";
+                //       }
+                //       try {
+                //         final data = DateFormat.Hm().parseStrict(val);
+                //         if (isSameDay && start != null) {
+                //           end = start!
+                //               .copyWith(hour: data.hour, minute: data.minute);
+                //         }
+                //         setState(() {});
+                //       } catch (e) {
+                //         return "Invalid Format";
+                //       }
+                //       return null;
+                //     },
+                //     hint: 'HH/MM',
+                //     suffix: GestureDetector(
+                //       child: const Icon(Icons.calendar_today_rounded),
+                //       onTap: () async {
+                //         final time = await showTimePicker(
+                //           context: context,
+                //           initialTime: const TimeOfDay(hour: 0, minute: 0),
+                //           // firstDate: DateTime(1800),
+                //           // lastDate: DateTime.now(),
+                //         );
+                //         // if (time != null) {
+                //         //   end?.copyWith(hour: time.hour, minute: time.minute);
+                //         //   setState(() {});
+                //         //   print(end);
+                //         // }
+                //         if (isSameDay && start != null) {
+                //           end = start!.copyWith();
+                //           endDateCtrl.text =
+                //               DateFormat('dd/MM/yyyy').format(end!);
+                //         }
+                //         setState(() {});
+                //         if (end != null) {
+                //           if (time != null) {
+                //             end = end!
+                //                 .copyWith(hour: time.hour, minute: time.minute);
+                //
+                //             setState(() {});
+                //           }
+                //           String formattedDate = DateFormat.Hm().format(end!);
+                //           setState(() {
+                //             endTimeCtrl.text = formattedDate;
+                //           });
+                //         }
+                //       },
+                //     ),
+                //   ),
+                // ),
               ],
             ),
             // SizedBox(height: 10),
@@ -363,56 +370,64 @@ class _CreateNewConferenceState extends State<CreateNewConference> {
         child: Consumer<ConferenceAPI>(
           builder: (context, conferenceAPI, child) {
             return CustomFilledButton(
-              child: const CustomText(
-                'Next',
+              child: CustomText(
+                widget.old != null ? 'Update' : 'Next',
                 color: Colors.white,
                 fontWeight: FontWeight.w500,
                 fontSize: 20,
               ),
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
+                  isClicked = true;
+                  setState(() {});
                   if (widget.old != null) {
                     await conferenceAPI
                         .editConference(
-                          widget.old!.id,
-                          widget.old!,
-                          subject: subjectCtrl.text,
-                          location: locCtrl.text,
-                          about: aboutCtrl.text,
-                          startTime: start,
-                          endTime: end,
-                        )
+                      widget.old!.id,
+                      widget.old!,
+                      subject: subjectCtrl.text,
+                      location: locCtrl.text,
+                      about: aboutCtrl.text,
+                      startTime: start,
+                      endTime: end,
+                    )
                         .then((value) async {
-                      if (eventLogoFile != null) {
-                        String? uploadS = await conferenceAPI.uploadConf(
-                            eventLogoFile!, widget.old!.id, storage.read('userId'));
-                      }
-                          Navigator.pop(context);
-                        });
+                      // if (eventLogoFile != null) {
+                      //   await conferenceAPI.uploadConf(eventLogoFile!);
+                      // }
+                      isClicked = false;
+                      setState(() {});
+                      Navigator.pop(context);
+                    });
                     return;
                   }
+
                   Conference conference = Conference(
                     id: "",
                     subject: subjectCtrl.text,
                     about: aboutCtrl.text,
                     location: locCtrl.text,
                     startTime: start!,
-                    endTime: end!,
+                    endTime: end!, admin: [storage.read('userId')], admin_data: [], events: [], reviewer: [], registered: [],
                   );
                   final data = await conferenceAPI.addConference(conference);
                   if (data != null) {
+
                     if (eventLogoFile != null) {
-                      String? uploadS = await conferenceAPI.uploadConf(
-                          eventLogoFile!, data.id, storage.read('userId'));
+                      String confUrl = await conferenceAPI.uploadConf(eventLogoFile!);
+                      print(confUrl);
+                      await conferenceAPI.editConference(data.id, data,eventLogo: confUrl);
                     }
+                    isClicked = false;
+                    setState(() {});
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => AddEvents(
                           data: data,
                           isAdmin:
-                              (data.admin.compareTo(storage.read('userId')) ==
-                                  0),
+                              (data.admin
+                                  .contains(storage.read('userId'))),
                           isEdit: false,
                         ),
                       ),

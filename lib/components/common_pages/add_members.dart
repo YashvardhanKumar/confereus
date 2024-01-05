@@ -5,12 +5,14 @@ import 'package:confereus/constants.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/user model/user_model.dart';
+import '../tiles/search_bar.dart';
 
 class AddMembers extends StatefulWidget {
-  const AddMembers({Key? key, required this.totalUsers, this.selectedUsers})
+  const AddMembers({Key? key, required this.totalUsers, this.selectedUsers, this.curUserId})
       : super(key: key);
   final List<Users> totalUsers;
   final List<Users>? selectedUsers;
+  final String? curUserId;
 
   @override
   State<AddMembers> createState() => _AddMembersState();
@@ -18,10 +20,26 @@ class AddMembers extends StatefulWidget {
 
 class _AddMembersState extends State<AddMembers> {
   late List<Users> selected = widget.selectedUsers ?? [];
+  late String query;
+  bool searchClicked = false;
+  bool nextPage = false;
+  late FocusNode focusNode;
+  late List<Users> searched;
+  late List<Users> totalUsers;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    totalUsers = widget.totalUsers.where((element) => element.id != widget.curUserId).toList();
+    searched = totalUsers;
+    query = "";
+    focusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    focusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -32,22 +50,84 @@ class _AddMembersState extends State<AddMembers> {
           selected.isEmpty ? 'Add Members' : '${selected.length} Selected',
         ),
         actions: [
-          CustomTextButton(
-              child: const CustomText(
-                'Done',
-                color: kColorDark,
-              ),
-              onPressed: () {
-                Navigator.pop(context, widget.selectedUsers);
-              })
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: CustomTextButton(
+                child: const CustomText(
+                  'Done',
+                  color: kColorDark,
+                ),
+                onPressed: () {
+                  Navigator.pop(context, widget.selectedUsers);
+                }),
+          )
         ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(60),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 12.0, right: 12, bottom: 12),
+            child: Row(
+              children: [
+                Flexible(
+                  child: CustomSearchBar(
+                    focusNode: focusNode,
+                    onChanged: (val) {
+                      if (searchClicked == true) {
+                        searchClicked = false;
+                        focusNode.unfocus();
+                      }
+                      query = val.toLowerCase();
+                      if (query.isNotEmpty) {
+                        query = query.toLowerCase().trim();
+                        // searchClicked = true;
+                        searched = totalUsers.where((e) {
+                          String email = e.email;
+                          String name = e.name.toLowerCase();
+                          return widget.curUserId != e.id && (email.contains(query) || name.contains(query));
+                        }).toList();
+                        // focusNode.unfocus();
+                      } else {
+                        searched = totalUsers;
+                      }
+                      setState(() {});
+
+                      setState(() {});
+                    },
+                    onTap: () {
+                      if (searchClicked == true) {
+                        searchClicked = false;
+                        setState(() {});
+                      }
+                    },
+                    onSearchClicked: () {
+                      if (query.isNotEmpty) {
+                        query = query.toLowerCase().trim();
+                        searchClicked = true;
+                        searched = totalUsers.where((e) {
+                          String email = e.email;
+                          String name = e.name.toLowerCase();
+                          return widget.curUserId != e.id && (email.contains(query) || name.contains(query));
+                        }).toList();
+                        focusNode.unfocus();
+                      } else {
+                        searched = totalUsers;
+                      }
+                      setState(() {});
+                    },
+                    searchClicked: searchClicked,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: ListView.builder(
-        itemCount: widget.totalUsers.length,
+        itemCount: searched.length,
         itemBuilder: (context, i) {
           return ListTile(
             leading: CircleAvatar(
-              radius: 30,
+              radius: 25,
               backgroundColor: Colors.grey.shade200,
               child: widget.totalUsers[i].profileImageURL == null
                   ? const Icon(

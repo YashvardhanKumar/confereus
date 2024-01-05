@@ -32,11 +32,13 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     Size deviceSize = MediaQuery.of(context).size;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         leadingWidth: 0,
         toolbarHeight: 70,
         leading: Container(),
         titleSpacing: 10,
+        backgroundColor: Colors.white,
         title: Consumer<UserProfileAPI>(builder: (context, userAPI, child) {
           return StreamBuilder<Users?>(
               stream: userAPI.userProfile(context).asStream(),
@@ -141,9 +143,9 @@ class _HomeState extends State<Home> {
                     final data = snapshot.data!.where((e) {
                       final now = DateTime.now().toUtc();
                       final today = now.copyWith(hour: 0, second: 0);
-                      bool isOngoingOrToday = e.startTime.day == today.day ||
+                      bool isOngoingOrToday = e.startTime.day <= today.day ||
                           e.endTime.compareTo(now) <= 0;
-                      return e.registered!.contains(storage.read('userId')) &&
+                      return e.registered.contains(storage.read('userId')) &&
                           isOngoingOrToday;
                     }).toList();
 
@@ -161,59 +163,43 @@ class _HomeState extends State<Home> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        SizedBox(
-                          height: 186,
-                          child: PageView.builder(
-                            controller: controller,
-                            // scrollDirection: Axis.vertical,
-                            onPageChanged: (numb) {
-                              pageNo = numb;
-                              setState(() {});
-                            },
-                            itemCount: data.length,
-                            itemBuilder: (context, i) {
-                              return CurrentConferenceCard(data: data[i]);
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Stack(
-                            children: [
-                              Container(
-                                height: 5,
-                                width: deviceSize.width - 40,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(2.5),
-                                  color: Colors.grey.shade200,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              color: Colors.white,
+                              height: 186,
+                              child: PageView.builder(
+
+                                controller: controller,
+                                // scrollDirection: Axis.vertical,
+                                onPageChanged: (numb) {
+                                  pageNo = numb;
+                                  setState(() {});
+                                },
+                                itemCount: data.length,
+                                itemBuilder: (context, i) {
+                                  return CurrentConferenceCard(data: data[i]);
+                                },
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(
+                                data.length,
+                                (index) => AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  margin: EdgeInsets.symmetric(horizontal: 2.5,vertical: 10),
+                                  height: 8,
+                                  width: index == pageNo ? 25 : 8,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      color: Colors.black),
                                 ),
                               ),
-                              Row(
-                                children: [
-                                  AnimatedContainer(
-                                    height: 5,
-                                    width: pageNo *
-                                        (deviceSize.width - 40) /
-                                        data.length,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(2.5),
-                                    ),
-                                    duration: const Duration(milliseconds: 200),
-                                  ),
-                                  Container(
-                                    height: 5,
-                                    width:
-                                        (deviceSize.width - 40) / data.length,
-                                    decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(2.5),
-                                        color: Colors.black),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        )
+                            )
+                          ],
+                        ),
                       ],
                     );
                   }),
@@ -235,6 +221,7 @@ class _HomeState extends State<Home> {
                         .where((e) =>
                             e.registered!.contains(storage.read('userId')))
                         .toList();
+                    print(data);
                     return Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: Column(

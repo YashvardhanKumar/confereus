@@ -10,9 +10,13 @@ import '../button/text_button.dart';
 class EducationTile extends StatelessWidget {
   const EducationTile({
     Key? key,
-    required this.data, required this.updateState, required this.onEditClicked,
+    required this.data,
+    required this.updateState,
+    required this.onEditClicked,
+    this.isAdmin = true,
   }) : super(key: key);
   final Education data;
+  final bool isAdmin;
   final VoidCallback updateState;
   final VoidCallback onEditClicked;
 
@@ -77,7 +81,8 @@ class EducationTile extends StatelessWidget {
               const SizedBox(
                 height: 5,
               ),
-              Row(
+              if (data.location != null)
+                Row(
                 children: [
                   const Icon(
                     Icons.location_on_rounded,
@@ -87,7 +92,6 @@ class EducationTile extends StatelessWidget {
                   const SizedBox(
                     width: 5,
                   ),
-                  if (data.location != null)
                     Text(
                       data.location!,
                       style: GoogleFonts.poppins(
@@ -102,30 +106,30 @@ class EducationTile extends StatelessWidget {
           ),
         ),
         // IconButton(onPressed: () {}, icon: Icon(Icons.edit_rounded), visualDensity: VisualDensity.compact,),
-        Row(
-          children: [
-            CustomTextButton(
-              onPressed: onEditClicked,
-              child: const Padding(
-                padding: EdgeInsets.all(5.0),
-                child: Icon(Icons.edit_rounded),
-              ),
-            ),
-            Consumer<UserProfileAPI>(builder: (context, userAPI, child) {
-              return CustomTextButton(
+        if (isAdmin)
+          Row(
+            children: [
+              CustomTextButton(
+                onPressed: onEditClicked,
                 child: const Padding(
                   padding: EdgeInsets.all(5.0),
-                  child: Icon(Icons.delete_forever_rounded),
+                  child: Icon(Icons.edit_rounded),
                 ),
-                onPressed: () async {
-                  await userAPI
-                      .deleteEducation(context, data.id);
-                  updateState();
-                },
-              );
-            }),
-          ],
-        ),
+              ),
+              Consumer<UserProfileAPI>(builder: (context, userAPI, child) {
+                return CustomTextButton(
+                  child: const Padding(
+                    padding: EdgeInsets.all(5.0),
+                    child: Icon(Icons.delete_forever_rounded),
+                  ),
+                  onPressed: () async {
+                    await userAPI.deleteEducation(context, data.id);
+                    updateState();
+                  },
+                );
+              }),
+            ],
+          ),
       ],
     );
   }

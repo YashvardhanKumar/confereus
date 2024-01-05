@@ -13,6 +13,7 @@ import 'package:confereus/components/tiles/work_experience_tile.dart';
 import 'package:confereus/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../components/bottom_drawers/add_work_experience.dart';
 import '../../../../components/button/text_button.dart';
@@ -22,14 +23,17 @@ import '../../../../main.dart';
 import '../../../../models/conference model/conference.model.dart';
 import '../../../../models/user model/user_model.dart';
 
-class Profile extends StatefulWidget {
-  const Profile({Key? key}) : super(key: key);
+class PublicProfile extends StatefulWidget {
+  const PublicProfile({Key? key, required this.userId, required this.email})
+      : super(key: key);
+  final String userId;
+  final String email;
 
   @override
-  State<Profile> createState() => _ProfileState();
+  State<PublicProfile> createState() => _PublicProfileState();
 }
 
-class _ProfileState extends State<Profile> {
+class _PublicProfileState extends State<PublicProfile> {
   @override
   Widget build(BuildContext context) {
     Size deviceSize = MediaQuery.of(context).size;
@@ -37,21 +41,25 @@ class _ProfileState extends State<Profile> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: const CustomText('Your Info'),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.settings_rounded),
-          ),
-        ],
+        title: const CustomText('Profile'),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await launchUrl(Uri.parse(
+              'mailto:yashram9798@gmail.com?subject=Write%20your%20subject%20here'));
+        },
+        backgroundColor: Colors.red,
+        child: const Icon(
+          Icons.mail,
+          color: Colors.white,
+        ),
       ),
       body: Consumer2<ConferenceAPI, UserProfileAPI>(
           builder: (context, confApi, userApi, _) {
-
         return RefreshIndicator(
           onRefresh: () async => setState(() {}),
           child: StreamBuilder<Users?>(
-              stream: userApi.userProfile(context).asStream(),
+              stream: userApi.userProfile(context, widget.userId).asStream(),
               builder: (context, userSnap) {
                 return StreamBuilder<List<Conference>?>(
                     stream: confApi.fetchConference('all').asStream(),
@@ -67,13 +75,17 @@ class _ProfileState extends State<Profile> {
                         return Container();
                       }
                       final userData = userSnap.data!;
-                      final curUserJob = userData.workExperience!.where((element) => element.end == null).first;
+                      final curUserJob = userData.workExperience!
+                          .where((element) => element.end == null)
+                          .first;
                       final registeredConf = snapshot.data!
                           .where((e) =>
                               e.registered.contains(storage.read('userId')))
                           .toList();
                       final createdConf = snapshot.data!
-                          .where((e) => e.admin.contains(storage.read('userId'))).toList();
+                          .where((e) => e.creator == storage.read('userId'))
+                          .toList();
+                      final isAdmin = widget.userId == storage.read('userId');
                       return ListView(
                         padding: const EdgeInsets.all(20),
                         children: [
@@ -169,7 +181,9 @@ class _ProfileState extends State<Profile> {
                           const SizedBox(
                             height: 10,
                           ),
-                          if (userData.workExperience!.where((element) => element.end == null).isNotEmpty)
+                          if (userData.workExperience!
+                              .where((element) => element.end == null)
+                              .isNotEmpty)
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -186,12 +200,14 @@ class _ProfileState extends State<Profile> {
                               ],
                             ),
                           const SizedBox(height: 10),
-                          const CustomText(
-                            'About You',
-                            fontSize: 22,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          const SizedBox(height: 10),
+                          const Divider(),
+
+                          // const CustomText(
+                          //   'About You',
+                          //   fontSize: 22,
+                          //   fontWeight: FontWeight.w500,
+                          // ),
+
                           AboutTile(
                             title: 'Work Experience',
                             items: List.generate(
@@ -200,6 +216,7 @@ class _ProfileState extends State<Profile> {
                                 return Padding(
                                   padding: const EdgeInsets.all(10.0),
                                   child: WorkExperienceTile(
+                                    isAdmin: isAdmin,
                                     data: userData.workExperience![i],
                                     updateState: () => setState(() {}),
                                     onEditClicked: () async {
@@ -215,6 +232,7 @@ class _ProfileState extends State<Profile> {
                               await addWorkExperience(context);
                               setState(() {});
                             },
+                            isAdmin: isAdmin,
                           ),
                           const SizedBox(height: 10),
                           AboutTile(
@@ -225,6 +243,7 @@ class _ProfileState extends State<Profile> {
                                 return Padding(
                                   padding: const EdgeInsets.all(10.0),
                                   child: EducationTile(
+                                    isAdmin: isAdmin,
                                     data: userData.education![i],
                                     updateState: () => setState(() {}),
                                     onEditClicked: () async {
@@ -240,9 +259,11 @@ class _ProfileState extends State<Profile> {
                               await addEducation(context);
                               setState(() {});
                             },
+                            isAdmin: isAdmin,
                           ),
                           const SizedBox(height: 10),
                           AboutTile(
+                            isAdmin: isAdmin,
                             title: 'Skills',
                             items: List.generate(
                               userData.skills!.length,
@@ -250,6 +271,7 @@ class _ProfileState extends State<Profile> {
                                 return Padding(
                                   padding: const EdgeInsets.all(10.0),
                                   child: SkillTile(
+                                    isAdmin: isAdmin,
                                     data: userData.skills![i],
                                     updateState: () => setState(() {}),
                                     onEditClicked: () async {
@@ -269,113 +291,59 @@ class _ProfileState extends State<Profile> {
                           const SizedBox(
                             height: 10,
                           ),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                children: [
-                                  const Expanded(
-                                    child: CustomText(
-                                      'Created Conferences',
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500,
+                          if (createdConf.isNotEmpty)
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Expanded(
+                                      child: CustomText(
+                                        'Created Conferences',
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
-                                  ),
-                                  CustomTextButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => SeeAllPage(
-                                            isCreated: true,
-                                            stream: confApi
-                                                .fetchConference('all')
-                                                .asStream(),
+                                    CustomTextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => SeeAllPage(
+                                              isCreated: true,
+                                              stream: confApi
+                                                  .fetchConference('all')
+                                                  .asStream(),
+                                            ),
                                           ),
-                                        ),
+                                        );
+                                      },
+                                      child: const CustomText(
+                                        'See all',
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: kColorDark,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 310,
+                                  width: deviceSize.width,
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    // primary: true,
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: createdConf.length,
+                                    itemBuilder: (_, i) {
+                                      return RegisteredConferenceCard(
+                                        data: createdConf[i],
                                       );
                                     },
-                                    child: const CustomText(
-                                      'See all',
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: kColorDark,
-                                    ),
                                   ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 310,
-                                width: deviceSize.width,
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  // primary: true,
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: createdConf.length,
-                                  itemBuilder: (_, i) {
-                                    return RegisteredConferenceCard(
-                                      data: createdConf[i],
-                                    );
-                                  },
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                children: [
-                                  const Expanded(
-                                    child: CustomText(
-                                      'Registered Conferences',
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  CustomTextButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => SeeAllPage(
-                                            stream: confApi
-                                                .getRegisteredConferences(
-                                                    storage.read('userId'))
-                                                .asStream(),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: const CustomText(
-                                      'See all',
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: kColorDark,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 310,
-                                width: deviceSize.width,
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  // primary: true,
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: registeredConf.length,
-                                  itemBuilder: (_, i) {
-                                    return RegisteredConferenceCard(
-                                      data: registeredConf[i],
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
+                              ],
+                            ),
                         ],
                       );
                     });

@@ -11,10 +11,11 @@ class WorkExperienceTile extends StatelessWidget {
   const WorkExperienceTile({
     super.key,
     required this.data,
-    required this.updateState, required this.onEditClicked,
+    required this.updateState, required this.onEditClicked, this.isAdmin = true,
   });
 
   final WorkExperience data;
+  final bool isAdmin;
   final VoidCallback updateState;
   final VoidCallback onEditClicked;
 
@@ -79,6 +80,7 @@ class WorkExperienceTile extends StatelessWidget {
               const SizedBox(
                 height: 5,
               ),
+              if (data.location != null)
               Row(
                 children: [
                   const Icon(
@@ -89,7 +91,6 @@ class WorkExperienceTile extends StatelessWidget {
                   const SizedBox(
                     width: 5,
                   ),
-                  if (data.location != null)
                     Text(
                       data.location!,
                       style: GoogleFonts.poppins(
@@ -103,6 +104,7 @@ class WorkExperienceTile extends StatelessWidget {
             ],
           ),
         ),
+        if(isAdmin)
         Row(
           children: [
             CustomTextButton(

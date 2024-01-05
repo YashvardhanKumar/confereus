@@ -18,7 +18,9 @@ class _ExploreState extends State<Explore> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: const CustomText('Explore conferences'),
         actions: [
           IconButton(
@@ -43,7 +45,7 @@ class _ExploreState extends State<Explore> {
                 if (snapshot.data!.isEmpty) {
                   return Container();
                 }
-                final data = snapshot.requireData?.where((e) => e.admin!=storage.read('userId')).toList() ?? [];
+                final data = snapshot.requireData?.where((e) => !e.admin.contains(storage.read('userId'))).toList() ?? [];
                 return ListView.builder(
                   shrinkWrap: true,
                   // primary: true,
@@ -51,7 +53,7 @@ class _ExploreState extends State<Explore> {
                   itemBuilder: (_, i) {
 
                     bool isRegistered =
-                        data[i].registered!.contains(storage.read('userId'));
+                        data[i].registered.contains(storage.read('userId'));
                     return ConferenceBigCard(
                       data: data[i],
                       onRegisterPressed: () async {

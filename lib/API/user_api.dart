@@ -177,7 +177,7 @@ class UserAPI extends HTTPClientProvider {
     await storage.write('userId', data['userId']);
     await storage.write('isLoggedIn', true);
     await storage.write('auth_provider', 'linkedin_login');
-    notifyListeners();
+    // notifyListeners();
     return data;
   }
 

@@ -8,18 +8,16 @@ import 'package:flutter/material.dart';
 import '../constants.dart';
 
 class UserProfileAPI extends HTTPClientProvider {
-  Future<Users?> userProfile(BuildContext context) async {
+  Future<Users?> userProfile(BuildContext context,[String? userId_]) async {
     String? refreshToken = await secstore.read(key: 'login_refresh_token');
     String? accessToken = await secstore.read(key: 'login_access_token');
-    String? userId = storage.read('userId');
+    String? userId = userId_ ?? storage.read('userId');
     Map<String, dynamic> reqBody = {
       'login_refresh_token': refreshToken,
     };
     final encoded = utf8.encode(jsonEncode(reqBody));
     HttpClientRequest request =
-        await client.getUrl(Uri.parse(fetchProfile(userId!))).catchError((error, stackTrace) {
-          // return ;
-        });
+        await client.getUrl(Uri.parse(fetchProfile(userId!)));
     request.headers.contentType = ContentType.json;
     request.headers.contentLength = encoded.length;
     request.headers.add('Authorization', 'Bearer $accessToken');

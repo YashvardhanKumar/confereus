@@ -11,9 +11,11 @@ class CurrentConferenceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Card(
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Card(
         elevation: 0,
+
         color: kColorDark.withOpacity(0.1),
         child: Padding(
           padding: const EdgeInsets.all(5.0),
@@ -134,10 +136,10 @@ class CurrentConferenceCard extends StatelessWidget {
                   ),
                 ],
               ),
-              if (data.events!.isNotEmpty)
+              if (data.events.isNotEmpty)
                 const SizedBox(height: 5),
 
-              if (data.events!.isNotEmpty)
+              if (data.events.isNotEmpty)
                 Container(
                   // avatar: Icon(Icons.event_rounded),
                   padding:
@@ -161,16 +163,16 @@ class CurrentConferenceCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CustomText(
-                              data.events![0].subject,
+                              data.events[0].subject,
                               fontSize: 12,
                               color: Colors.black,
                             ),
                             CustomText(
-                              (data.events![0].startTime
+                              (data.events[0].startTime
                                           .compareTo(DateTime.now().toUtc()) <=
                                       0)
-                                  ? 'Ends at ${DateFormat.jm().format(data.events![0].endTime)}'
-                                  : 'Starts at ${DateFormat.jm().format(data.events![0].startTime)}',
+                                  ? 'Ends at ${DateFormat.jm().format(data.events[0].endTime)}'
+                                  : 'Starts at ${DateFormat.jm().format(data.events[0].startTime)}',
                               fontSize: 10,
                               color: const Color(0xff8B8B8B),
                               fontWeight: FontWeight.w600,
@@ -178,7 +180,7 @@ class CurrentConferenceCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      if (data.events![0].startTime
+                      if (data.events[0].startTime
                               .compareTo(DateTime.now().toUtc()) <=
                           0)
                         const CustomText(

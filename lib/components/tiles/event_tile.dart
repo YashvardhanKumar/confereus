@@ -1,9 +1,15 @@
 import 'package:confereus/API/conference_api.dart';
+import 'package:confereus/constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../API/user_api.dart';
+import '../../main.dart';
 import '../../models/conference model/conference.model.dart';
+import '../../models/user model/user_model.dart';
+import '../bottom_drawers/add_abstract_link.dart';
 import '../button/text_button.dart';
 import '../custom_text.dart';
 
@@ -15,6 +21,7 @@ class EventTile extends StatefulWidget {
     required this.data,
     required this.updateState,
     required this.onEdit,
+    required this.isRegistered,
   });
 
   final Event event;
@@ -22,6 +29,7 @@ class EventTile extends StatefulWidget {
   final Conference data;
   final VoidCallback updateState;
   final VoidCallback onEdit;
+  final bool isRegistered;
 
   @override
   State<EventTile> createState() => _EventTileState();
@@ -30,6 +38,8 @@ class EventTile extends StatefulWidget {
 class _EventTileState extends State<EventTile> {
   @override
   Widget build(BuildContext context) {
+    final isAdmin = (widget.data.admin
+        .where((e) => (e.contains(storage.read('userId'))))).isNotEmpty;
     return Padding(
       padding: const EdgeInsets.all(5.0),
       child: IntrinsicHeight(
@@ -121,9 +131,80 @@ class _EventTileState extends State<EventTile> {
                       ),
                     ],
                   ),
+                  if (!isAdmin && widget.isRegistered)
+                    FutureBuilder<Users?>(
+                      future: Provider.of<UserAPI>(context).getCurUsers(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 6.0),
+                            child: CupertinoButton(
+                              color: kColorDark,
+                              padding: EdgeInsets.symmetric(vertical: 3, horizontal: 6),
+                              minSize: 25,
+                              onPressed: () async {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => AddAbstractLinkDrawer(
+                                      data: widget.data,
+                                      curUser: snapshot.requireData!,
+                                      dataEvent: widget.event,
+                                    ),
+                                  ),
+                                );
+                                setState(() {});
+                              },
+
+                              // icon: const Icon(Icons.edit_document),
+                              // color: Colors.white,
+                              // style: TextButton.styleFrom(
+                              //     backgroundColor: Colors.black26),
+                              child: CustomText(
+                                '+ Add Abstract',
+                              ),
+                            ),
+                          );
+                        }
+                        return Container();
+                      },
+                    ),
                 ],
               ),
             ),
+            // if(!widget.isAdmin)
+            // if (!isAdmin && widget.isRegistered)
+            //   FutureBuilder<Users?>(
+            //       future: Provider.of<UserAPI>(context).getCurUsers(),
+            //       builder: (context, snapshot) {
+            //         if (snapshot.hasData) {
+            //           return CupertinoButton(
+            //             onPressed: () async {
+            //               Navigator.push(
+            //                 context,
+            //                 MaterialPageRoute(
+            //                   builder: (_) => AddAbstractLinkDrawer(
+            //                     data: widget.data,
+            //                     curUser: snapshot.requireData!,
+            //                     dataEvent: widget.event,
+            //                   ),
+            //                 ),
+            //               );
+            //               setState(() {});
+            //             },
+            //
+            //             // icon: const Icon(Icons.edit_document),
+            //             // color: Colors.white,
+            //             // style: TextButton.styleFrom(
+            //             //     backgroundColor: Colors.black26),
+            //             child: CustomText(
+            //               '+ Add Abstract',
+            //               fontSize: 12,
+            //             ),
+            //           );
+            //         }
+            //         return CircularProgressIndicator();
+            //       }),
             if (widget.isAdmin)
               Column(
                 children: [

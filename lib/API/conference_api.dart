@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:confereus/API/http_client.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../constants.dart';
 import '../models/conference model/conference.model.dart';
@@ -76,24 +76,34 @@ String _validateUrl(String url) {
 }
 
 class ConferenceAPI extends HTTPClientProvider {
-  
-  Future<String?> uploadConf(XFile file,String confId,String id) async {
+  Future<String> uploadConf(File file) async {
+    FirebaseStorage _storage = FirebaseStorage.instance;
     String? accessToken = await secstore.read(key: 'login_access_token');
-    String fileName = file.path.split("/").last;
-    MultipartRequest request = MultipartRequest('PATCH', Uri.parse(uploadConfLogoRoute(id,confId)));
-    request.files.add(
-        MultipartFile.fromBytes(
-            'picture',
-            await file.readAsBytes(),
-            filename: fileName,
-        )
-    );
-    request.headers.addAll({
-      "Content-type": "multipart/form-data",
-      "Authorization": "Bearer $accessToken"
+    UploadTask uploadTask = _storage.ref('uploads/${DateTime.now()}.jpeg').putFile(file);
+    String url = await uploadTask.whenComplete(() {}).then((value) {
+      return value.ref.getDownloadURL();
     });
-    var res = await request.send();
-    return res.reasonPhrase;
+    //Upload the file to firebase
+
+    // Waits till the file is uploaded then stores the download url
+
+    //returns the download url
+    return url;
+    // String fileName = file.path.split("/").last;
+    // MultipartRequest request = MultipartRequest('PATCH', Uri.parse(uploadConfLogoRoute(id,confId)));
+    // request.files.add(
+    //     MultipartFile.fromBytes(
+    //         'picture',
+    //         await file.readAsBytes(),
+    //         filename: fileName,
+    //     )
+    // );
+    // request.headers.addAll({
+    //   "Content-type": "multipart/form-data",
+    //   "Authorization": "Bearer $accessToken"
+    // });
+    // var res = await request.send();
+    // return res.reasonPhrase;
     // HttpClientRequest request =
     //     await client.postUrl(Uri.parse(uploadConfLogoRoute));
     // request.headers.contentType = ContentType.binary;
@@ -101,7 +111,7 @@ class ConferenceAPI extends HTTPClientProvider {
     // request.add(encoded);
     // HttpClientResponse res = await request.close();
   }
-  
+
   Future<List<Conference>?> fetchConference(
     // Conference conference,
     String visibility,
@@ -126,8 +136,12 @@ class ConferenceAPI extends HTTPClientProvider {
     request.headers.contentLength = encoded.length;
     request.headers.add('Authorization', 'Bearer $accessToken');
     request.add(encoded);
+
     HttpClientResponse res = await request.close();
+
     var data = jsonDecode(await res.transform(utf8.decoder).join());
+    print(data);
+    print((data['data'] as List).map((e) => Conference.fromJson(e)).toList());
     if (data['status']) {
       await updateCookie(res);
       return (data['data'] as List).map((e) => Conference.fromJson(e)).toList();
@@ -163,6 +177,7 @@ class ConferenceAPI extends HTTPClientProvider {
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
       await updateCookie(res);
+      print(data);
       return Conference.fromJson(data['data']);
     } else {
       // return data['message'];
@@ -175,9 +190,11 @@ class ConferenceAPI extends HTTPClientProvider {
       String? about,
       String? eventLogo,
       String? location,
+        List? reviewer,
+        List? admin,
       // String? registeredID,
       String? visibility,
-      String? abstractLink,
+      // String? abstractLink,
       DateTime? startTime,
       DateTime? endTime}) async {
     String? refreshToken = await secstore.read(key: 'login_refresh_token');
@@ -190,15 +207,16 @@ class ConferenceAPI extends HTTPClientProvider {
           'subject': subject,
         if (about != conference.about && about != null) 'about': about,
         if (eventLogo != conference.eventLogo && eventLogo != null)
-          'eventLogo': about,
+          'eventLogo': eventLogo,
         if (location != conference.location && location != null)
           'location': location,
-        // if(!listEquals(presenters, conference.presenters)) 'presenters': presenters,
+        if(admin != null && !listEquals(admin, conference.admin)) 'admin': admin,
+        if(reviewer != null && !listEquals(reviewer, conference.reviewer)) 'reviewer': reviewer,
         // if(registeredID != null && !(conference.registered?.contains(registeredID) ?? false)) 'registered': registeredID,
         if (visibility != conference.visibility && visibility != null)
           'visibility': visibility,
-        if (abstractLink != conference.abstractLink && abstractLink != null)
-          'abstractLink': abstractLink,
+        // if (abstractLink != conference.abstractLink && abstractLink != null)
+        //   'abstractLink': abstractLink,
         if ((startTime ?? conference.startTime)
                 .compareTo(conference.startTime) !=
             0)
@@ -281,11 +299,13 @@ class ConferenceAPI extends HTTPClientProvider {
     request.headers.add('Authorization', 'Bearer $accessToken');
     request.add(encoded);
     HttpClientResponse res = await request.close();
+    print(res);
+
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     // print("=>$data");
     if (data['status']) {
       await updateCookie(res);
-      // print((data['data'] as List)[1]);
+      print(data);
       return (data['data'] as List).map((e) => Conference.fromJson(e)).toList();
     }
     return null;
@@ -369,6 +389,7 @@ class EventAPI extends HTTPClientProvider {
     Event event, {
     String? subject,
     String? location,
+        String? reviewer,
     DateTime? startTime,
     DateTime? endTime,
     List<String>? presenter,
@@ -382,6 +403,8 @@ class EventAPI extends HTTPClientProvider {
         if (subject != event.subject && subject != null) 'subject': subject,
         if (location != event.location && location != null)
           'location': location,
+        if (reviewer != event.reviewer && reviewer != null)
+          'reviewer': reviewer,
         if (listEquals(presenter, event.presenter)) 'presenter': presenter,
         if ((startTime ?? event.startTime).compareTo(event.startTime) != 0)
           'startTime': startTime!.toIso8601String(),
