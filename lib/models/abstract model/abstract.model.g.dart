@@ -28,8 +28,8 @@ Abstract _$AbstractFromJson(Map<String, dynamic> json) => Abstract(
       abstract: json['abstract'] as String,
       approved: json['approved'] == null
           ? null
-          : DateTime.parse(json['approved'] as String),
-      createdAt: DateTime.parse(json['createdAt'] as String),
+          : DateTime.parse(json['approved'] as String).toLocal(),
+      createdAt: DateTime.parse(json['createdAt'] as String).toLocal(),
     );
 
 Map<String, dynamic> _$AbstractToJson(Abstract instance) => <String, dynamic>{
@@ -40,8 +40,8 @@ Map<String, dynamic> _$AbstractToJson(Abstract instance) => <String, dynamic>{
       'abstract': instance.abstract,
       'paperName': instance.paperName,
       'paperLink': instance.paperLink,
-      'approved': instance.approved?.toIso8601String(),
-      'createdAt': instance.createdAt.toIso8601String(),
+      'approved': instance.approved?.toLocal().toIso8601String(),
+      'createdAt': instance.createdAt.toLocal().toIso8601String(),
       'isApproved': instance.isApproved,
       'conference': instance.conference,
       'event': instance.event,

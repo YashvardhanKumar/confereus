@@ -87,7 +87,7 @@ class SocketStream extends LoginStatus {
     });
   }
 
-  void addDocument(String tableName, Map<String, dynamic>? data) async {
+  void addDocument(String tableName, data) async {
     String? refreshToken = await secstore.read(key: 'login_refresh_token');
     String? accessToken = await secstore.read(key: 'login_access_token');
     socket.emit("$tableName-add", [accessToken, refreshToken, data ?? {}]);

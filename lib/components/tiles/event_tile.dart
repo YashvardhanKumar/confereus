@@ -10,6 +10,7 @@ import '../../API/user_api.dart';
 import '../../main.dart';
 import '../../models/conference model/conference.model.dart';
 import '../../models/user model/user_model.dart';
+import '../../stream_socket.dart';
 import '../bottom_drawers/add_abstract_link.dart';
 import '../bottom_drawers/edit_event.dart';
 import '../button/text_button.dart';
@@ -22,7 +23,7 @@ class EventTile extends StatefulWidget {
     required this.isAdmin,
     required this.data,
     required this.isRegistered,
-    required this.users,
+    required this.users, required this.onDelete,
   });
 
   final Event event;
@@ -30,12 +31,27 @@ class EventTile extends StatefulWidget {
   final Conference data;
   final bool isRegistered;
   final List<Users> users;
+  final VoidCallback onDelete;
 
   @override
   State<EventTile> createState() => _EventTileState();
 }
 
 class _EventTileState extends State<EventTile> {
+  final _streamControllerUser = SocketController<Users?>();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    final prov = Provider.of<SocketStream>(context, listen: false);
+    prov.fetchOneDocument(
+        initControllerUser, 'users', {"userId": storage.read("userId")});
+  }
+
+  void initControllerUser(dynamic eventdata) {
+    _streamControllerUser.add(Users.fromJson(eventdata));
+  }
+
   @override
   Widget build(BuildContext context) {
     final isAdmin = (widget.data.admin
@@ -132,8 +148,8 @@ class _EventTileState extends State<EventTile> {
                     ],
                   ),
                   if (!isAdmin && widget.isRegistered)
-                    FutureBuilder<Users?>(
-                      future: Provider.of<UserAPI>(context).getCurUsers(),
+                    StreamBuilder<Users?>(
+                      stream: _streamControllerUser.get,
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           return Padding(
@@ -192,11 +208,7 @@ class _EventTileState extends State<EventTile> {
                     ),
                   ),
                   CustomTextButton(
-                    onPressed: () => Provider.of<SocketStream>(context)
-                        .deleteDocument("events", {
-                      "eventId": widget.event.id,
-                      "confId": widget.data.id
-                    }),
+                    onPressed: widget.onDelete,
                     child: const Padding(
                       padding: EdgeInsets.all(5.0),
                       child: Icon(Icons.delete_forever_rounded),

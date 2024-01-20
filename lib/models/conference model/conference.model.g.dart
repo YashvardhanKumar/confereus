@@ -28,15 +28,15 @@ Conference _$ConferenceFromJson(Map<String, dynamic> json) => Conference(
       id: json['_id'] as String,
       subject: json['subject'] as String,
       about: json['about'] as String,
-      startTime: DateTime.parse(json['startTime'] as String),
-      endTime: DateTime.parse(json['endTime'] as String),
+      startTime: DateTime.parse(json['startTime'] as String).toLocal(),
+      endTime: DateTime.parse(json['endTime'] as String).toLocal(),
       admin: (json['admin'] as List<dynamic>).map((e) => e as String).toList(),
       visibility: json['visibility'] as String?,
       location: json['location'] as String,
       registered: json['registered'] as List<dynamic>,
       events_data: (json['events_data'] as List<dynamic>?)
-          ?.map((e) => Event.fromJson(e as Map<String, dynamic>))
-          .toList()??
+              ?.map((e) => Event.fromJson(e as Map<String, dynamic>))
+              .toList() ??
           const [],
     );
 
@@ -46,8 +46,8 @@ Map<String, dynamic> _$ConferenceToJson(Conference instance) =>
       'subject': instance.subject,
       'about': instance.about,
       'creator': instance.creator,
-      'startTime': instance.startTime.toIso8601String(),
-      'endTime': instance.endTime.toIso8601String(),
+      'startTime': instance.startTime.toLocal().toIso8601String(),
+      'endTime': instance.endTime.toLocal().toIso8601String(),
       'admin': instance.admin,
       'visibility': instance.visibility,
       'registered': instance.registered,
@@ -65,8 +65,8 @@ Event _$EventFromJson(Map<String, dynamic> json) => Event(
       id: json['_id'] as String,
       subject: json['subject'] as String,
       presenter: json['presenter'] as List<dynamic>?,
-      startTime: DateTime.parse(json['startTime'] as String),
-      endTime: DateTime.parse(json['endTime'] as String),
+      startTime: DateTime.parse(json['startTime'] as String).toLocal(),
+      endTime: DateTime.parse(json['endTime'] as String).toLocal(),
       location: json['location'] as String,
     );
 
@@ -75,7 +75,7 @@ Map<String, dynamic> _$EventToJson(Event instance) => <String, dynamic>{
       'subject': instance.subject,
       'reviewer': instance.reviewer,
       'presenter': instance.presenter,
-      'startTime': instance.startTime.toIso8601String(),
-      'endTime': instance.endTime.toIso8601String(),
+      'startTime': instance.startTime.toLocal().toIso8601String(),
+      'endTime': instance.endTime.toLocal().toIso8601String(),
       'location': instance.location,
     };

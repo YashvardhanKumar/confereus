@@ -190,13 +190,24 @@ class _DayEventState extends State<DayEvent>
                                     children: List.generate(
                                       events.length,
                                       (index) {
-                                        return EventTile(
-                                          event: events[index],
-                                          isAdmin: widget.isAdmin,
-                                          data: widget.conf,
-                                          users: userList.data!,
-                                          isRegistered: widget.registered,
-                                        );
+                                        return Consumer<SocketStream>(builder:
+                                            (context, socketStream, _) {
+                                          return EventTile(
+                                            event: events[index],
+                                            isAdmin: widget.isAdmin,
+                                            data: widget.conf,
+                                            users: userList.data!,
+                                            isRegistered: widget.registered,
+                                            onDelete: () {
+                                              socketStream.deleteDocument(
+                                                  "events", {
+                                                "eventId": events[index].id,
+                                                "confId": widget.conf.id
+                                              });
+                                              setState(() {});
+                                            },
+                                          );
+                                        });
                                       },
                                     ),
                                   ),

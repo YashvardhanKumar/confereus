@@ -176,6 +176,8 @@ class _EditEventsState extends State<EditEvents> {
                               // start.copyWith(
                               //     hour: data.hour, minute: data.minute);
                               setState(() {});
+                              print("end");
+                              print(start);
                             } catch (e) {
                               return "Invalid Format";
                             }
@@ -201,15 +203,20 @@ class _EditEventsState extends State<EditEvents> {
                               final time = await showTimePicker(
                                 context: context,
                                 initialTime: TimeOfDay(
-                                    hour: widget.date.hour,
-                                    minute: widget.date.minute),
+                                    hour: start.hour, minute: start.minute),
                                 // firstDate: DateTime(1800),
                                 // lastDate: DateTime.now(),
                               );
 
                               if (time != null) {
-                                start = DateTime(start.year, start.month,
-                                    start.day, time.hour, time.minute);
+                                start = DateTime(
+                                  start.year,
+                                  start.month,
+                                  start.day,
+                                  time.hour,
+                                  time.minute,
+                                );
+                                print(start);
                                 setState(() {});
                               }
                               String formattedDate =
@@ -239,12 +246,14 @@ class _EditEventsState extends State<EditEvents> {
                               end = DateTime(
                                 end.year,
                                 end.month,
-                                end.minute,
+                                end.day,
                                 data.hour,
                                 data.minute,
                               );
-
                               setState(() {});
+
+                              print("end");
+                              print(end);
                             } catch (e) {
                               return "Invalid Format";
                             }
@@ -281,10 +290,16 @@ class _EditEventsState extends State<EditEvents> {
                               // }
                               setState(() {});
                               if (time != null) {
-                                end = DateTime(end.year, end.month, end.day,
-                                    time.hour, time.minute);
+                                end = DateTime(
+                                  end.year,
+                                  end.month,
+                                  end.day,
+                                  time.hour,
+                                  time.minute,
+                                );
 
                                 setState(() {});
+                                print(end);
                               }
                               String formattedDate =
                                   DateFormat.Hm().format(end);
@@ -301,42 +316,47 @@ class _EditEventsState extends State<EditEvents> {
                 const SizedBox(
                   height: 10,
                 ),
-                GestureDetector(
-                  onTap: () {
-                    isSameDay = !isSameDay;
-                    end = DateTime(
-                      start.year,
-                      start.month,
-                      start.day,
-                      end.hour,
-                      end.minute,
-                    );
-                    endDateCtrl.text = DateFormat.Hm().format(end);
-                    setState(() {});
-                  },
-                  child: Row(
-                    children: [
-                      Checkbox(
-                        value: isSameDay,
-                        onChanged: (val) {
-                          isSameDay = !isSameDay;
-                          end = DateTime(start.year, start.month, start.day,
-                              end.hour, end.minute);
-                          endDateCtrl.text = DateFormat.Hm().format(end);
-                          setState(() {});
-                        },
-                        visualDensity: VisualDensity.compact,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
-                      Text(
-                        'Same Day',
-                        style: GoogleFonts.poppins(),
-                      )
-                    ],
-                  ),
-                ),
+                // GestureDetector(
+                //   onTap: () {
+                //     isSameDay = !isSameDay;
+                //     end = DateTime(
+                //       start.year,
+                //       start.month,
+                //       start.day,
+                //       end.hour,
+                //       end.minute,
+                //     );
+                //     endDateCtrl.text = DateFormat.Hm().format(end);
+                //     setState(() {});
+                //   },
+                //   child: Row(
+                //     children: [
+                //       Checkbox(
+                //         value: isSameDay,
+                //         onChanged: (val) {
+                //           isSameDay = !isSameDay;
+                //           end = DateTime(
+                //             start.year,
+                //             start.month,
+                //             start.day,
+                //             end.hour,
+                //             end.minute,
+                //           );
+                //           endDateCtrl.text = DateFormat.Hm().format(end);
+                //           setState(() {});
+                //         },
+                //         visualDensity: VisualDensity.compact,
+                //         shape: RoundedRectangleBorder(
+                //           borderRadius: BorderRadius.circular(5),
+                //         ),
+                //       ),
+                //       Text(
+                //         'Same Day',
+                //         style: GoogleFonts.poppins(),
+                //       )
+                //     ],
+                //   ),
+                // ),
                 const SizedBox(
                   height: 10,
                 ),

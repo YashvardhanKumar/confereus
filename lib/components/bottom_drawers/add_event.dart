@@ -25,9 +25,7 @@ Future addEvents(BuildContext context, Conference data, DateTime date) async {
     backgroundColor: Colors.white,
     // useRootNavigator: true,
     builder: (_) {
-      return AddEvents(
-        data: data,
-      );
+      return AddEvents(data: data, date: date);
     },
   );
 }
@@ -36,9 +34,11 @@ class AddEvents extends StatefulWidget {
   const AddEvents({
     super.key,
     required this.data,
+    required this.date,
   });
 
   final Conference data;
+  final DateTime date;
 
   @override
   State<AddEvents> createState() => _AddEventsState();
@@ -51,10 +51,16 @@ class _AddEventsState extends State<AddEvents> {
   TextEditingController startDateCtrl = TextEditingController();
   TextEditingController endDateCtrl = TextEditingController();
   List<Users> selected = [];
-  late DateTime start = widget.data.startTime;
-  late DateTime end = widget.data.startTime;
+  late DateTime start = widget.date;
+  late DateTime end = widget.date;
   bool isSameDay = false;
   final _formKey = GlobalKey<FormState>();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print(widget.date.toIso8601String());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +138,8 @@ class _AddEventsState extends State<AddEvents> {
                                     MaterialPageRoute(
                                       builder: (_) => AddMembers(
                                         totalUsers: snapshot.data!,
-                                        selectedUsers: selected, includeCurUser: true,
+                                        selectedUsers: selected,
+                                        includeCurUser: true,
                                       ),
                                     ),
                                   ) ??
@@ -168,15 +175,16 @@ class _AddEventsState extends State<AddEvents> {
                                       final data =
                                           DateFormat.Hm().parseStrict(val);
                                       start = DateTime(
-                                        start.year,
-                                        start.month,
-                                        start.day,
+                                        widget.date.year,
+                                        widget.date.month,
+                                        widget.date.day,
                                         data.hour,
                                         data.minute,
                                       );
                                       // start.copyWith(
                                       //     hour: data.hour, minute: data.minute);
                                       setState(() {});
+                                      print(start);
                                     } catch (e) {
                                       return "Invalid Format";
                                     }
@@ -198,12 +206,14 @@ class _AddEventsState extends State<AddEvents> {
 
                                       if (time != null) {
                                         start = DateTime(
-                                          start.year,
-                                          start.month,
-                                          start.day,
+                                          widget.date.year,
+                                          widget.date.month,
+                                          widget.date.day,
                                           time.hour,
                                           time.minute,
                                         );
+                                      print(start);
+
                                         setState(() {});
                                       }
                                       String formattedDate =
@@ -232,14 +242,16 @@ class _AddEventsState extends State<AddEvents> {
                                       final data =
                                           DateFormat.Hm().parseStrict(val);
                                       end = DateTime(
-                                        end.year,
-                                        end.month,
-                                        end.minute,
+                                        widget.date.year,
+                                        widget.date.month,
+                                        widget.date.day,
                                         data.hour,
                                         data.minute,
                                       );
 
                                       setState(() {});
+                                      print(end);
+
                                     } catch (e) {
                                       return "Invalid Format";
                                     }
@@ -257,22 +269,22 @@ class _AddEventsState extends State<AddEvents> {
                                           minute: now.minute,
                                         ),
                                       );
-                                      if (isSameDay) {
-                                        end = start.copyWith();
-                                        endDateCtrl.text =
-                                            DateFormat.Hm().format(end);
-                                      }
+                                      // if (isSameDay) {
+                                      //   end = start.copyWith();
+                                      //   endDateCtrl.text =
+                                      //       DateFormat.Hm().format(end);
+                                      // }
                                       setState(() {});
                                       if (time != null) {
                                         end = DateTime(
-                                          end.year,
-                                          end.month,
-                                          end.day,
+                                          widget.date.year,
+                                          widget.date.month,
+                                          widget.date.day,
                                           time.hour,
                                           time.minute,
                                         );
-
                                         setState(() {});
+                                      print(end);
                                       }
                                       String formattedDate =
                                           DateFormat.Hm().format(end);
@@ -299,17 +311,17 @@ class _AddEventsState extends State<AddEvents> {
                                   Event event = Event(
                                       id: "",
                                       subject: subjectCtrl.text,
-                                      presenter:
-                                          selected.map((e) => e.id).toList(growable: true),
+                                      presenter: selected
+                                          .map((e) => e.id)
+                                          .toList(growable: true),
                                       startTime: start,
                                       endTime: end,
                                       location: locCtrl.text);
-                                  final finalmap = event.toJson();
-                                  finalmap.addAll({"confId": widget.data.id});
-                                  confAPI.addDocument(
-                                    'events',
-                                    finalmap,
-                                  );
+                                  print(event.toJson());
+                                  confAPI.addDocument('events', [
+                                    event.toJson(),
+                                    {"confId": widget.data.id}
+                                  ]);
                                   Navigator.pop(context);
                                 }
                               },
