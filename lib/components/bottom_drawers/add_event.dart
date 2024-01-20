@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:confereus/API/conference_api.dart';
 import 'package:confereus/API/user_api.dart';
 import 'package:confereus/components/button/add_button.dart';
@@ -6,6 +8,7 @@ import 'package:confereus/common_pages/add_members.dart';
 import 'package:confereus/components/custom_text.dart';
 import 'package:confereus/components/input_fields/text_form_field.dart';
 import 'package:confereus/models/user%20model/user_model.dart';
+import 'package:confereus/sockets/socket_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -24,7 +27,6 @@ Future addEvents(BuildContext context, Conference data, DateTime date) async {
     builder: (_) {
       return AddEvents(
         data: data,
-        date: date,
       );
     },
   );
@@ -34,11 +36,9 @@ class AddEvents extends StatefulWidget {
   const AddEvents({
     super.key,
     required this.data,
-    required this.date,
   });
 
   final Conference data;
-  final DateTime date;
 
   @override
   State<AddEvents> createState() => _AddEventsState();
@@ -51,8 +51,8 @@ class _AddEventsState extends State<AddEvents> {
   TextEditingController startDateCtrl = TextEditingController();
   TextEditingController endDateCtrl = TextEditingController();
   List<Users> selected = [];
-  late DateTime start = widget.date;
-  late DateTime end = widget.date;
+  late DateTime start = widget.data.startTime;
+  late DateTime end = widget.data.startTime;
   bool isSameDay = false;
   final _formKey = GlobalKey<FormState>();
 
@@ -111,7 +111,6 @@ class _AddEventsState extends State<AddEvents> {
                                 padding: const EdgeInsets.all(1.5),
                                 child: InputChip(
                                   backgroundColor: kColorLight,
-
                                   label: CustomText(selected[index].name),
                                   labelPadding: EdgeInsets.zero,
                                   padding: EdgeInsets.symmetric(horizontal: 10),
@@ -133,7 +132,7 @@ class _AddEventsState extends State<AddEvents> {
                                     MaterialPageRoute(
                                       builder: (_) => AddMembers(
                                         totalUsers: snapshot.data!,
-                                        selectedUsers: selected,
+                                        selectedUsers: selected, includeCurUser: true,
                                       ),
                                     ),
                                   ) ??
@@ -168,8 +167,15 @@ class _AddEventsState extends State<AddEvents> {
                                     try {
                                       final data =
                                           DateFormat.Hm().parseStrict(val);
-                                      start = start.copyWith(
-                                          hour: data.hour, minute: data.minute);
+                                      start = DateTime(
+                                        start.year,
+                                        start.month,
+                                        start.day,
+                                        data.hour,
+                                        data.minute,
+                                      );
+                                      // start.copyWith(
+                                      //     hour: data.hour, minute: data.minute);
                                       setState(() {});
                                     } catch (e) {
                                       return "Invalid Format";
@@ -181,17 +187,23 @@ class _AddEventsState extends State<AddEvents> {
                                     child: const Icon(
                                         Icons.calendar_today_rounded),
                                     onTap: () async {
+                                      final now = DateTime.now();
                                       final time = await showTimePicker(
                                         context: context,
                                         initialTime: TimeOfDay(
-                                            hour: widget.date.hour,
-                                            minute: widget.date.minute),
+                                          hour: now.hour,
+                                          minute: now.minute,
+                                        ),
                                       );
 
                                       if (time != null) {
-                                        start = start.copyWith(
-                                            hour: time.hour,
-                                            minute: time.minute);
+                                        start = DateTime(
+                                          start.year,
+                                          start.month,
+                                          start.day,
+                                          time.hour,
+                                          time.minute,
+                                        );
                                         setState(() {});
                                       }
                                       String formattedDate =
@@ -219,8 +231,13 @@ class _AddEventsState extends State<AddEvents> {
                                     try {
                                       final data =
                                           DateFormat.Hm().parseStrict(val);
-                                      start = start.copyWith(
-                                          hour: data.hour, minute: data.minute);
+                                      end = DateTime(
+                                        end.year,
+                                        end.month,
+                                        end.minute,
+                                        data.hour,
+                                        data.minute,
+                                      );
 
                                       setState(() {});
                                     } catch (e) {
@@ -232,11 +249,13 @@ class _AddEventsState extends State<AddEvents> {
                                     child: const Icon(
                                         Icons.calendar_today_rounded),
                                     onTap: () async {
+                                      final now = DateTime.now();
                                       final time = await showTimePicker(
                                         context: context,
                                         initialTime: TimeOfDay(
-                                            hour: start.hour,
-                                            minute: start.minute),
+                                          hour: now.hour,
+                                          minute: now.minute,
+                                        ),
                                       );
                                       if (isSameDay) {
                                         end = start.copyWith();
@@ -245,9 +264,13 @@ class _AddEventsState extends State<AddEvents> {
                                       }
                                       setState(() {});
                                       if (time != null) {
-                                        end = end.copyWith(
-                                            hour: time.hour,
-                                            minute: time.minute);
+                                        end = DateTime(
+                                          end.year,
+                                          end.month,
+                                          end.day,
+                                          time.hour,
+                                          time.minute,
+                                        );
 
                                         setState(() {});
                                       }
@@ -268,7 +291,7 @@ class _AddEventsState extends State<AddEvents> {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(10.0),
-                          child: Consumer<EventAPI>(
+                          child: Consumer<SocketStream>(
                               builder: (context, confAPI, child) {
                             return CustomFilledButton(
                               onPressed: () async {
@@ -277,13 +300,17 @@ class _AddEventsState extends State<AddEvents> {
                                       id: "",
                                       subject: subjectCtrl.text,
                                       presenter:
-                                          selected.map((e) => e.id).toList(),
+                                          selected.map((e) => e.id).toList(growable: true),
                                       startTime: start,
                                       endTime: end,
                                       location: locCtrl.text);
-                                  final data = await confAPI.addEvent(
-                                      widget.data.id, event);
-                                  Navigator.pop(context, data);
+                                  final finalmap = event.toJson();
+                                  finalmap.addAll({"confId": widget.data.id});
+                                  confAPI.addDocument(
+                                    'events',
+                                    finalmap,
+                                  );
+                                  Navigator.pop(context);
                                 }
                               },
                               child: Text(

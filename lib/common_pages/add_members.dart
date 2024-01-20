@@ -8,11 +8,17 @@ import '../models/user model/user_model.dart';
 import '../components/tiles/search_bar.dart';
 
 class AddMembers extends StatefulWidget {
-  const AddMembers({Key? key, required this.totalUsers, this.selectedUsers, this.curUserId})
+  const AddMembers(
+      {Key? key,
+      required this.totalUsers,
+      this.selectedUsers,
+      this.curUserId,
+      this.includeCurUser = false})
       : super(key: key);
   final List<Users> totalUsers;
   final List<Users>? selectedUsers;
   final String? curUserId;
+  final bool includeCurUser;
 
   @override
   State<AddMembers> createState() => _AddMembersState();
@@ -30,7 +36,11 @@ class _AddMembersState extends State<AddMembers> {
   @override
   void initState() {
     super.initState();
-    totalUsers = widget.totalUsers.where((element) => element.id != widget.curUserId).toList();
+    totalUsers = widget.totalUsers
+        .where(
+          (element) => widget.includeCurUser || element.id != widget.curUserId,
+        )
+        .toList();
     searched = totalUsers;
     query = "";
     focusNode = FocusNode();
@@ -83,7 +93,8 @@ class _AddMembersState extends State<AddMembers> {
                         searched = totalUsers.where((e) {
                           String email = e.email;
                           String name = e.name.toLowerCase();
-                          return widget.curUserId != e.id && (email.contains(query) || name.contains(query));
+                          return widget.curUserId != e.id &&
+                              (email.contains(query) || name.contains(query));
                         }).toList();
                         // focusNode.unfocus();
                       } else {
@@ -106,7 +117,8 @@ class _AddMembersState extends State<AddMembers> {
                         searched = totalUsers.where((e) {
                           String email = e.email;
                           String name = e.name.toLowerCase();
-                          return widget.curUserId != e.id && (email.contains(query) || name.contains(query));
+                          return widget.curUserId != e.id &&
+                              (email.contains(query) || name.contains(query));
                         }).toList();
                         focusNode.unfocus();
                       } else {

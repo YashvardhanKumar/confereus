@@ -99,7 +99,7 @@ class SocketStream extends LoginStatus {
     socket.emit("$tableName-delete", [accessToken, refreshToken, data ?? {}]);
   }
 
-  void editDocument(String tableName, Map<String, dynamic>? data) async {
+  void editDocument(String tableName,data) async {
     String? refreshToken = await secstore.read(key: 'login_refresh_token');
     String? accessToken = await secstore.read(key: 'login_access_token');
     socket.emit("$tableName-edit", [accessToken, refreshToken, data ?? {}]);

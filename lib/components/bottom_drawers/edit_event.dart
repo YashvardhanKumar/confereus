@@ -5,6 +5,8 @@ import 'package:confereus/common_pages/add_members.dart';
 import 'package:confereus/components/input_fields/text_form_field.dart';
 import 'package:confereus/constants.dart';
 import 'package:confereus/models/user%20model/user_model.dart';
+import 'package:confereus/sockets/socket_stream.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -125,12 +127,15 @@ class _EditEventsState extends State<EditEvents> {
                   child: AddButton(
                     onPressed: () async {
                       selected = await Navigator.push<List<Users>>(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => AddMembers(
-                                        totalUsers: widget.users,
-                                        selectedUsers: selected,
-                                      ))) ??
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AddMembers(
+                                totalUsers: widget.users,
+                                selectedUsers: selected,
+                                includeCurUser: true,
+                              ),
+                            ),
+                          ) ??
                           selected;
                       setState(() {});
                     },
@@ -158,6 +163,21 @@ class _EditEventsState extends State<EditEvents> {
                           validator: (val) {
                             if (val == null || val.isEmpty) {
                               return "Field Required";
+                            }
+                            try {
+                              final data = DateFormat.Hm().parseStrict(val);
+                              start = DateTime(
+                                start.year,
+                                start.month,
+                                start.day,
+                                data.hour,
+                                data.minute,
+                              );
+                              // start.copyWith(
+                              //     hour: data.hour, minute: data.minute);
+                              setState(() {});
+                            } catch (e) {
+                              return "Invalid Format";
                             }
                             return null;
                           },
@@ -210,6 +230,26 @@ class _EditEventsState extends State<EditEvents> {
                           enabled: !isSameDay,
                           label: 'End',
                           controller: endDateCtrl,
+                          validator: (val) {
+                            if (val == null || val.isEmpty) {
+                              return "Field Required";
+                            }
+                            try {
+                              final data = DateFormat.Hm().parseStrict(val);
+                              end = DateTime(
+                                end.year,
+                                end.month,
+                                end.minute,
+                                data.hour,
+                                data.minute,
+                              );
+
+                              setState(() {});
+                            } catch (e) {
+                              return "Invalid Format";
+                            }
+                            return null;
+                          },
                           hint: 'HH:MM',
                           suffix: GestureDetector(
                             child: const Icon(Icons.calendar_today_rounded),
@@ -234,11 +274,11 @@ class _EditEventsState extends State<EditEvents> {
                                 // firstDate: DateTime(1800),
                                 // lastDate: DateTime.now(),
                               );
-                              if (isSameDay) {
-                                end = DateTime(
-                                    start.year, start.month, start.day);
-                                endDateCtrl.text = DateFormat.Hm().format(end);
-                              }
+                              // if (isSameDay) {
+                              //   end = DateTime(start.year, start.month,
+                              //       start.day, time.hour, time.minute);
+                              //   endDateCtrl.text = DateFormat.Hm().format(end);
+                              // }
                               setState(() {});
                               if (time != null) {
                                 end = DateTime(end.year, end.month, end.day,
@@ -302,19 +342,38 @@ class _EditEventsState extends State<EditEvents> {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: Consumer<EventAPI>(builder: (context, confAPI, child) {
+                  child: Consumer<SocketStream>(
+                      builder: (context, confAPI, child) {
                     return CustomFilledButton(
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          final data = await confAPI.editEvent(
-                            widget.data.id,
-                            widget.event,
-                            location: locCtrl.text,
-                            subject: subjectCtrl.text,
-                            startTime: start,
-                            endTime: end,
-                          );
-                          Navigator.pop(context, data);
+                          confAPI.editDocument('events', [
+                            {
+                              if (subjectCtrl.text != widget.event.subject)
+                                'subject': subjectCtrl.text,
+                              if (locCtrl.text != widget.event.location)
+                                'location': locCtrl.text,
+                              if (!listEquals(
+                                  selected.map((e) => e.id).toList(),
+                                  widget.event.presenter))
+                                'presenter': selected,
+                              if ((start).compareTo(widget.event.startTime) !=
+                                  0)
+                                'startTime': start.toIso8601String(),
+                              if ((end).compareTo(widget.event.endTime) != 0)
+                                'endTime': end.toIso8601String(),
+                            },
+                            {
+                              'eventId': widget.event.id,
+                            },
+                          ]);
+                          // widget.data.id,
+                          // widget.event,
+                          // location: locCtrl.text,
+                          // subject: subjectCtrl.text,
+                          // startTime: start,
+                          // endTime: end,
+                          Navigator.pop(context);
                         }
                       },
                       child: Text(

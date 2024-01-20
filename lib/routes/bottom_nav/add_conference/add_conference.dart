@@ -414,32 +414,37 @@ class _CreateNewConferenceState extends State<CreateNewConference> {
                   if (widget.old != null) {
                     conferenceAPI.editDocument(
                       'conferences',
-                      {
-                        if (subjectCtrl.text != widget.old!.subject)
-                          'subject': subjectCtrl.text,
-                        if (aboutCtrl.text != widget.old!.about)
-                          'about': aboutCtrl.text,
-                        // if (eventLogo != conference.eventLogo && eventLogo != null)
-                        //   'eventLogo': eventLogo,
-                        if (locCtrl.text != widget.old!.location)
-                          'location': locCtrl.text,
-                        // if (admin != null && !listEquals(admin, conference.admin))
-                        //   'admin': admin,
-                        // if (reviewer != null && !listEquals(reviewer, conference.reviewer))
-                        //   'reviewer': reviewer,
-                        // if(registeredID != null && !(conference.registered?.contains(registeredID) ?? false)) 'registered': registeredID,
-                        'visibility': isPrivateEvent ? "private" : "public",
-                        // if (abstractLink != conference.abstractLink && abstractLink != null)
-                        //   'abstractLink': abstractLink,
-                        if ((start ?? widget.old!.startTime)
-                                .compareTo(widget.old!.startTime) !=
-                            0)
-                          'startTime': start!.toIso8601String(),
-                        if ((end ?? widget.old!.endTime)
-                                .compareTo(widget.old!.endTime) !=
-                            0)
-                          'endTime': end!.toIso8601String(),
-                      },
+                      [
+                        {
+                          if (subjectCtrl.text != widget.old!.subject)
+                            'subject': subjectCtrl.text,
+                          if (aboutCtrl.text != widget.old!.about)
+                            'about': aboutCtrl.text,
+                          // if (eventLogo != conference.eventLogo && eventLogo != null)
+                          //   'eventLogo': eventLogo,
+                          if (locCtrl.text != widget.old!.location)
+                            'location': locCtrl.text,
+                          // if (admin != null && !listEquals(admin, conference.admin))
+                          //   'admin': admin,
+                          // if (reviewer != null && !listEquals(reviewer, conference.reviewer))
+                          //   'reviewer': reviewer,
+                          // if(registeredID != null && !(conference.registered?.contains(registeredID) ?? false)) 'registered': registeredID,
+                          'visibility': isPrivateEvent ? "private" : "public",
+                          // if (abstractLink != conference.abstractLink && abstractLink != null)
+                          //   'abstractLink': abstractLink,
+                          if ((start ?? widget.old!.startTime)
+                                  .compareTo(widget.old!.startTime) !=
+                              0)
+                            'startTime': start!.toIso8601String(),
+                          if ((end ?? widget.old!.endTime)
+                                  .compareTo(widget.old!.endTime) !=
+                              0)
+                            'endTime': end!.toIso8601String(),
+                        },
+                        {
+                          'confId': widget.old!.id,
+                        }
+                      ],
                       // widget.old!.id,
                       // widget.old!,
                       // subject: subjectCtrl.text,
@@ -482,8 +487,10 @@ class _CreateNewConferenceState extends State<CreateNewConference> {
                       String confUrl =
                           await conferenceAPI.uploadConf(eventLogoFile!);
                       print(confUrl);
-                      conferenceAPI
-                          .editDocument("conferences", {"eventLogo": confUrl});
+                      conferenceAPI.editDocument("conferences", [
+                        {"eventLogo": confUrl},
+                        {"confId": data!.id}
+                      ]);
 
                       isClicked = false;
                       setState(() {});

@@ -128,12 +128,12 @@ class _AddEventsState extends State<AddEvents> {
                       if (event.hasData && conf.hasData) {
                         final today = DateTime.now().toUtc();
                         final e =
-                            widget.data.startTime.difference(today).inDays < 0
+                            conf.data!.startTime.difference(today).inDays < 0
                                 ? today
-                                : widget.data.startTime;
+                                : conf.data!.startTime;
                         return Column(
                           children: List.generate(
-                            widget.data.endTime.day - e.day + 1,
+                             conf.data!.endTime.day - e.day + 1,
                             (index) {
                               return DayEvent(
                                 data: event.data!,
