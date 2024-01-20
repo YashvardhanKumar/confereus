@@ -4,8 +4,8 @@ import 'package:confereus/components/custom_text.dart';
 import 'package:confereus/constants.dart';
 import 'package:flutter/material.dart';
 
-import '../../models/user model/user_model.dart';
-import '../tiles/search_bar.dart';
+import '../models/user model/user_model.dart';
+import '../components/tiles/search_bar.dart';
 
 class AddMembers extends StatefulWidget {
   const AddMembers({Key? key, required this.totalUsers, this.selectedUsers, this.curUserId})
@@ -63,7 +63,7 @@ class _AddMembersState extends State<AddMembers> {
           )
         ],
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(60),
+          preferredSize: const Size.fromHeight(60),
           child: Padding(
             padding: const EdgeInsets.only(left: 12.0, right: 12, bottom: 12),
             child: Row(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../search_bar.dart';
+import '../components/input_fields/search_bar.dart';
 import 'search_suggestions_recent.dart';
 
 class SearchUser extends StatefulWidget {

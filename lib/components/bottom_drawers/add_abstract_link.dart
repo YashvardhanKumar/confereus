@@ -14,7 +14,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../API/user_api.dart';
 import '../../models/user model/user_model.dart';
 import '../button/add_button.dart';
-import '../common_pages/add_members.dart';
+import '../../common_pages/add_members.dart';
 import '../custom_text.dart';
 
 // Future<Conference> addAbstract(BuildContext context, Conference data) async {
@@ -61,8 +61,11 @@ class _AddAbstractLinkDrawerState extends State<AddAbstractLinkDrawer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: CustomText('Add Abstract'),
+        surfaceTintColor: Colors.white,
+        backgroundColor: Colors.white,
+        title: const CustomText('Add Abstract'),
       ),
       body: Form(
         key: _formKey,
@@ -192,7 +195,7 @@ class _AddAbstractLinkDrawerState extends State<AddAbstractLinkDrawer> {
                                         setState(() {});
                                       }
                                     : null,
-                            child: CustomText(
+                            child: const CustomText(
                               'Generate Title',
                               fontWeight: FontWeight.w600,
                             ));

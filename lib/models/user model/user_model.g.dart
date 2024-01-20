@@ -7,6 +7,18 @@ part of 'user_model.dart';
 // **************************************************************************
 
 Users _$UsersFromJson(Map<String, dynamic> json) => Users(
+      workExperience: (json['workExperience'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      education: (json['education'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      skills: (json['skills'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       id: json['_id'] as String,
       email: json['email'] as String,
       name: json['name'] as String,
@@ -15,19 +27,22 @@ Users _$UsersFromJson(Map<String, dynamic> json) => Users(
       emailVerified: json['emailVerified'] as bool,
       profileImageURL: json['profileImageURL'] as String?,
       provider: json['provider'] as String,
-      workExperience: (json['workExperience'] as List<dynamic>?)
-          ?.map((e) => WorkExperience.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      education: (json['education'] as List<dynamic>?)
-          ?.map((e) => Education.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      skills: (json['skills'] as List<dynamic>?)
-          ?.map((e) => Skills.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      workExperience_data: (json['workExperience_data'] as List<dynamic>?)
+              ?.map((e) => WorkExperience.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      education_data: (json['education_data'] as List<dynamic>?)
+              ?.map((e) => Education.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      skills_data: (json['skills_data'] as List<dynamic>?)
+              ?.map((e) => Skills.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$UsersToJson(Users instance) => <String, dynamic>{
-      // 'id': instance.id,
+      // '_id': instance.id,
       'email': instance.email,
       'name': instance.name,
       'password': instance.password,
@@ -38,6 +53,9 @@ Map<String, dynamic> _$UsersToJson(Users instance) => <String, dynamic>{
       'workExperience': instance.workExperience,
       'education': instance.education,
       'skills': instance.skills,
+      'workExperience_data': instance.workExperience_data,
+      'education_data': instance.education_data,
+      'skills_data': instance.skills_data,
     };
 
 WorkExperience _$WorkExperienceFromJson(Map<String, dynamic> json) =>
@@ -53,7 +71,7 @@ WorkExperience _$WorkExperienceFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$WorkExperienceToJson(WorkExperience instance) =>
     <String, dynamic>{
-      // 'id': instance.id,
+      // '_id': instance.id,
       'position': instance.position,
       'company': instance.company,
       'jobType': instance.jobType,
@@ -73,7 +91,7 @@ Education _$EducationFromJson(Map<String, dynamic> json) => Education(
     );
 
 Map<String, dynamic> _$EducationToJson(Education instance) => <String, dynamic>{
-      // 'id': instance.id,
+      // '_id': instance.id,
       'institution': instance.institution,
       'degree': instance.degree,
       'field': instance.field,
@@ -89,7 +107,7 @@ Skills _$SkillsFromJson(Map<String, dynamic> json) => Skills(
     );
 
 Map<String, dynamic> _$SkillsToJson(Skills instance) => <String, dynamic>{
-      // 'id': instance.id,
+      // '_id': instance.id,
       'skill': instance.skill,
       'expertise': instance.expertise,
     };

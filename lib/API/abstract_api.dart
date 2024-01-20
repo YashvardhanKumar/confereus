@@ -8,6 +8,8 @@ import 'package:flutter/foundation.dart';
 import 'http_client.dart';
 
 class AbstractAPI extends HTTPClientProvider {
+
+
   Future<List<Abstract>?> fetchAbstract(
       String confId,
       String? eventId,
@@ -28,7 +30,7 @@ class AbstractAPI extends HTTPClientProvider {
     final encoded = utf8.encode(jsonEncode(reqBody));
     print(abstractGetRoute(userId!, confId,eventId));
     HttpClientRequest request =
-    await client.getUrl(Uri.parse(abstractGetRoute(userId!, confId,eventId)));
+    await client.getUrl(Uri.parse(abstractGetRoute(userId, confId,eventId)));
     request.headers.contentType = ContentType.json;
     request.headers.contentLength = encoded.length;
     request.headers.add('Authorization', 'Bearer $accessToken');
@@ -37,7 +39,7 @@ class AbstractAPI extends HTTPClientProvider {
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
       await updateCookie(res);
-      print((data['data'] as List).map((e) => Abstract.fromJson(e)).toList());
+      //TODO: print((data['data'] as List).map((e) => Abstract.fromJson(e)).toList());
       return (data['data'] as List).map((e) => Abstract.fromJson(e)).toList();
     } else {
       // return data['message'];

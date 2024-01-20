@@ -1,4 +1,4 @@
-import 'package:confereus/components/common_pages/search_page.dart';
+import 'package:confereus/common_pages/search_page.dart';
 import 'package:flutter/material.dart';
 import '../custom_text.dart';
 class SearchBarButton extends StatelessWidget {
@@ -28,7 +28,7 @@ class SearchBarButton extends StatelessWidget {
           );
         },
         child: Container(
-          padding: EdgeInsets.all(12),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: const Color(0xffefe9f5),
             borderRadius: BorderRadius.circular(50),

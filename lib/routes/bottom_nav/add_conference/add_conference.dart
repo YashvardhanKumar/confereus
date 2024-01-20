@@ -7,6 +7,7 @@ import 'package:confereus/components/custom_text.dart';
 import 'package:confereus/components/input_fields/text_form_field.dart';
 import 'package:confereus/models/conference%20model/conference.model.dart';
 import 'package:confereus/routes/bottom_nav/add_conference/add_events.dart';
+import 'package:confereus/sockets/socket_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -25,7 +26,7 @@ class CreateNewConference extends StatefulWidget {
 class _CreateNewConferenceState extends State<CreateNewConference> {
   late final subjectCtrl = TextEditingController(text: widget.old?.subject);
   late final aboutCtrl = TextEditingController(text: widget.old?.about);
-  late final locCtrl = TextEditingController(text: widget.old?.about);
+  late final locCtrl = TextEditingController(text: widget.old?.location);
   late final startDateCtrl = TextEditingController(
       text: widget.old != null
           ? DateFormat("dd/MM/yy").format(widget.old!.startTime)
@@ -49,11 +50,15 @@ class _CreateNewConferenceState extends State<CreateNewConference> {
   Uint8List? eventLogoBytes;
   bool isClicked = false;
 
+  late bool isPrivateEvent = widget.old?.visibility == null ||
+      (widget.old!.visibility == "private" ? true : false);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        surfaceTintColor: Colors.white,
         backgroundColor: Colors.white,
         title: const CustomText('Create New Conference'),
       ),
@@ -362,16 +367,42 @@ class _CreateNewConferenceState extends State<CreateNewConference> {
                 ],
               ),
             ),
+            GestureDetector(
+              onTap: () {
+                isPrivateEvent = !isPrivateEvent;
+                setState(() {});
+              },
+              child: Row(
+                children: [
+                  Checkbox(
+                    value: isPrivateEvent,
+                    visualDensity: VisualDensity.compact,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    onChanged: (val) {
+                      isPrivateEvent = !isPrivateEvent;
+                      setState(() {});
+                    },
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  const CustomText(
+                    'Private Event',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Consumer<ConferenceAPI>(
+        child: Consumer<SocketStream>(
           builder: (context, conferenceAPI, child) {
             return CustomFilledButton(
               child: CustomText(
-                widget.old != null ? 'Update' : 'Next',
+                widget.old != null ? 'Update' : 'Create Conference',
                 color: Colors.white,
                 fontWeight: FontWeight.w500,
                 fontSize: 20,
@@ -381,24 +412,50 @@ class _CreateNewConferenceState extends State<CreateNewConference> {
                   isClicked = true;
                   setState(() {});
                   if (widget.old != null) {
-                    await conferenceAPI
-                        .editConference(
-                      widget.old!.id,
-                      widget.old!,
-                      subject: subjectCtrl.text,
-                      location: locCtrl.text,
-                      about: aboutCtrl.text,
-                      startTime: start,
-                      endTime: end,
-                    )
-                        .then((value) async {
-                      // if (eventLogoFile != null) {
-                      //   await conferenceAPI.uploadConf(eventLogoFile!);
-                      // }
-                      isClicked = false;
-                      setState(() {});
-                      Navigator.pop(context);
-                    });
+                    conferenceAPI.editDocument(
+                      'conferences',
+                      {
+                        if (subjectCtrl.text != widget.old!.subject)
+                          'subject': subjectCtrl.text,
+                        if (aboutCtrl.text != widget.old!.about)
+                          'about': aboutCtrl.text,
+                        // if (eventLogo != conference.eventLogo && eventLogo != null)
+                        //   'eventLogo': eventLogo,
+                        if (locCtrl.text != widget.old!.location)
+                          'location': locCtrl.text,
+                        // if (admin != null && !listEquals(admin, conference.admin))
+                        //   'admin': admin,
+                        // if (reviewer != null && !listEquals(reviewer, conference.reviewer))
+                        //   'reviewer': reviewer,
+                        // if(registeredID != null && !(conference.registered?.contains(registeredID) ?? false)) 'registered': registeredID,
+                        'visibility': isPrivateEvent ? "private" : "public",
+                        // if (abstractLink != conference.abstractLink && abstractLink != null)
+                        //   'abstractLink': abstractLink,
+                        if ((start ?? widget.old!.startTime)
+                                .compareTo(widget.old!.startTime) !=
+                            0)
+                          'startTime': start!.toIso8601String(),
+                        if ((end ?? widget.old!.endTime)
+                                .compareTo(widget.old!.endTime) !=
+                            0)
+                          'endTime': end!.toIso8601String(),
+                      },
+                      // widget.old!.id,
+                      // widget.old!,
+                      // subject: subjectCtrl.text,
+                      // location: locCtrl.text,
+                      // about: aboutCtrl.text,
+                      // startTime: start,
+                      // endTime: end,
+                    );
+                    //   .then((value) async {
+                    // // if (eventLogoFile != null) {
+                    // //   await conferenceAPI.uploadConf(eventLogoFile!);
+                    // // }
+                    isClicked = false;
+                    setState(() {});
+                    Navigator.pop(context);
+                    // });
                     return;
                   }
 
@@ -408,31 +465,44 @@ class _CreateNewConferenceState extends State<CreateNewConference> {
                     about: aboutCtrl.text,
                     location: locCtrl.text,
                     startTime: start!,
-                    endTime: end!, admin: [storage.read('userId')], admin_data: [], events: [], reviewer: [], registered: [],
+                    visibility: isPrivateEvent ? "Private" : "Public",
+                    endTime: end ?? start!,
+                    admin: [storage.read('userId')],
+                    admin_data: [],
+                    events_data: [],
+                    reviewer: [],
+                    registered: [],
+                    creator: storage.read('userId'),
                   );
-                  final data = await conferenceAPI.addConference(conference);
-                  if (data != null) {
-
+                  // final data = await
+                  Conference? data;
+                  conferenceAPI.changedDocumentListener((p0) async {
+                    data = Conference.fromJson(p0);
                     if (eventLogoFile != null) {
-                      String confUrl = await conferenceAPI.uploadConf(eventLogoFile!);
+                      String confUrl =
+                          await conferenceAPI.uploadConf(eventLogoFile!);
                       print(confUrl);
-                      await conferenceAPI.editConference(data.id, data,eventLogo: confUrl);
-                    }
-                    isClicked = false;
-                    setState(() {});
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => AddEvents(
-                          data: data,
-                          isAdmin:
-                              (data.admin
-                                  .contains(storage.read('userId'))),
-                          isEdit: false,
+                      conferenceAPI
+                          .editDocument("conferences", {"eventLogo": confUrl});
+
+                      isClicked = false;
+                      setState(() {});
+                      // ignore: use_build_context_synchronously
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AddEvents(
+                            data: data!,
+                            isAdmin:
+                                (data!.admin.contains(storage.read('userId'))),
+                            isEdit: false,
+                          ),
                         ),
-                      ),
-                    );
-                  }
+                      );
+                    }
+                  }, "conferences");
+                  conferenceAPI.addDocument("conferences", conference.toJson());
+                  if (data != null) {}
                 }
               },
             );

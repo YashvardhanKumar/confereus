@@ -1,5 +1,7 @@
 import 'package:confereus/components/custom_text.dart';
 import 'package:confereus/components/tiles/event_tiles_big.dart';
+import 'package:confereus/sockets/socket_stream.dart';
+import 'package:confereus/stream_socket.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,11 +17,35 @@ class Explore extends StatefulWidget {
 }
 
 class _ExploreState extends State<Explore> {
+  final _streamController =
+      SocketController<List<Conference>?>();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Provider.of<SocketStream>(context, listen: false)
+        .fetchAllDocuments(initController, 'conferences');
+  }
+
+  void initController(dynamic eventdata) {
+    _streamController
+        .add((eventdata as List).map((e) => Conference.fromJson(e)).toList());
+  }
+
+  @override
+  void dispose() {
+    print("dispose");
+    // _streamController.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        surfaceTintColor: Colors.white,
         backgroundColor: Colors.white,
         title: const CustomText('Explore conferences'),
         actions: [
@@ -35,38 +61,52 @@ class _ExploreState extends State<Explore> {
             setState(() {});
           },
           child: StreamBuilder<List<Conference>?>(
-              stream: confApi.fetchConference('all').asStream(),
+              stream: _streamController.get,
               builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                // if (!snapshot.hasData) {
+                //   return const Center(
+                //     child: CircularProgressIndicator(),
+                //   );
+                // }
+                List<Conference>? data;
+                if (snapshot.hasData) {
+                  // if (snapshot.data!.isEmpty) {
+                  //   return Container();
+                  // }
+                  data = snapshot.data
+                      ?.where((e) => !e.admin.contains(storage.read('userId')))
+                      .toList();
                 }
-                if (snapshot.data!.isEmpty) {
-                  return Container();
-                }
-                final data = snapshot.requireData?.where((e) => !e.admin.contains(storage.read('userId'))).toList() ?? [];
-                return ListView.builder(
-                  shrinkWrap: true,
-                  // primary: true,
-                  itemCount: data.length,
-                  itemBuilder: (_, i) {
-
-                    bool isRegistered =
-                        data[i].registered.contains(storage.read('userId'));
-                    return ConferenceBigCard(
-                      data: data[i],
-                      onRegisterPressed: () async {
-                        if (snapshot.hasData) {
-                          await confApi
-                              .registerConference(snapshot.data![i].id);
-                          setState(() {});
-                        }
-                      },
-                      isRegistered: isRegistered,
+                return Builder(builder: (context) {
+                  if (data != null && data.isEmpty) {
+                    return const Center(
+                      child: CustomText("Nothing to show!"),
                     );
-                  },
-                );
+                  }
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    // primary: true,
+                    itemCount: data?.length ?? 3,
+                    itemBuilder: (_, i) {
+                      bool? isRegistered;
+                      if (data != null) {
+                        isRegistered =
+                            data[i].registered.contains(storage.read('userId'));
+                      }
+                      return ConferenceBigCard(
+                        data: data?[i],
+                        onRegisterPressed: () async {
+                          if (snapshot.hasData) {
+                            await confApi
+                                .registerConference(snapshot.data![i].id);
+                            setState(() {});
+                          }
+                        },
+                        isRegistered: isRegistered,
+                      );
+                    },
+                  );
+                });
               }),
         );
       }),

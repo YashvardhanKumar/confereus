@@ -12,12 +12,18 @@ class Users {
   final bool emailVerified;
   final String? profileImageURL;
   final String provider;
+  final List<String> workExperience;
+  final List<String> education;
+  final List<String> skills;
 
-  final List<WorkExperience>? workExperience;
-  final List<Education>? education;
-  final List<Skills>? skills;
+  final List<WorkExperience> workExperience_data;
+  final List<Education> education_data;
+  final List<Skills> skills_data;
 
   Users({
+    this.workExperience = const [],
+    this.education = const [],
+    this.skills = const [],
     required this.id,
     required this.email,
     required this.name,
@@ -26,9 +32,9 @@ class Users {
     required this.emailVerified,
     this.profileImageURL,
     required this.provider,
-     this.workExperience,
-     this.education,
-     this.skills,
+    this.workExperience_data = const [],
+    this.education_data = const [],
+    this.skills_data = const [],
   });
 
   factory Users.fromJson(Map<String, dynamic> json) => _$UsersFromJson(json);

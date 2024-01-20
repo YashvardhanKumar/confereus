@@ -1,5 +1,6 @@
 import 'package:confereus/API/conference_api.dart';
 import 'package:confereus/constants.dart';
+import 'package:confereus/sockets/socket_stream.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -10,6 +11,7 @@ import '../../main.dart';
 import '../../models/conference model/conference.model.dart';
 import '../../models/user model/user_model.dart';
 import '../bottom_drawers/add_abstract_link.dart';
+import '../bottom_drawers/edit_event.dart';
 import '../button/text_button.dart';
 import '../custom_text.dart';
 
@@ -19,17 +21,15 @@ class EventTile extends StatefulWidget {
     required this.event,
     required this.isAdmin,
     required this.data,
-    required this.updateState,
-    required this.onEdit,
     required this.isRegistered,
+    required this.users,
   });
 
   final Event event;
   final bool isAdmin;
   final Conference data;
-  final VoidCallback updateState;
-  final VoidCallback onEdit;
   final bool isRegistered;
+  final List<Users> users;
 
   @override
   State<EventTile> createState() => _EventTileState();
@@ -140,7 +140,8 @@ class _EventTileState extends State<EventTile> {
                             padding: const EdgeInsets.symmetric(vertical: 6.0),
                             child: CupertinoButton(
                               color: kColorDark,
-                              padding: EdgeInsets.symmetric(vertical: 3, horizontal: 6),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 3, horizontal: 6),
                               minSize: 25,
                               onPressed: () async {
                                 Navigator.push(
@@ -160,7 +161,7 @@ class _EventTileState extends State<EventTile> {
                               // color: Colors.white,
                               // style: TextButton.styleFrom(
                               //     backgroundColor: Colors.black26),
-                              child: CustomText(
+                              child: const CustomText(
                                 '+ Add Abstract',
                               ),
                             ),
@@ -172,46 +173,18 @@ class _EventTileState extends State<EventTile> {
                 ],
               ),
             ),
-            // if(!widget.isAdmin)
-            // if (!isAdmin && widget.isRegistered)
-            //   FutureBuilder<Users?>(
-            //       future: Provider.of<UserAPI>(context).getCurUsers(),
-            //       builder: (context, snapshot) {
-            //         if (snapshot.hasData) {
-            //           return CupertinoButton(
-            //             onPressed: () async {
-            //               Navigator.push(
-            //                 context,
-            //                 MaterialPageRoute(
-            //                   builder: (_) => AddAbstractLinkDrawer(
-            //                     data: widget.data,
-            //                     curUser: snapshot.requireData!,
-            //                     dataEvent: widget.event,
-            //                   ),
-            //                 ),
-            //               );
-            //               setState(() {});
-            //             },
-            //
-            //             // icon: const Icon(Icons.edit_document),
-            //             // color: Colors.white,
-            //             // style: TextButton.styleFrom(
-            //             //     backgroundColor: Colors.black26),
-            //             child: CustomText(
-            //               '+ Add Abstract',
-            //               fontSize: 12,
-            //             ),
-            //           );
-            //         }
-            //         return CircularProgressIndicator();
-            //       }),
             if (widget.isAdmin)
               Column(
                 children: [
                   CustomTextButton(
-                    onPressed: () {
-                      widget.onEdit();
-                      setState(() {});
+                    onPressed: () async {
+                      await editEvents(
+                        context,
+                        widget.data,
+                        widget.event.startTime,
+                        widget.event,
+                        widget.users,
+                      );
                     },
                     child: const Padding(
                       padding: EdgeInsets.all(5.0),
@@ -219,11 +192,11 @@ class _EventTileState extends State<EventTile> {
                     ),
                   ),
                   CustomTextButton(
-                    onPressed: () async {
-                      await Provider.of<EventAPI>(context, listen: false)
-                          .deleteEvent(widget.data.id, widget.event.id);
-                      widget.updateState();
-                    },
+                    onPressed: () => Provider.of<SocketStream>(context)
+                        .deleteDocument("events", {
+                      "eventId": widget.event.id,
+                      "confId": widget.data.id
+                    }),
                     child: const Padding(
                       padding: EdgeInsets.all(5.0),
                       child: Icon(Icons.delete_forever_rounded),

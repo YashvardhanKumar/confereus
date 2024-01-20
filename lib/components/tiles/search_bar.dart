@@ -22,7 +22,7 @@ class CustomSearchBar extends StatelessWidget {
       clipBehavior: Clip.hardEdge,
       child: AnimatedContainer(
         curve: Curves.easeInOutCubicEmphasized,
-        margin: EdgeInsets.symmetric(horizontal: 0),
+        margin: const EdgeInsets.symmetric(horizontal: 0),
         decoration: BoxDecoration(
           color: const Color(0xffefe9f5),
           borderRadius:

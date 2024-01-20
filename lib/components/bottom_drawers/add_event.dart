@@ -2,15 +2,16 @@ import 'package:confereus/API/conference_api.dart';
 import 'package:confereus/API/user_api.dart';
 import 'package:confereus/components/button/add_button.dart';
 import 'package:confereus/components/button/filled_button.dart';
-import 'package:confereus/components/common_pages/add_members.dart';
+import 'package:confereus/common_pages/add_members.dart';
+import 'package:confereus/components/custom_text.dart';
 import 'package:confereus/components/input_fields/text_form_field.dart';
-import 'package:confereus/constants.dart';
 import 'package:confereus/models/user%20model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../constants.dart';
 import '../../models/conference model/conference.model.dart';
 
 Future addEvents(BuildContext context, Conference data, DateTime date) async {
@@ -18,6 +19,7 @@ Future addEvents(BuildContext context, Conference data, DateTime date) async {
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
+    backgroundColor: Colors.white,
     // useRootNavigator: true,
     builder: (_) {
       return AddEvents(
@@ -65,7 +67,7 @@ class _AddEventsState extends State<AddEvents> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return BottomSheet(
-                backgroundColor: kColorLight,
+                backgroundColor: Colors.white,
                 onClosing: () {},
                 builder: (BuildContext context) {
                   return Form(
@@ -100,11 +102,25 @@ class _AddEventsState extends State<AddEvents> {
                             },
                           ),
                         ),
-                        Row(
-                          children: List.generate(
-                            selected.length,
-                            (index) =>
-                                InputChip(label: Text(selected[index].name)),
+                        Padding(
+                          padding: const EdgeInsets.all(1.5),
+                          child: Row(
+                            children: List.generate(
+                              selected.length,
+                              (index) => Padding(
+                                padding: const EdgeInsets.all(1.5),
+                                child: InputChip(
+                                  backgroundColor: kColorLight,
+
+                                  label: CustomText(selected[index].name),
+                                  labelPadding: EdgeInsets.zero,
+                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                  visualDensity: VisualDensity.compact,
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                         Padding(
@@ -290,7 +306,15 @@ class _AddEventsState extends State<AddEvents> {
                 },
               );
             }
-            return const Center(child: CircularProgressIndicator());
+            return const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(),
+                ),
+              ],
+            );
           }),
     );
   }

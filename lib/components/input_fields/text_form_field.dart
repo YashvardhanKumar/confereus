@@ -89,7 +89,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
                 Colors.black,
                     // : const Color(0xffD8DADC),
               ),
-              borderRadius: BorderRadius.circular(5),
+              borderRadius: BorderRadius.circular(15),
             ),
             enabledBorder: OutlineInputBorder(
               borderSide: const BorderSide(
@@ -99,14 +99,14 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
                 Colors.black,
                     // : const Color(0xffD8DADC),
               ),
-              borderRadius: BorderRadius.circular(5),
+              borderRadius: BorderRadius.circular(15),
             ),
             focusedBorder: OutlineInputBorder(
               borderSide: const BorderSide(
                 color: Colors.black,
                 width: 2,
               ),
-              borderRadius: BorderRadius.circular(5),
+              borderRadius: BorderRadius.circular(15),
             ),
           ),
         ),

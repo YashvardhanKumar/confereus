@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../custom_text.dart';
-import '../tiles/resent_search_tile.dart';
+import '../components/custom_text.dart';
+import '../components/tiles/resent_search_tile.dart';
 
 class SearchSuggestions extends StatefulWidget {
   const SearchSuggestions({

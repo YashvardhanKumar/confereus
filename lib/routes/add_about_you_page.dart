@@ -65,9 +65,9 @@ class _AddAboutYouState extends State<AddAboutYou> {
           // if (snapshot.hasData) {
 
           final users = snapshot.data!;
-          if ((users.workExperience?.isNotEmpty ?? false) ||
-              (users.education?.isNotEmpty ?? false) ||
-              (users.skills?.isNotEmpty ?? false)) {
+          if ((users.workExperience_data?.isNotEmpty ?? false) ||
+              (users.education_data?.isNotEmpty ?? false) ||
+              (users.skills_data?.isNotEmpty ?? false)) {
             return const MainPage();
           }
           // workExperienceList = users.workExperience ?? [];
@@ -125,11 +125,11 @@ class _AddAboutYouState extends State<AddAboutYou> {
                               ),
                             ),
                             const Divider(),
-                            (users.workExperience?.isNotEmpty ?? false)
+                            (users.workExperience_data?.isNotEmpty ?? false)
                                 ? Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    children: users.workExperience!
+                                    children: users.workExperience_data!
                                         .map(
                                           (e) => Padding(
                                             padding: const EdgeInsets.all(10),
@@ -179,11 +179,11 @@ class _AddAboutYouState extends State<AddAboutYou> {
                               ),
                             ),
                             const Divider(),
-                            (users.education?.isNotEmpty ?? false)
+                            (users.education_data?.isNotEmpty ?? false)
                                 ? Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    children: users.education!
+                                    children: users.education_data!
                                         .map(
                                           (e) => Padding(
                                             padding: const EdgeInsets.all(10.0),
@@ -233,11 +233,11 @@ class _AddAboutYouState extends State<AddAboutYou> {
                               ),
                             ),
                             const Divider(),
-                            (users.skills?.isNotEmpty ?? false)
+                            (users.skills_data?.isNotEmpty ?? false)
                                 ? Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    children: users.skills!
+                                    children: users.skills_data!
                                         .map(
                                           (e) => Padding(
                                             padding: const EdgeInsets.all(10.0),

@@ -11,22 +11,26 @@ class Conference {
   final String id;
 
   final String subject, about;
+  final String creator;
   final DateTime startTime, endTime;
-  final String? creator;
   final List<String> admin;
   final String? visibility;
   final List registered;
-  final List<String>? reviewer;
-  final List<Event> events;
+  final List<String> reviewer;
+  final List<String> eventsId;
   final String? eventLogo;
-  final String? location;
-  final List<Users>? admin_data, reviewer_data;
+  final String location;
+
+  final List<Users> reviewer_data;
+  final List<Users> admin_data;
+  final List<Event> events_data;
 
   Conference({
-    this.admin_data,
-    this.reviewer_data,
-    this.creator,
-    this.reviewer,
+    this.eventsId = const [],
+    this.admin_data = const [],
+    this.reviewer_data = const [],
+    required this.creator,
+    this.reviewer = const [],
     this.eventLogo,
     required this.id,
     required this.subject,
@@ -35,9 +39,9 @@ class Conference {
     required this.endTime,
     required this.admin,
     this.visibility,
-    this.location,
+    required this.location,
     required this.registered,
-    required this.events,
+    this.events_data = const [],
   });
 
   factory Conference.fromJson(Map<String, dynamic> json) =>

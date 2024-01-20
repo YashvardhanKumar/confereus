@@ -24,12 +24,17 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
   TextEditingController cnfPasswordCtrl = TextEditingController();
   DateTime? date;
   String? errorText;
+  bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        surfaceTintColor: Colors.white,
+        backgroundColor: Colors.white,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Form(
@@ -58,7 +63,7 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
                   if (value == null || value.isEmpty) {
                     return 'Email is Required';
                   } else if (!RegExp(
-                          r"^([a-zA-Z\d_.+-]+)@([a-zA-Z\d-]+\.)+[a-zA-Z]{2,}$")
+                          r'^([a-zA-Z\d_.+-]+)@([a-zA-Z\d-]+\.)+[a-zA-Z]{2,}$')
                       .hasMatch(value)) {
                     return 'Not an Email Format';
                   }
@@ -153,8 +158,10 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
               ),
               Consumer<UserAPI>(builder: (context, userApi, _) {
                 return CustomFilledButton(
+                  isLoading: isLoading,
                   // margin: const EdgeInsets.all(10),
                   onPressed: () async {
+                    isLoading = true;
                     errorText = null;
                     setState(() {});
                     if (_formKey.currentState!.validate()) {
@@ -168,13 +175,23 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
                           password: passwordCtrl.text);
                       await userApi.signUp(context, user).then((value) {
                         errorText = value;
+                        isLoading = false;
                         setState(() {});
                         // });
                       });
                       if (!_formKey.currentState!.validate()) {
                         return;
                       }
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => OTPPage(user: user,)));
+                      await userApi
+                          .sendOTPMail(emailCtrl.text,true);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => OTPPage(
+                            email: user.email,
+                          ),
+                        ),
+                      );
                       setState(() {});
                     }
                   },

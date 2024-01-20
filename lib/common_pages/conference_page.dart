@@ -1,18 +1,23 @@
+import 'dart:async';
+
 import 'package:confereus/API/conference_api.dart';
-import 'package:confereus/components/common_pages/conference_register_page.dart';
+import 'package:confereus/common_pages/conference_register_page.dart';
 import 'package:confereus/components/custom_text.dart';
 import 'package:confereus/constants.dart';
 import 'package:confereus/main.dart';
-import 'package:confereus/routes/bottom_nav/home/app_bar/public_profile.dart';
+import 'package:confereus/common_pages/public_profile.dart';
+import 'package:confereus/sockets/socket_stream.dart';
+import 'package:confereus/stream_socket.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/conference model/conference.model.dart';
-import '../../routes/bottom_nav/add_conference/add_conference.dart';
-import '../../routes/bottom_nav/add_conference/add_events.dart';
-import '../button/filled_button.dart';
+import '../models/conference model/conference.model.dart';
+import '../routes/bottom_nav/add_conference/add_conference.dart';
+import '../routes/bottom_nav/add_conference/add_events.dart';
+import '../components/button/filled_button.dart';
 import 'abstract_page.dart';
+import 'register_event.dart';
 
 class ConferencePage extends StatefulWidget {
   const ConferencePage({
@@ -32,13 +37,32 @@ class ConferencePage extends StatefulWidget {
 
 class _ConferencePageState extends State<ConferencePage> {
   bool isClicked = false;
+  final _streamController = SocketController<Conference?>();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Provider.of<SocketStream>(context, listen: false).fetchOneDocument(
+        initController, 'conferences', {"confId": widget.data.id});
+  }
+
+  void initController(dynamic eventdata) {
+    _streamController.add(Conference.fromJson(eventdata));
+  }
+
+  // @override
+  // void dispose() {
+  //   _streamController.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<ConferenceAPI>(
-      builder: (context, data, _) {
-        return FutureBuilder<List<Conference>?>(
-          future: data.fetchConference("all"),
+      builder: (context, datas, _) {
+        return StreamBuilder<Conference?>(
+          stream: _streamController.get,
           builder: (context, snapshot) {
             // if (snapshot.hasData || snapshot.data == null) return const Scaffold();
             // print(snapshot.data?.first.toJson());
@@ -48,9 +72,7 @@ class _ConferencePageState extends State<ConferencePage> {
                 child: CircularProgressIndicator(),
               );
             }
-            final data = snapshot.data!
-                .where((element) => element.id == widget.data.id)
-                .first;
+            final data = snapshot.data!;
             print(storage.read('userId'));
             final isAdmin = (data.admin
                 .where((e) => (e.contains(storage.read('userId'))))).isNotEmpty;
@@ -63,10 +85,11 @@ class _ConferencePageState extends State<ConferencePage> {
                     context,
                     MaterialPageRoute(
                       builder: (_) => AddEvents(
-                          data: data,
-                          isAdmin: isAdmin,
-                          isEdit: true,
-                          isRegistered: !isAdmin && widget.isRegistered),
+                        data: data,
+                        isAdmin: isAdmin,
+                        isEdit: true,
+                        isRegistered: !isAdmin && widget.isRegistered,
+                      ),
                     ),
                   );
                   setState(() {});
@@ -210,26 +233,25 @@ class _ConferencePageState extends State<ConferencePage> {
                                       ],
                                     ),
                                     const SizedBox(height: 5),
-                                    if (data.location != null)
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.location_on_rounded,
-                                            size: 18,
-                                            color: Color(0xff8B8B8B),
-                                          ),
-                                          SizedBox(
-                                            width: 5,
-                                          ),
-                                          CustomText(
-                                            data.location!,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                            color: Color(0xff8B8B8B),
-                                            // fontWeight: FontWeight.w600,
-                                          ),
-                                        ],
-                                      ),
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.location_on_rounded,
+                                          size: 18,
+                                          color: Color(0xff8B8B8B),
+                                        ),
+                                        const SizedBox(
+                                          width: 5,
+                                        ),
+                                        CustomText(
+                                          data.location,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: const Color(0xff8B8B8B),
+                                          // fontWeight: FontWeight.w600,
+                                        ),
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ],
@@ -263,7 +285,8 @@ class _ConferencePageState extends State<ConferencePage> {
                       //       );
                       //     }),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 5),
                         child: Card(
                           elevation: 0,
                           color: Colors.white,
@@ -281,6 +304,7 @@ class _ConferencePageState extends State<ConferencePage> {
                                   fontSize: 20,
                                   fontWeight: FontWeight.w600,
                                 ),
+                                const Divider(),
                                 CustomText(
                                   data.about,
                                   color: Colors.grey.shade700,
@@ -290,45 +314,107 @@ class _ConferencePageState extends State<ConferencePage> {
                           ),
                         ),
                       ),
-                      if (data.admin_data != null)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-                          child: Card(
-                            elevation: 0,
-                            color: Colors.white,
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(color: Colors.grey.shade200),
-                                borderRadius: BorderRadius.circular(10)),
-                            clipBehavior: Clip.hardEdge,
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const CustomText(
-                                    'Admininstrators',
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  Row(
-                                    children: List.generate(
-                                      data.admin_data!.length,
-                                      (index) => InputChip(
-                                        labelPadding: EdgeInsets.zero,
-                                        visualDensity: VisualDensity.compact,
-                                        label: CustomText(
-                                            data.admin_data![index].name),
-                                        onPressed: () {
-                                          Navigator.push(context, MaterialPageRoute(builder: (_) => PublicProfile(userId: data.admin_data![index].id, email: data.admin_data![index].email,)));
-                                        },
-                                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 5),
+                        child: Card(
+                          elevation: 0,
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(color: Colors.grey.shade200),
+                              borderRadius: BorderRadius.circular(10)),
+                          clipBehavior: Clip.hardEdge,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const CustomText(
+                                          'Admininstrators',
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        
+                                        if (widget.data.admin
+                                            .contains(storage.read("userId")))
+                                          IconButton(
+                                            onPressed: () {},
+                                            icon: const Icon(
+                                              Icons.edit_rounded,
+                                              size: 12,
+                                            ),
+                                            // visualDensity: VisualDensity.compact,
+                                            padding: const EdgeInsets.all(5),
+                                          )
+                                      ],
                                     ),
-                                  ),
-                                ],
+                                    Divider(),
+                                  ],
+                                ),
                               ),
-                            ),
+                              Column(
+                                children: List.generate(
+                                    data.admin_data.length,
+                                    (index) => ListTile(
+                                          title: CustomText(
+                                              data.admin_data[index].name),
+                                          subtitle: CustomText(
+                                              data.admin_data[index].email),
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => PublicProfile(
+                                                  userId:
+                                                      data.admin_data[index].id,
+                                                  email: data
+                                                      .admin_data[index].email,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          leading: CircleAvatar(
+                                            child: Icon(
+                                              Icons.person_rounded,
+                                              size: 28,
+                                            ),
+                                          ),
+                                        )
+                                    // InputChip(
+                                    //   backgroundColor: kColorLight,
+                                    //   labelPadding: EdgeInsets.zero,
+                                    //   visualDensity: VisualDensity.compact,
+                                    //   padding: const EdgeInsets.symmetric(
+                                    //       horizontal: 15),
+                                    //   materialTapTargetSize:
+                                    //       MaterialTapTargetSize.shrinkWrap,
+                                    //   label: CustomText(
+                                    //       data.admin_data[index].name),
+                                    //   onPressed: () {
+                                    //     Navigator.push(
+                                    //       context,
+                                    //       MaterialPageRoute(
+                                    //         builder: (_) => PublicProfile(
+                                    //           userId: data.admin_data[index].id,
+                                    //           email:
+                                    //               data.admin_data[index].email,
+                                    //         ),
+                                    //       ),
+                                    //     );
+                                    //   },
+                                    // ),
+                                    ),
+                              ),
+                            ],
                           ),
                         ),
+                      ),
                     ],
                   ),
                 ),
@@ -340,7 +426,7 @@ class _ConferencePageState extends State<ConferencePage> {
                   onPressed: isClicked
                       ? null
                       : () async {
-                          if (!widget.isRegistered) {
+                          if (!widget.isRegistered && !isAdmin) {
                             isClicked = true;
                             setState(() {});
 
@@ -348,12 +434,14 @@ class _ConferencePageState extends State<ConferencePage> {
                               isClicked = false;
                               setState(() {});
                             });
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const ConferenceRegisterPage(),
-                              ),
-                            );
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (_) => RegisterEvent(
+                            //       conf: allData[i],
+                            //     ),
+                            //   ),
+                            // );
                           } else {
                             Navigator.push(
                               context,

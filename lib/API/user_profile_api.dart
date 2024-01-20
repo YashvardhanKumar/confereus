@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -8,6 +9,35 @@ import 'package:flutter/material.dart';
 import '../constants.dart';
 
 class UserProfileAPI extends HTTPClientProvider {
+Stream<List<Users>?> getUsersLive(
+      StreamController<List<Users>?> controller, String confId) async* {
+    String? refreshToken = await secstore.read(key: 'login_refresh_token');
+    String? accessToken = await secstore.read(key: 'login_access_token');
+    socket.emit('users', [
+      accessToken,
+      refreshToken,
+      {}
+    ]);
+    socket.on('users', (eventdata) {
+      controller.sink
+          .add((eventdata as List).map((e) => Users.fromJson(e)).toList());
+    });
+  }
+
+  void getUsersOneLive(StreamController<Users?> controller, String userId) async {
+    String? refreshToken = await secstore.read(key: 'login_refresh_token');
+    String? accessToken = await secstore.read(key: 'login_access_token');
+    socket.emit('users', [
+      accessToken,
+      refreshToken,
+      {
+        "userId": userId,
+      }
+    ]);
+    socket.on('users-one', (eventdata) {
+      controller.sink.add(Users.fromJson(eventdata));
+    });
+  }
   Future<Users?> userProfile(BuildContext context,[String? userId_]) async {
     String? refreshToken = await secstore.read(key: 'login_refresh_token');
     String? accessToken = await secstore.read(key: 'login_access_token');
@@ -24,6 +54,7 @@ class UserProfileAPI extends HTTPClientProvider {
     request.add(encoded);
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
+    print(data);
     if (data['status']) {
       await updateCookie(res);
       return Users.fromJson(data['data']);

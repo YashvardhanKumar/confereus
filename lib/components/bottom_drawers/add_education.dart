@@ -11,6 +11,7 @@ Future<Education?> addEducation(BuildContext context) async {
   return await showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    backgroundColor: Colors.white,
     // useRootNavigator: true,
     builder: (_) {
       return const AddEducation();
@@ -46,6 +47,7 @@ class _AddEducationState extends State<AddEducation> {
       duration: kThemeAnimationDuration,
       child: BottomSheet(
         onClosing: () {},
+        backgroundColor: Colors.white,
         builder: (BuildContext context) {
           return Form(
             key: _formKey,

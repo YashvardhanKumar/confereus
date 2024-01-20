@@ -1,3 +1,4 @@
+import 'package:confereus/components/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:linkedin_login/linkedin_login.dart';
 import 'package:provider/provider.dart';
@@ -7,7 +8,7 @@ import '../../constants.dart';
 import '../../provider/login_status_provider.dart';
 import '../../routes/auth/add_dob_for_sso_login.dart';
 import '../../secrets.dart';
-import 'outline_button.dart';
+import 'filled_button.dart';
 
 class LinkedInButtonCustom extends StatefulWidget {
   const LinkedInButtonCustom({Key? key}) : super(key: key);
@@ -24,9 +25,9 @@ class _LinkedInButtonCustomState extends State<LinkedInButtonCustom> {
 
   @override
   Widget build(BuildContext context) {
-    return CustomOutlinedButton(
+    return CustomFilledButton(
       // margin: const EdgeInsets.all(10),
-      color: const Color(0xff0077B7),
+      color: const Color(0xff0A66C2),
       onPressed: () {
         Navigator.push(
           context,
@@ -38,25 +39,40 @@ class _LinkedInButtonCustomState extends State<LinkedInButtonCustom> {
                 children: [
                   if (isLoading)
                     const Center(
-                      child: CircularProgressIndicator(
-                        color: kColorDark,
-                      ),
-                    ),
-                  LinkedInUserWidget(
-                    useVirtualDisplay: true,
-                    appBar: AppBar(),
-                    destroySession: !status.isLoggedIn,
-                    redirectUrl: linkedinLoginRoute,
-                    clientId: LinkedinAPI.CLIENT_ID,
-                    clientSecret: LinkedinAPI.CLIENT_SECRET,
-                    onError: (userFailed) {
-                      print(userFailed.stackTrace);
-                      Navigator.pop(context);
-                    },
-                    onGetUserProfile:
-                        (final UserSucceededAction response) async {
+                              child: CircularProgressIndicator(
+                                color: kColorDark,
+                              ),
+                            ),
+                          LinkedInUserWidget(
+                            useVirtualDisplay: true,
+                            appBar: AppBar(
+                              surfaceTintColor: Colors.white,
+                              backgroundColor: Colors.white,
+                            ),
+                            destroySession: !status.isLoggedIn,
+                            redirectUrl: linkedinLoginRoute,
+                            clientId: LinkedinAPI.CLIENT_ID,
+                            clientSecret: LinkedinAPI.CLIENT_SECRET,
+                            onError: (userFailed) {
+                              print(userFailed.stackTrace);
+                              Navigator.pop(context);
+                            },
+                            onGetUserProfile:
+                                (final UserSucceededAction response) async {
                       // isLoading = true;
                       // setState(() {});
+                      print("object");
+                      Navigator.maybePop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const Scaffold(
+                            body: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                        ),
+                      );
                       await userAPI.linkedInLogin(response.user);
                       Navigator.maybePop(context);
                       Navigator.pushAndRemoveUntil(
@@ -69,28 +85,28 @@ class _LinkedInButtonCustomState extends State<LinkedInButtonCustom> {
                       //     .then(
                       //       (value) async => await userAPI.getCurUsers().then(
                       //         (value) {
-                      //           isLoading = false;
-                      //           setState(() {});
-                      //           if (user == null) {
-                      //             ScaffoldMessenger.of(context).showSnackBar(
-                      //                 const SnackBar(
-                      //                     content: CustomText(
-                      //                         'Something Went Wrong')));
-                      //           }
-                      //           return Navigator.pushAndRemoveUntil(
-                      //             context,
-                      //             MaterialPageRoute(
-                      //               builder: (_) => (value!.dob ==
-                      //                       null)
-                      //                   ? AddDOBForSSOLogin(
-                      //                       isDobPresent: value.dob != null,
-                      //                     )
-                      //                   : MainPage(email: value.email),
-                      //             ),
-                      //             (route) => false,
-                      //           );
-                      //         },
-                      //       ),
+                              //           isLoading = false;
+                              //           setState(() {});
+                              //           if (user == null) {
+                              //             ScaffoldMessenger.of(context).showSnackBar(
+                              //                 const SnackBar(
+                              //                     content: CustomText(
+                              //                         'Something Went Wrong')));
+                              //           }
+                              //           return Navigator.pushAndRemoveUntil(
+                              //             context,
+                              //             MaterialPageRoute(
+                              //               builder: (_) => (value!.dob ==
+                              //                       null)
+                              //                   ? AddDOBForSSOLogin(
+                              //                       isDobPresent: value.dob != null,
+                              //                     )
+                              //                   : MainPage(email: value.email),
+                              //             ),
+                              //             (route) => false,
+                              //           );
+                              //         },
+                              //       ),
                       //     );
                     },
                   ),
@@ -101,9 +117,24 @@ class _LinkedInButtonCustomState extends State<LinkedInButtonCustom> {
           ),
         );
       },
-      child: (_) => Image.asset(
-        'images/linkedinlogo.png',
-        height: 28,
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(3.0),
+            child: Image.asset(
+              'images/linkedin.png',
+              height: 48,
+            ),
+          ),
+          const Center(
+              child: CustomText(
+            'Login With LinkedIn',
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+            fontSize: 18,
+            textAlign: TextAlign.center,
+          )),
+        ],
       ),
     );
   }

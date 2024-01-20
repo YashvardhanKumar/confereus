@@ -1,7 +1,7 @@
 import 'package:confereus/API/conference_api.dart';
 import 'package:confereus/components/button/add_button.dart';
 import 'package:confereus/components/button/filled_button.dart';
-import 'package:confereus/components/common_pages/add_members.dart';
+import 'package:confereus/common_pages/add_members.dart';
 import 'package:confereus/components/input_fields/text_form_field.dart';
 import 'package:confereus/constants.dart';
 import 'package:confereus/models/user%20model/user_model.dart';

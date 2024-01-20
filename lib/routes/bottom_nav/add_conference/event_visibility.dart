@@ -22,7 +22,10 @@ class _EventVisibilityState extends State<EventVisibility> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        surfaceTintColor: Colors.white,
+        backgroundColor: Colors.white,
         title: const Text('Event Visibility'),
       ),
       body: Padding(
@@ -181,7 +184,10 @@ class _EventVisibilityState extends State<EventVisibility> {
             fontWeight: FontWeight.w500,
           ),
           onPressed: () {
-            Provider.of<ConferenceAPI>(context).editConference(widget.data.id, widget.data, visibility: isPrivateEvent ? "Private": "Public");
+            Provider.of<ConferenceAPI>(context,listen: false).editConference(widget.data.id, widget.data, visibility: isPrivateEvent ? "Private": "Public");
+            while(Navigator.canPop(context)) {
+              Navigator.pop(context);
+            }
           },
         ),
       ),

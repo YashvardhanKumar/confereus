@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../constants.dart';
-import 'custom_text.dart';
+import '../../constants.dart';
+import '../custom_text.dart';
 
 class AboutTile extends StatefulWidget {
   const AboutTile({

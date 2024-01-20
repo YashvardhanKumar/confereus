@@ -5,6 +5,7 @@ import 'package:confereus/routes/bottom_nav/notification/notification.dart';
 import 'package:flutter/material.dart';
 
 import '../components/bottom_nav.dart';
+import 'bottom_nav/communities/communities.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key,}) : super(key: key);
@@ -25,7 +26,7 @@ class _MainPageState extends State<MainPage> {
           Icons.home_rounded,
           Icons.explore_rounded,
           Icons.notifications_rounded,
-          // Icons.groups_rounded,
+          Icons.groups_rounded,
         ],
 
         onChanged: (int value) {
@@ -39,7 +40,7 @@ class _MainPageState extends State<MainPage> {
         const Home(),
         const Explore(),
         const Notifications(),
-        // const Communities(),
+        const Communities(),
       ][idx],
     );
   }

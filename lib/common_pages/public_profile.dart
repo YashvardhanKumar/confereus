@@ -1,6 +1,6 @@
 import 'package:confereus/API/conference_api.dart';
 import 'package:confereus/API/user_profile_api.dart';
-import 'package:confereus/components/add_about_you_tile.dart';
+import 'package:confereus/components/tiles/add_about_you_tile.dart';
 import 'package:confereus/components/bottom_drawers/add_education.dart';
 import 'package:confereus/components/bottom_drawers/add_skills.dart';
 import 'package:confereus/components/bottom_drawers/edit_education.dart';
@@ -11,17 +11,19 @@ import 'package:confereus/components/tiles/education_tile.dart';
 import 'package:confereus/components/tiles/skill_tile.dart';
 import 'package:confereus/components/tiles/work_experience_tile.dart';
 import 'package:confereus/constants.dart';
+import 'package:confereus/sockets/socket_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../components/bottom_drawers/add_work_experience.dart';
-import '../../../../components/button/text_button.dart';
-import '../../../../components/common_pages/see_all_page.dart';
-import '../../../../components/tiles/registered_event_tiles_small.dart';
-import '../../../../main.dart';
-import '../../../../models/conference model/conference.model.dart';
-import '../../../../models/user model/user_model.dart';
+import '../components/bottom_drawers/add_work_experience.dart';
+import '../components/button/text_button.dart';
+import 'see_all_page.dart';
+import '../components/tiles/registered_event_tiles_small.dart';
+import '../main.dart';
+import '../models/conference model/conference.model.dart';
+import '../models/user model/user_model.dart';
+import '../stream_socket.dart';
 
 class PublicProfile extends StatefulWidget {
   const PublicProfile({Key? key, required this.userId, required this.email})
@@ -34,6 +36,27 @@ class PublicProfile extends StatefulWidget {
 }
 
 class _PublicProfileState extends State<PublicProfile> {
+  final _streamControllerUser = SocketController<Users?>();
+  final _streamControllerConf = SocketController<List<Conference>?>();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    final prov = Provider.of<SocketStream>(context, listen: false);
+    prov.fetchOneDocument(
+        initControllerUser, 'users', {"userId": widget.userId});
+    prov.fetchAllDocuments(initControllerConf, 'conferences');
+  }
+
+  void initControllerUser(dynamic eventdata) {
+    _streamControllerUser.add(Users.fromJson(eventdata));
+  }
+
+  void initControllerConf(dynamic eventdata) {
+    _streamControllerConf
+        .add((eventdata as List).map((e) => Conference.fromJson(e)).toList());
+  }
+
   @override
   Widget build(BuildContext context) {
     Size deviceSize = MediaQuery.of(context).size;
@@ -54,30 +77,28 @@ class _PublicProfileState extends State<PublicProfile> {
           color: Colors.white,
         ),
       ),
-      body: Consumer2<ConferenceAPI, UserProfileAPI>(
-          builder: (context, confApi, userApi, _) {
+      body: Consumer<SocketStream>(builder: (context, confApi, _) {
         return RefreshIndicator(
           onRefresh: () async => setState(() {}),
           child: StreamBuilder<Users?>(
-              stream: userApi.userProfile(context, widget.userId).asStream(),
+              stream: _streamControllerUser.get,
               builder: (context, userSnap) {
                 return StreamBuilder<List<Conference>?>(
-                    stream: confApi.fetchConference('all').asStream(),
+                    stream: _streamControllerConf.get,
                     builder: (context, snapshot) {
                       if (!snapshot.hasData && !userSnap.hasData) {
                         return const Center(
                           child: CircularProgressIndicator(),
                         );
                       }
-                      if (snapshot.data == null ||
-                          snapshot.data!.isEmpty ||
-                          userSnap.data == null) {
+                      if (snapshot.data == null || userSnap.data == null) {
                         return Container();
                       }
                       final userData = userSnap.data!;
-                      final curUserJob = userData.workExperience!
+                      final cur = userData.workExperience_data
                           .where((element) => element.end == null)
-                          .first;
+                          .toList();
+                      final curUserJob = cur.isEmpty ? null : cur[0];
                       final registeredConf = snapshot.data!
                           .where((e) =>
                               e.registered.contains(storage.read('userId')))
@@ -181,9 +202,7 @@ class _PublicProfileState extends State<PublicProfile> {
                           const SizedBox(
                             height: 10,
                           ),
-                          if (userData.workExperience!
-                              .where((element) => element.end == null)
-                              .isNotEmpty)
+                          if (curUserJob != null)
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -193,7 +212,7 @@ class _PublicProfileState extends State<PublicProfile> {
                                   fontWeight: FontWeight.w600,
                                 ),
                                 CustomText(
-                                  'Currently working as ${userData.workExperience![0].position}',
+                                  'Currently working as ${userData.workExperience_data[0].position}',
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                 )
@@ -211,17 +230,17 @@ class _PublicProfileState extends State<PublicProfile> {
                           AboutTile(
                             title: 'Work Experience',
                             items: List.generate(
-                              userData.workExperience!.length,
+                              userData.workExperience_data.length,
                               (i) {
                                 return Padding(
                                   padding: const EdgeInsets.all(10.0),
                                   child: WorkExperienceTile(
                                     isAdmin: isAdmin,
-                                    data: userData.workExperience![i],
+                                    data: userData.workExperience_data[i],
                                     updateState: () => setState(() {}),
                                     onEditClicked: () async {
-                                      await editWorkExperience(
-                                          context, userData.workExperience![i]);
+                                      await editWorkExperience(context,
+                                          userData.workExperience_data[i]);
                                       setState(() {});
                                     },
                                   ),
@@ -238,17 +257,17 @@ class _PublicProfileState extends State<PublicProfile> {
                           AboutTile(
                             title: 'Education',
                             items: List.generate(
-                              userData.education!.length,
+                              userData.education_data.length,
                               (i) {
                                 return Padding(
                                   padding: const EdgeInsets.all(10.0),
                                   child: EducationTile(
                                     isAdmin: isAdmin,
-                                    data: userData.education![i],
+                                    data: userData.education_data[i],
                                     updateState: () => setState(() {}),
                                     onEditClicked: () async {
                                       await editEducation(
-                                          context, userData.education![i]);
+                                          context, userData.education_data[i]);
                                       setState(() {});
                                     },
                                   ),
@@ -266,17 +285,17 @@ class _PublicProfileState extends State<PublicProfile> {
                             isAdmin: isAdmin,
                             title: 'Skills',
                             items: List.generate(
-                              userData.skills!.length,
+                              userData.skills_data.length,
                               (i) {
                                 return Padding(
                                   padding: const EdgeInsets.all(10.0),
                                   child: SkillTile(
                                     isAdmin: isAdmin,
-                                    data: userData.skills![i],
+                                    data: userData.skills_data[i],
                                     updateState: () => setState(() {}),
                                     onEditClicked: () async {
                                       await editSkills(
-                                          context, userData.skills![i]);
+                                          context, userData.skills_data[i]);
                                       setState(() {});
                                     },
                                   ),
@@ -311,9 +330,8 @@ class _PublicProfileState extends State<PublicProfile> {
                                           MaterialPageRoute(
                                             builder: (_) => SeeAllPage(
                                               isCreated: true,
-                                              stream: confApi
-                                                  .fetchConference('all')
-                                                  .asStream(),
+                                              stream: _streamControllerConf.get,
+                                              isRegistered: false,
                                             ),
                                           ),
                                         );

@@ -1,8 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:confereus/API/http_client.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart';
@@ -76,80 +76,61 @@ String _validateUrl(String url) {
 }
 
 class ConferenceAPI extends HTTPClientProvider {
-  Future<String> uploadConf(File file) async {
-    FirebaseStorage _storage = FirebaseStorage.instance;
-    String? accessToken = await secstore.read(key: 'login_access_token');
-    UploadTask uploadTask = _storage.ref('uploads/${DateTime.now()}.jpeg').putFile(file);
-    String url = await uploadTask.whenComplete(() {}).then((value) {
-      return value.ref.getDownloadURL();
-    });
-    //Upload the file to firebase
+  // void fetchOneConfSnapshot(
+  //     SocketController<Conference?> confOneSocketController, String confId) async {
+  //   String? refreshToken = await secstore.read(key: 'login_refresh_token');
+  //   String? accessToken = await secstore.read(key: 'login_access_token');
+  //   socket.emit('conferences', [
+  //     accessToken,
+  //     refreshToken,
+  //     {'confId': confId}
+  //   ]);
 
-    // Waits till the file is uploaded then stores the download url
+  //   socket.on('conferences-one', (eventdata) {
+  //     confOneSocketController.add(Conference.fromJson(eventdata));
+  //   });
+  //   // });
+  // }
 
-    //returns the download url
-    return url;
-    // String fileName = file.path.split("/").last;
-    // MultipartRequest request = MultipartRequest('PATCH', Uri.parse(uploadConfLogoRoute(id,confId)));
-    // request.files.add(
-    //     MultipartFile.fromBytes(
-    //         'picture',
-    //         await file.readAsBytes(),
-    //         filename: fileName,
-    //     )
-    // );
-    // request.headers.addAll({
-    //   "Content-type": "multipart/form-data",
-    //   "Authorization": "Bearer $accessToken"
-    // });
-    // var res = await request.send();
-    // return res.reasonPhrase;
-    // HttpClientRequest request =
-    //     await client.postUrl(Uri.parse(uploadConfLogoRoute));
-    // request.headers.contentType = ContentType.binary;
-    // request.headers.add('Authorization', 'Bearer $accessToken');
-    // request.add(encoded);
-    // HttpClientResponse res = await request.close();
-  }
+  // void fetchConfSnapshot(Function(dynamic) callback) async {
+  //   String? refreshToken = await secstore.read(key: 'login_refresh_token');
+  //   String? accessToken = await secstore.read(key: 'login_access_token');
+  //   socket.emit('conferences', [accessToken, refreshToken, {}]);
+  //   socket.on('conferences', callback);
+  // }
 
-  Future<List<Conference>?> fetchConference(
-    // Conference conference,
-    String visibility,
-  ) async {
-    String? refreshToken = await secstore.read(key: 'login_refresh_token');
-    String? accessToken = await secstore.read(key: 'login_access_token');
-    String? userId = storage.read('userId');
-    Map<String, dynamic> reqBody = {
-      'login_refresh_token': refreshToken,
-      // 'data': conference.toJson(),
-      // {
-      //   'subject': subject,
-      //   'about': about,
-      //   'startTime': startTime,
-      //   'endTime': endTime,
-      // }
-    };
-    final encoded = utf8.encode(jsonEncode(reqBody));
-    HttpClientRequest request =
-        await client.getUrl(Uri.parse(conferenceGetRoute(userId!, visibility)));
-    request.headers.contentType = ContentType.json;
-    request.headers.contentLength = encoded.length;
-    request.headers.add('Authorization', 'Bearer $accessToken');
-    request.add(encoded);
+  // Future<List<Conference>?> fetchConference(
+  //   // Conference conference,
+  //   String visibility,
+  // ) async {
+  //   String? refreshToken = await secstore.read(key: 'login_refresh_token');
+  //   String? accessToken = await secstore.read(key: 'login_access_token');
+  //   String? userId = storage.read('userId');
+  //   Map<String, dynamic> reqBody = {
+  //     'login_refresh_token': refreshToken,
+  //   };
+  //   final encoded = utf8.encode(jsonEncode(reqBody));
+  //   HttpClientRequest request =
+  //       await client.getUrl(Uri.parse(conferenceGetRoute(userId!, visibility)));
+  //   request.headers.contentType = ContentType.json;
+  //   request.headers.contentLength = encoded.length;
+  //   request.headers.add('Authorization', 'Bearer $accessToken');
+  //   request.add(encoded);
 
-    HttpClientResponse res = await request.close();
+  //   HttpClientResponse res = await request.close();
 
-    var data = jsonDecode(await res.transform(utf8.decoder).join());
-    print(data);
-    print((data['data'] as List).map((e) => Conference.fromJson(e)).toList());
-    if (data['status']) {
-      await updateCookie(res);
-      return (data['data'] as List).map((e) => Conference.fromJson(e)).toList();
-    } else {
-      // return data['message'];
-    }
-    return null;
-  }
+  //   var data = jsonDecode(await res.transform(utf8.decoder).join());
+  //   // print(data['data'][0]);
+  //   //TODO: print('data');
+  //   // print((data['data'] as List).map((e) => Conference.fromJson(e)).toList());
+  //   if (data['status']) {
+  //     await updateCookie(res);
+  //     return (data['data'] as List).map((e) => Conference.fromJson(e)).toList();
+  //   } else {
+  //     // return data['message'];
+  //   }
+  //   return null;
+  // }
 
   Future<Conference?> addConference(
     Conference conference,
@@ -160,12 +141,6 @@ class ConferenceAPI extends HTTPClientProvider {
     Map<String, dynamic> reqBody = {
       'login_refresh_token': refreshToken,
       'data': conference.toJson(),
-      // {
-      //   'subject': subject,
-      //   'about': about,
-      //   'startTime': startTime,
-      //   'endTime': endTime,
-      // }
     };
     HttpClientRequest request =
         await client.postUrl(Uri.parse(conferenceAddRoute(userId!)));
@@ -177,7 +152,7 @@ class ConferenceAPI extends HTTPClientProvider {
     var data = jsonDecode(await res.transform(utf8.decoder).join());
     if (data['status']) {
       await updateCookie(res);
-      print(data);
+      //TODO: print(data);
       return Conference.fromJson(data['data']);
     } else {
       // return data['message'];
@@ -190,8 +165,8 @@ class ConferenceAPI extends HTTPClientProvider {
       String? about,
       String? eventLogo,
       String? location,
-        List? reviewer,
-        List? admin,
+      List? reviewer,
+      List? admin,
       // String? registeredID,
       String? visibility,
       // String? abstractLink,
@@ -210,8 +185,10 @@ class ConferenceAPI extends HTTPClientProvider {
           'eventLogo': eventLogo,
         if (location != conference.location && location != null)
           'location': location,
-        if(admin != null && !listEquals(admin, conference.admin)) 'admin': admin,
-        if(reviewer != null && !listEquals(reviewer, conference.reviewer)) 'reviewer': reviewer,
+        if (admin != null && !listEquals(admin, conference.admin))
+          'admin': admin,
+        if (reviewer != null && !listEquals(reviewer, conference.reviewer))
+          'reviewer': reviewer,
         // if(registeredID != null && !(conference.registered?.contains(registeredID) ?? false)) 'registered': registeredID,
         if (visibility != conference.visibility && visibility != null)
           'visibility': visibility,
@@ -283,49 +260,78 @@ class ConferenceAPI extends HTTPClientProvider {
     return data['status'];
   }
 
-  Future<List<Conference>?> getRegisteredConferences(String confId) async {
-    String? refreshToken = await secstore.read(key: 'login_refresh_token');
-    String? accessToken = await secstore.read(key: 'login_access_token');
-    String? userId = storage.read('userId');
-    Map<String, dynamic> reqBody = {
-      'login_refresh_token': refreshToken,
-    };
-    final encoded = utf8.encode(jsonEncode(reqBody));
-    // print(encoded);
-    HttpClientRequest request =
-        await client.getUrl(Uri.parse(getRegisteredConferencesRoute(userId!)));
-    request.headers.contentType = ContentType.json;
-    request.headers.contentLength = encoded.length;
-    request.headers.add('Authorization', 'Bearer $accessToken');
-    request.add(encoded);
-    HttpClientResponse res = await request.close();
-    print(res);
+  // Future<List<Conference>?> getRegisteredConferences(String confId) async {
+  //   String? refreshToken = await secstore.read(key: 'login_refresh_token');
+  //   String? accessToken = await secstore.read(key: 'login_access_token');
+  //   String? userId = storage.read('userId');
+  //   Map<String, dynamic> reqBody = {
+  //     'login_refresh_token': refreshToken,
+  //   };
+  //   final encoded = utf8.encode(jsonEncode(reqBody));
+  //   // print(encoded);
+  //   HttpClientRequest request =
+  //       await client.getUrl(Uri.parse(getRegisteredConferencesRoute(userId!)));
+  //   request.headers.contentType = ContentType.json;
+  //   request.headers.contentLength = encoded.length;
+  //   request.headers.add('Authorization', 'Bearer $accessToken');
+  //   request.add(encoded);
+  //   HttpClientResponse res = await request.close();
+  //   //TODO: print(res);
 
-    var data = jsonDecode(await res.transform(utf8.decoder).join());
-    // print("=>$data");
-    if (data['status']) {
-      await updateCookie(res);
-      print(data);
-      return (data['data'] as List).map((e) => Conference.fromJson(e)).toList();
-    }
-    return null;
-  }
+  //   var data = jsonDecode(await res.transform(utf8.decoder).join());
+  //   // print("=>$data");
+  //   if (data['status']) {
+  //     await updateCookie(res);
+  //     //TODO: print(data);
+  //     return (data['data'] as List).map((e) => Conference.fromJson(e)).toList();
+  //   }
+  //   return null;
+  // }
 }
 
 class EventAPI extends HTTPClientProvider {
+  void getEventLive(
+      StreamController<List<Event>?> controller, String confId) async {
+    String? refreshToken = await secstore.read(key: 'login_refresh_token');
+    String? accessToken = await secstore.read(key: 'login_access_token');
+    socket.emit('events', [
+      accessToken,
+      refreshToken,
+      {
+        "confId": confId,
+      }
+    ]);
+    socket.on('events', (eventdata) {
+      controller.sink
+          .add((eventdata as List).map((e) => Event.fromJson(e)).toList());
+    });
+  }
+
+  void getEventOneLive(StreamController<Event?> controller, String confId,
+      String eventId) async {
+    String? refreshToken = await secstore.read(key: 'login_refresh_token');
+    String? accessToken = await secstore.read(key: 'login_access_token');
+    socket.emit('events', [
+      accessToken,
+      refreshToken,
+      {
+        "confId": confId,
+        "eventId": eventId,
+      }
+    ]);
+    // socket.on('connect', (data) {
+    socket.on('events-one', (eventdata) {
+      controller.sink.add(Event.fromJson(eventdata));
+    });
+    // });
+  }
+
   Future<List<Event>?> getEvent(String confId) async {
     String? refreshToken = await secstore.read(key: 'login_refresh_token');
     String? accessToken = await secstore.read(key: 'login_access_token');
     String? userId = storage.read('userId');
     Map<String, dynamic> reqBody = {
       'login_refresh_token': refreshToken,
-      // {
-      //   'subject': subject,
-      //   'location': location,
-      //   'presenter': presenter,
-      //   'startTime': startTime,
-      //   'endTime': endTime,
-      // }
     };
     final encoded = utf8.encode(jsonEncode(reqBody));
     HttpClientRequest request =
@@ -389,7 +395,7 @@ class EventAPI extends HTTPClientProvider {
     Event event, {
     String? subject,
     String? location,
-        String? reviewer,
+    String? reviewer,
     DateTime? startTime,
     DateTime? endTime,
     List<String>? presenter,

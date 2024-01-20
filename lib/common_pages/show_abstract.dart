@@ -6,9 +6,9 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../constants.dart';
-import '../../models/abstract model/abstract.model.dart';
-import '../button/filled_button.dart';
+import '../constants.dart';
+import '../models/abstract model/abstract.model.dart';
+import '../components/button/filled_button.dart';
 
 class ShowAbstract extends StatefulWidget {
   const ShowAbstract({Key? key, required this.isAdmin, required this.abstract})
@@ -212,7 +212,7 @@ class _ShowAbstractState extends State<ShowAbstract> {
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
                     Expanded(

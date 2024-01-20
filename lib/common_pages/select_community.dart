@@ -2,7 +2,7 @@ import 'package:confereus/components/custom_text.dart';
 import 'package:confereus/routes/bottom_nav/communities/create_communities.dart';
 import 'package:flutter/material.dart';
 
-import '../../constants.dart';
+import '../constants.dart';
 
 class SelectCommunity extends StatefulWidget {
   const SelectCommunity({Key? key}) : super(key: key);

@@ -14,6 +14,7 @@ class BottomNavBar extends StatefulWidget {
 
   @override
   State<BottomNavBar> createState() => _BottomNavBarState();
+
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
@@ -24,6 +25,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
     return Container(
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: Colors.grey.shade200)),
+        color: Colors.white,
+
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -34,15 +37,16 @@ class _BottomNavBarState extends State<BottomNavBar> {
             return Padding(
               padding: const EdgeInsets.all(10.0),
               child: Material(
-                borderRadius: BorderRadius.circular(20),
-                color: kColorLight,
+                shape: const StadiumBorder(),
+                color: kColorDark.withOpacity(0.1),
                 clipBehavior: Clip.hardEdge,
                 child: InkWell(
                   onTap: widget.onAddClicked,
                   child: const Padding(
-                    padding: EdgeInsets.all(10.0),
+                    padding: EdgeInsets.symmetric(horizontal: 7.5,vertical: 7.5),
                     child: Icon(
                       Icons.add,
+                      size: 28,
                       color: kColorDark,
                     ),
                   ),
@@ -92,17 +96,19 @@ class _CustomBottomBarItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Material(
+
         borderRadius: BorderRadius.circular(10),
-        color: selected ? kColorDark : kColorLight,
+        color: selected ? kColorDark : kColorDark.withOpacity(0.1),
         // padding: EdgeInsets.all(10),
         clipBehavior: Clip.hardEdge,
         child: InkWell(
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.symmetric(horizontal: 14.0,vertical: 7),
             child: Icon(
               icon,
-              color: selected ? kColorLight : kColorDark,
+              size: 28,
+              color: selected ? Colors.white : kColorDark,
             ),
           ),
         ),

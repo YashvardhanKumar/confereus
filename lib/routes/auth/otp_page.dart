@@ -9,12 +9,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../components/button/text_button.dart';
-import '../../models/user model/user_model.dart';
 import '../../provider/login_status_provider.dart';
+import 'change_password.dart';
 
 class OTPPage extends StatefulWidget {
-  const OTPPage({Key? key, required this.user}) : super(key: key);
-  final Users user;
+  const OTPPage({Key? key, required this.email, this.isForgotPass = false})
+      : super(key: key);
+  final String email;
+  final bool isForgotPass;
 
   @override
   State<OTPPage> createState() => _OTPPageState();
@@ -37,15 +39,7 @@ class _OTPPageState extends State<OTPPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Provider.of<UserAPI>(context, listen: false)
-        .sendMail(widget.user.email)
-        .then((sent) {
-      isSent = sent;
-      // _channel = channel;
-      setState(() {});
-      if (!isSent) {
-        return;
-      }
+      isSent = true;
       timer = Timer.periodic(const Duration(minutes: 2), (timer) {
         if (timer.tick == 1) {
           // errorText = null;
@@ -60,7 +54,6 @@ class _OTPPageState extends State<OTPPage> {
           timer.cancel();
         }
       });
-    });
     for (int i = 0; i < 6; i++) {
       // focusNode.add(FocusNode());
       controllers.add(TextEditingController());
@@ -87,7 +80,10 @@ class _OTPPageState extends State<OTPPage> {
     //   return const LogoPage(needsLogin: true);
     // }
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        surfaceTintColor: Colors.white,
+        backgroundColor: Colors.white,
         leading: Container(),
         leadingWidth: 0,
       ),
@@ -97,7 +93,7 @@ class _OTPPageState extends State<OTPPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Verify your Account',
+              'Verify your OTP',
               style: GoogleFonts.poppins(
                   fontSize: 28, fontWeight: FontWeight.w500),
               textAlign: TextAlign.center,
@@ -107,7 +103,7 @@ class _OTPPageState extends State<OTPPage> {
               child: Row(
                 children: List.generate(
                   6,
-                  (index) => Flexible(
+                      (index) => Flexible(
                     child: OTPBox(
                       errorText: errorText,
                       controller: controllers[index],
@@ -119,8 +115,8 @@ class _OTPPageState extends State<OTPPage> {
                           return;
                         }
                       },
-                    ),
-                  ),
+                        ),
+                      ),
                 ),
               ),
             ),
@@ -135,7 +131,7 @@ class _OTPPageState extends State<OTPPage> {
                         ? null
                         : () async {
                             await Provider.of<UserAPI>(context)
-                                .sendMail(widget.user.email)
+                                .sendOTPMail(widget.email,widget.isForgotPass)
                                 .then((value) {
                               // _channel = value;
                               setState(() {});
@@ -194,48 +190,25 @@ class _OTPPageState extends State<OTPPage> {
       otp += controllers[i].text;
       controllers[i].clear();
     }
-    // if (c1.text.isNotEmpty &&
-    //     c2.text.isNotEmpty &&
-    //     c3.text.isNotEmpty &&
-    //     c4.text.isNotEmpty &&
-    //     c5.text.isNotEmpty) {
-    //   String otp = c1.text + c2.text + c3.text + c4.text + c5.text + c6.text;
-    // print(verifyOTP);
-
-    // _channel?.stream.listen((event) async {
-    //   event = event.replaceAll(RegExp("'"), '"');
-    //   var verify = json.decode(event);
-    //   _channel!.sink.close();
-    //   verifyOTP = verify["otp"];
-    //   setState(() {});
-    //   print(verify["otp"]);
-    // Check if the status is succesfull
 
     errorText = await Provider.of<UserAPI>(context, listen: false)
-        .verifyOTP(context, otp);
+        .verifyOTP(context, otp,widget.isForgotPass);
     setState(() {});
     if (errorText == "Login Needed") {
       Provider.of<LoginStatus>(context).clearData();
     }
-    Navigator.pushAndRemoveUntil(context,
-        MaterialPageRoute(builder: (_) => const AddAboutYou()), (route) => false);
-    // if (errorText == null) {
-    //   errorText = null;
-    //   setState(() {});
-    //   // box.write('isLogin', true);
-    //   // if (box.read('isAnonymous') ?? false) {
-    //   //   box.write('isAnonymous', false);
-    //   //   Navigator.pop(context);
-    //   //   Navigator.pop(context);
-    //   // }
-    //   // else {
-    //   while (Navigator.canPop(context)) {
-    //     Navigator.pop(context);
-    //   }
-    //   Navigator.pushReplacement(
-    //       context, MaterialPageRoute(builder: (_) => const AddAboutYou()));
-    // }
-    // });
+    if (widget.isForgotPass) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => ChangePassword(email: widget.email)),
+      );
+    } else {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const AddAboutYou()),
+        (route) => false,
+      );
+    }
   }
 // }
 }

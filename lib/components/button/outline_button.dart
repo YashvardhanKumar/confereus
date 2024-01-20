@@ -9,11 +9,13 @@ class CustomOutlinedButton extends StatefulWidget {
     this.color,
     this.width,
     this.height,
+    this.isLoading = false,
   }) : super(key: key);
   final Widget Function(Color color) child;
   final VoidCallback? onPressed;
   final Color? color;
   final double? width, height;
+  final bool isLoading;
 
   @override
   State<CustomOutlinedButton> createState() => _CustomOutlinedButtonState();
@@ -33,30 +35,42 @@ class _CustomOutlinedButtonState extends State<CustomOutlinedButton> {
         opacity = 1;
         setState(() {});
       },
-      child: GestureDetector(
-        onTap: () {
-          if (widget.onPressed != null) {
-            opacity = 0.4;
-            setState(() {});
-            widget.onPressed!();
-          }
-        },
-        child: Container(
-          // margin: const EdgeInsets.all(10),
-          height: widget.height ?? 55,
-          alignment: Alignment.center,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(
-                color: widget.onPressed == null
+      child: Container(
+        height: widget.height ?? 55,
+        alignment: Alignment.center,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(
+              color: widget.onPressed == null
+                  ? Colors.grey
+                  : widget.color ?? kColorDark,
+              width: 2),
+        ),
+        child: Material(
+          clipBehavior: Clip.hardEdge,
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: (widget.isLoading)
+                ? null
+                : () {
+                    if (widget.onPressed != null) {
+                      opacity = 0.4;
+                      setState(() {});
+                      widget.onPressed!();
+                    }
+                  },
+            child: (widget.isLoading)
+                ? const Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 1,
+                    ),
+                  )
+                : widget.child(widget.onPressed == null
                     ? Colors.grey
-                    : widget.color ?? kColorDark,
-                width: 2),
+                    : widget.color ?? kColorDark),
           ),
-          child: widget.child(widget.onPressed == null
-              ? Colors.grey
-              : widget.color ?? kColorDark),
         ),
       ),
     );

@@ -8,8 +8,9 @@ import 'package:linkedin_login/linkedin_login.dart';
 import '../constants.dart';
 import '../models/user model/user_model.dart';
 class UserAPI extends HTTPClientProvider {
-  Future<String?> login(BuildContext context, String mail,
-      String cpwd) async {
+
+  Future<Map<String, dynamic>> login(
+      BuildContext context, String mail, String cpwd) async {
     Map<String, dynamic> reqBody = {
       "email": mail,
       "password": cpwd,
@@ -19,29 +20,36 @@ class UserAPI extends HTTPClientProvider {
     request.add(utf8.encode(jsonEncode(reqBody)));
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
-    // print('cookies of res = ${res.cookies}');
-    // print('cookies of req = ${request.cookies}');
-    // await secstore.write(key: 'cookies', value: res.cookies.join('; '));
-
-    // http.Response res = await http.post(
-    //   Uri.parse(loginRoute),
-    //   headers: {"Content-Type": "application/json"},
-    //   body: jsonEncode(reqBody),
-    // );
-    // var jsonResp = jsonDecode(res.body);
+    print(data);
     if (data['status']) {
       //
       await storage.write('token', data['token']);
       await storage.write('userId', data['userId']);
       await storage.write('isLoggedIn', true);
       await storage.write('auth_provider', 'email_login');
-      // final auth = JwtDecoder.decode(token);
       await updateCookie(res);
       notifyListeners();
-    } else {
-      return data['success'];
     }
-    return null;
+    return data;
+  }
+
+  Future<Map<String, dynamic>> changePassword(String mail, String cpwd) async {
+    Map<String, dynamic> reqBody = {
+      "email": mail,
+      "password": cpwd,
+    };
+    HttpClientRequest request =
+        await client.postUrl(Uri.parse(changePasswordRoute));
+    request.headers.contentType = ContentType.json;
+    request.add(utf8.encode(jsonEncode(reqBody)));
+    HttpClientResponse res = await request.close();
+    var data = jsonDecode(await res.transform(utf8.decoder).join());
+    print(data);
+    if (data['status']) {
+      await updateCookie(res);
+      notifyListeners();
+    }
+    return data;
   }
 
   void logout() async {
@@ -111,14 +119,32 @@ class UserAPI extends HTTPClientProvider {
     return null;
   }
 
-  Future<bool> sendMail(String email) async {
+  // Future<bool> sendOTPMailVerify(String email) async {
+  //   String? refreshToken = await secstore.read(key: 'login_refresh_token');
+  //   Map<String, dynamic> reqBody = {
+  //     "email": email,
+  //     "login_refresh_token": refreshToken,
+  //   };
+  //   HttpClient client = HttpClient();
+  //   HttpClientRequest request =
+  //       await client.postUrl(Uri.parse("$sendOTPMailRoute/verify"));
+  //   request.headers.contentType = ContentType.json;
+  //   request.add(utf8.encode(jsonEncode(reqBody)));
+  //   HttpClientResponse res = await request.close();
+  //   var data = jsonDecode(await res.transform(utf8.decoder).join());
+  //   await updateCookie(res);
+  //   return data['status'];
+  // }
+
+  Future<bool> sendOTPMail(String email, bool isReset) async {
     String? refreshToken = await secstore.read(key: 'login_refresh_token');
     Map<String, dynamic> reqBody = {
       "email": email,
-      "login_refresh_token": refreshToken,
+      if (!isReset) "login_refresh_token": refreshToken,
     };
     HttpClient client = HttpClient();
-    HttpClientRequest request = await client.postUrl(Uri.parse(sendMailRoute));
+    HttpClientRequest request = await client.postUrl(
+        Uri.parse("$sendOTPMailRoute/${isReset ? "reset" : "verify"}"));
     request.headers.contentType = ContentType.json;
     request.add(utf8.encode(jsonEncode(reqBody)));
     HttpClientResponse res = await request.close();
@@ -127,7 +153,8 @@ class UserAPI extends HTTPClientProvider {
     return data['status'];
   }
 
-  Future<String?> verifyOTP(BuildContext context, String otp) async {
+  Future<String?> verifyOTP(
+      BuildContext context, String otp, bool isForgotPass) async {
     String? refreshToken = await secstore.read(key: 'login_refresh_token');
     String? accessToken = await secstore.read(key: 'login_access_token');
     String? encryptedOTP = await secstore.read(key: 'encrypted_otp_token');
@@ -139,13 +166,14 @@ class UserAPI extends HTTPClientProvider {
       // "login_access_token": accessToken,
     };
     HttpClient client = HttpClient();
-    HttpClientRequest request = await client.postUrl(Uri.parse(verifyMailRoute));
+    HttpClientRequest request = await client.postUrl(
+        Uri.parse("$verifyMailRoute/${isForgotPass ? "reset" : "verify"}"));
     request.headers.contentType = ContentType.json;
     request.headers.add('Authorization', 'Bearer $accessToken');
     request.add(utf8.encode(jsonEncode(reqBody)));
     HttpClientResponse res = await request.close();
     var data = jsonDecode(await res.transform(utf8.decoder).join());
-    if(data['status']) {
+    if (data['status']) {
     } else {
       return data['success'];
     }

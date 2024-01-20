@@ -5,15 +5,19 @@ import 'package:confereus/API/conference_api.dart';
 import 'package:confereus/API/http_client.dart';
 import 'package:confereus/API/user_api.dart';
 import 'package:confereus/API/user_profile_api.dart';
+import 'package:confereus/constants.dart';
 import 'package:confereus/provider/login_status_provider.dart';
+import 'package:confereus/sockets/socket_stream.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:timezone/data/latest.dart';
+import 'package:path/path.dart' as path;
 
 import 'fire_messaging.dart';
 import 'firebase_options.dart';
@@ -36,12 +40,19 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => LoginStatus()),
-        ChangeNotifierProvider(create: (_) => HTTPClientProvider()),
-        ChangeNotifierProvider(create: (_) => UserAPI()),
-        ChangeNotifierProvider(create: (_) => ConferenceAPI()),
-        ChangeNotifierProvider(create: (_) => EventAPI()),
-        ChangeNotifierProvider(create: (_) => UserProfileAPI()),
-        ChangeNotifierProvider(create: (_) => AbstractAPI()),
+        ChangeNotifierProvider(create: (_) => SocketStream()),
+        ChangeNotifierProvider(
+            create: (_) => HTTPClientProvider()),
+        ChangeNotifierProvider(
+            create: (_) => UserAPI()),
+        ChangeNotifierProvider(
+            create: (_) => ConferenceAPI()),
+        ChangeNotifierProvider(
+            create: (_) => EventAPI()),
+        ChangeNotifierProvider(
+            create: (_) => UserProfileAPI()),
+        ChangeNotifierProvider(
+            create: (_) => AbstractAPI()),
       ],
       builder: (context, child) => const MyApp(),
     ),
@@ -58,6 +69,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Timer? _timer;
   bool needsLogin = false;
+  bool isLoggedIn = false;
 
   @override
   void initState() {
@@ -97,6 +109,7 @@ class _MyAppState extends State<MyApp> {
         needsLogin = false;
       }
     }
+    isLoggedIn = Provider.of<LoginStatus>(context, listen: false).isLoggedIn;
   }
 
   @override
@@ -118,14 +131,19 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff332D72)),
+        colorScheme: ColorScheme.fromSeed(seedColor: kColorDark),
         useMaterial3: true,
+        // colorSchemeSeed: Colors.green,
       ),
       home: Consumer<LoginStatus>(builder: (_, status, child) {
         // storage.erase().then((value) => status.syncVariables());
-        return LogoPage(
-          needsLogin: needsLogin,
-        );
+        if (isLoggedIn) {
+          return const MainPage();
+        }
+        return const LoginSignUpPage();
+        // return LogoPage(
+        //   needsLogin: needsLogin,
+        // );
       }),
     );
   }
@@ -149,22 +167,22 @@ class _LogoPageState extends State<LogoPage> {
     // isLoggedIn = !widget.needsLogin;
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       isLoggedIn = Provider.of<LoginStatus>(context, listen: false).isLoggedIn;
-      if (storage.read('provider') == 'email_login') {
-      }
+      if (storage.read('provider') == 'email_login') {}
       // print(storage.getValues());
       // print(storage.getKeys());
-      Future.delayed(
-        const Duration(seconds: 1),
-        () => Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => (isLoggedIn)
-                ? const MainPage()
-                // ? AddAboutYou()
-                : const LoginSignUpPage(),
-          ),
+      // Future.delayed(
+      //   const Duration(seconds: 0),
+      //   () =>
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => (isLoggedIn)
+              ? const MainPage()
+              // ? AddAboutYou()
+              : const LoginSignUpPage(),
         ),
       );
+      // );
     });
   }
 

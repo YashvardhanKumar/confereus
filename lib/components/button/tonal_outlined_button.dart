@@ -22,7 +22,7 @@ class _TonalOutlinedButtonState extends State<TonalOutlinedButton> {
       child: Material(
         shape: RoundedRectangleBorder(
           side: const BorderSide(width: 2, color: kColorDark),
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(15),
         ),
         color: kColorLight,
         child: InkWell(
