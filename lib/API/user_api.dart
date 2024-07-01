@@ -180,14 +180,13 @@ class UserAPI extends HTTPClientProvider {
     return null;
   }
 
-  Future linkedInLogin(LinkedInUserModel user) async {
+  Future linkedInLogin(EnrichedUser user) async {
     Map<String, dynamic> reqBody = {
-      'firstName': user.localizedFirstName,
-      'lastName': user.localizedLastName,
-      'profilePicture': user.profilePicture?.displayImage,
+      'name': user.name,
+      'picture': user.picture,
         // .displayImageContent?.elements?[0]
         //   .identifiers?[0].file,
-      'email': user.email?.elements?[0].handleDeep?.emailAddress,
+      'email': user.email,
     };
     // HttpClient client = HttpClient();
     HttpClientRequest reqFinal =

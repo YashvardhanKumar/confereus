@@ -11,6 +11,7 @@ import 'package:confereus/sockets/socket_stream.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -27,14 +28,16 @@ import 'routes/main_page.dart';
 final storage = GetStorage('user');
 
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
   Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  NotificationService().initNotification();
+  dotenv.load(fileName: ".env");
+  // NotificationService().initNotification();
   initializeTimeZones();
-  initializeMessaging();
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  // initializeMessaging();
+  // FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   await GetStorage.init('user');
   runApp(
     MultiProvider(

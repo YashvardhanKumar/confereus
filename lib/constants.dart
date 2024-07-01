@@ -12,8 +12,8 @@ const kColorLight = Color(0x224477CE);
 
 // const url = "http://10.0.2.2:3000";
 // const url = "http://192.168.65.68:3000";
-// const url = "http://192.168.11.182:3000";
-const url = "https://confereus.onrender.com";
+const url = "http://192.168.1.5:3000";
+// const url = "https://confereus.onrender.com";
 const signupRoute = "$url/signup";
 const loginRoute = "$url/login";
 const changePasswordRoute = "$url/resetpassword";
