@@ -1,4 +1,3 @@
-![SystemConfereus drawio](https://github.com/user-attachments/assets/48ce86a4-4b3c-4fd6-9d5c-cc6203a89457)
 # Confereus
 
 A Single Window Solution for the Management of Scientific and Academic Conferences/meetings.
