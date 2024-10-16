@@ -10,6 +10,8 @@ import 'package:confereus/main.dart';
 import 'package:confereus/models/user%20model/user_model.dart';
 import 'package:confereus/routes/main_page.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:provider/provider.dart';
@@ -20,12 +22,13 @@ import '../components/bottom_drawers/edit_work_experience.dart';
 import '../components/tiles/education_tile.dart';
 import '../components/tiles/skill_tile.dart';
 import '../components/tiles/work_experience_tile.dart';
-
+import '../controller/auth.controller.dart';
+import '../logo_page.dart';
+final storage = GetStorage('user');
 // Credentials credentials = Credentials.anonymous();
 //
 // final configRealm = Configuration.flexibleSync(credentials, schemaObjects)
 // final realm = Realm(config);
-
 class AddAboutYou extends StatefulWidget {
   const AddAboutYou({Key? key}) : super(key: key);
 
@@ -36,26 +39,12 @@ class AddAboutYou extends StatefulWidget {
 }
 
 class _AddAboutYouState extends State<AddAboutYou> {
-  // List<WorkExperience> workExperienceList = [];
-  // List<Education> educationList = [];
-  // List<Skills> skillsList = [];
-  // late UserAPI userAPI;
-
-  // void getUsers() {
-  //   userAPI = UserAPI();
-  //   userAPI.getCurUsers().then((users) {
-  //     if ((users?.workExperience?.isNotEmpty ?? false) &&
-  //         (users?.education?.isNotEmpty ?? false) &&
-  //         (users?.skills?.isNotEmpty ?? false)) {
-  //       return const MainPage();
-  //     }
-  //   });
-  // }
+  final auth = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Users?>(
-        stream: Provider.of<UserAPI>(context).getCurUsers().asStream(),
+        stream: auth.getCurUsers().asStream(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const Center(

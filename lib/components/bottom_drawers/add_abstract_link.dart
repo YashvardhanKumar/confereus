@@ -1,5 +1,6 @@
 import 'package:confereus/API/abstract_api.dart';
 import 'package:confereus/API/conference_api.dart';
+import 'package:confereus/API/user_profile_api.dart';
 import 'package:confereus/components/button/filled_button.dart';
 import 'package:confereus/components/button/text_button.dart';
 import 'package:confereus/components/input_fields/text_form_field.dart';
@@ -219,7 +220,7 @@ class _AddAbstractLinkDrawerState extends State<AddAbstractLinkDrawer> {
               ),
             ),
             FutureBuilder<List<Users>?>(
-                future: Provider.of<UserAPI>(context).getAllUsers(context),
+                future: Provider.of<UserProfileAPI>(context).getAllUsers(context),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return AddButton(

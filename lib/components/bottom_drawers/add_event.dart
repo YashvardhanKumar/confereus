@@ -2,14 +2,17 @@ import 'dart:math';
 
 import 'package:confereus/API/conference_api.dart';
 import 'package:confereus/API/user_api.dart';
+import 'package:confereus/API/user_profile_api.dart';
 import 'package:confereus/components/button/add_button.dart';
 import 'package:confereus/components/button/filled_button.dart';
 import 'package:confereus/common_pages/add_members.dart';
 import 'package:confereus/components/custom_text.dart';
 import 'package:confereus/components/input_fields/text_form_field.dart';
+import 'package:confereus/controller/auth.controller.dart';
 import 'package:confereus/models/user%20model/user_model.dart';
 import 'package:confereus/sockets/socket_stream.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -55,6 +58,7 @@ class _AddEventsState extends State<AddEvents> {
   late DateTime end = widget.date;
   bool isSameDay = false;
   final _formKey = GlobalKey<FormState>();
+  final auth = Get.find<AuthController>();
   @override
   void initState() {
     // TODO: implement initState
@@ -69,7 +73,7 @@ class _AddEventsState extends State<AddEvents> {
           EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       duration: kThemeAnimationDuration,
       child: FutureBuilder<List<Users>?>(
-          future: Provider.of<UserAPI>(context).getAllUsers(context),
+          future: Provider.of<UserProfileAPI>(context).getAllUsers(context),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return BottomSheet(

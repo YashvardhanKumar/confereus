@@ -9,7 +9,6 @@ import 'package:get_storage/get_storage.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
 class HTTPClientProvider extends LoginStatus {
-  HttpClient client = HttpClient();
   GetStorage storage = GetStorage('user');
   final secstore = const FlutterSecureStorage();
   late Socket socket;

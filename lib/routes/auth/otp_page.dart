@@ -2,12 +2,13 @@ import 'dart:async';
 
 import 'package:confereus/API/user_api.dart';
 import 'package:confereus/constants.dart';
+import 'package:confereus/controller/auth.controller.dart';
 import 'package:confereus/routes/add_about_you_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-
+import 'package:get/get.dart';
 import '../../components/button/text_button.dart';
 import '../../provider/login_status_provider.dart';
 import 'change_password.dart';
@@ -21,7 +22,7 @@ class OTPPage extends StatefulWidget {
   @override
   State<OTPPage> createState() => _OTPPageState();
 }
-
+final auth = Get.find<AuthController>();
 class _OTPPageState extends State<OTPPage> {
   // final List<FocusNode> focusNode = [];
   final List<TextEditingController> controllers = [];
@@ -130,8 +131,7 @@ class _OTPPageState extends State<OTPPage> {
                     onPressed: (tick == null || tick != 0)
                         ? null
                         : () async {
-                            await Provider.of<UserAPI>(context)
-                                .sendOTPMail(widget.email,widget.isForgotPass)
+                            await auth.sendOTPMail(widget.email,widget.isForgotPass)
                                 .then((value) {
                               // _channel = value;
                               setState(() {});
@@ -191,8 +191,8 @@ class _OTPPageState extends State<OTPPage> {
       controllers[i].clear();
     }
 
-    errorText = await Provider.of<UserAPI>(context, listen: false)
-        .verifyOTP(context, otp,widget.isForgotPass);
+    errorText = await auth
+        .verifyOTP(otp,widget.isForgotPass);
     setState(() {});
     if (errorText == "Login Needed") {
       Provider.of<LoginStatus>(context).clearData();

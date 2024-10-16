@@ -1,6 +1,8 @@
 import 'package:confereus/API/user_api.dart';
+import 'package:confereus/controller/auth.controller.dart';
 import 'package:confereus/models/user%20model/user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +17,7 @@ class SignUpWithEmail extends StatefulWidget {
   @override
   State<SignUpWithEmail> createState() => _SignUpWithEmailState();
 }
-
+final auth = Get.find<AuthController>();
 class _SignUpWithEmailState extends State<SignUpWithEmail> {
   TextEditingController emailCtrl = TextEditingController();
   TextEditingController nameCtrl = TextEditingController();
@@ -156,8 +158,7 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
               const SizedBox(
                 height: 30,
               ),
-              Consumer<UserAPI>(builder: (context, userApi, _) {
-                return CustomFilledButton(
+              CustomFilledButton(
                   isLoading: isLoading,
                   // margin: const EdgeInsets.all(10),
                   onPressed: () async {
@@ -173,7 +174,7 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
                           emailVerified: false,
                           provider: "email_login",
                           password: passwordCtrl.text);
-                      await userApi.signUp(context, user).then((value) {
+                      await auth.signUp(user).then((value) {
                         errorText = value;
                         isLoading = false;
                         setState(() {});
@@ -182,7 +183,7 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
                       if (!_formKey.currentState!.validate()) {
                         return;
                       }
-                      await userApi
+                      await auth
                           .sendOTPMail(emailCtrl.text,true);
                       Navigator.pushReplacement(
                         context,
@@ -203,8 +204,7 @@ class _SignUpWithEmailState extends State<SignUpWithEmail> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                );
-              }),
+                ),
             ],
           ),
         ),

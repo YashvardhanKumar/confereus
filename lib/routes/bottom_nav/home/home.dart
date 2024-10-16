@@ -15,14 +15,16 @@ import 'package:confereus/routes/bottom_nav/home/app_bar/profile.dart';
 import 'package:confereus/sockets/socket_stream.dart';
 import 'package:confereus/stream_socket.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
 import '../../../API/conference_api.dart';
 import '../../../common_pages/see_all_page.dart';
 import '../../../components/tiles/registered_event_tiles_small.dart';
 import '../../../components/tiles/unregistered_event_tiles_small.dart';
+import '../../../logo_page.dart';
 import '../../../models/user model/user_model.dart';
-
+final storage = GetStorage('user');
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 

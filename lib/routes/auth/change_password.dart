@@ -1,5 +1,8 @@
+import 'package:confereus/API/user_profile_api.dart';
+import 'package:confereus/controller/auth.controller.dart';
 import 'package:confereus/routes/auth/login_signup_page.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +23,7 @@ class _ChangePasswordState extends State<ChangePassword> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController passCtrl = TextEditingController();
   TextEditingController cnfPassCtrl = TextEditingController();
-
+  final auth = Get.find<AuthController>();
   bool isLoading = false;
 
   @override
@@ -63,7 +66,7 @@ class _ChangePasswordState extends State<ChangePassword> {
               const SizedBox(
                 height: 30,
               ),
-              Consumer<UserAPI>(builder: (context, userApi, _) {
+              Obx(() {
                 return CustomFilledButton(
                   isLoading: isLoading,
                   // margin: const EdgeInsets.all(10),
@@ -72,7 +75,7 @@ class _ChangePasswordState extends State<ChangePassword> {
 
                     setState(() {});
                     if (_formKey.currentState!.validate()) {
-                      await userApi
+                      await auth
                           .changePassword(widget.email, passCtrl.text)
                           .then((value) {
                         isLoading = false;
