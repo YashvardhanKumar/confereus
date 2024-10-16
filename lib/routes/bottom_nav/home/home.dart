@@ -152,6 +152,7 @@ class _HomeState extends State<Home> {
                                   (route) => false,
                                 );
                               },
+
                               child: const CustomText(
                                 'Sign Out',
                                 fontSize: 14,
